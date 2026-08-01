@@ -13,3 +13,7 @@ out/
 
 # packaged handoff file
 outputs/*.zip
+
+# local tooling
+.claude/
+tsconfig.tsbuildinfo
