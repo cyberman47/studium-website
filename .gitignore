@@ -1,0 +1,15 @@
+# dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# local environment files
+.env*
+
+# logs
+*.log
+
+# packaged handoff file
+outputs/*.zip
