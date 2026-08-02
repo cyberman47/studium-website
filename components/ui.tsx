@@ -36,6 +36,14 @@ export function AppleIcon({ size = 18, className = "" }: { size?: number; classN
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zm3.415-3.099c.836-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.71-.688 3.559-1.701z" /></svg>;
 }
 
+export function GooglePlayIcon({ size = 24, className = "" }: { size?: number; className?: string }) {
+  return <svg aria-hidden="true" viewBox="0 0 34 38" width={size} height={size} className={className}><path fill="#34A853" d="M3 2.2 20.5 19 3 35.8Z" /><path fill="#4285F4" d="m3 2.2 20.5 12.1-6 4.7Z" /><path fill="#FBBC04" d="m3 35.8 14.5-16 6 4.7Z" /><path fill="#EA4335" d="m23.5 14.3 6.6 3.9a1 1 0 0 1 0 1.6l-6.6 3.9-6-4.7Z" /></svg>;
+}
+
+export function TikTokIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z" /></svg>;
+}
+
 export function OAuthButtons({ actionLabel }: { actionLabel: string }) {
   const [notice, setNotice] = useState("");
   function handle(provider: string) {
