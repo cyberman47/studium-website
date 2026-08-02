@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, Sparkles } from "lucide-react";
 import { LogoMark } from "@/components/navigation";
-import { completeOnboarding, emptyAnswers, getUser, isOnboardingComplete, OnboardingAnswers } from "@/lib/onboarding";
+import { completeOnboarding, emptyAnswers, getUser, goalOptions, isOnboardingComplete, OnboardingAnswers, roleOptions, sourceOptions, studyMethodOptions, studyTimeOptions } from "@/lib/onboarding";
 
 type Question = {
   key: keyof Omit<OnboardingAnswers, "studyMethods">;
@@ -22,11 +22,11 @@ type Question = {
 };
 
 const questions: Question[] = [
-  { key: "role", question: "What best describes you?", options: ["Medical Student", "Pre-Med Student", "Nursing Student", "Pharmacy Student", "Dentistry Student", "Graduate Student", "University Student", "Other"] },
-  { key: "goal", question: "What is your main goal?", options: ["Pass Exams", "Learn Faster", "Stay Organized", "Improve My Grades", "Build Long-Term Knowledge"] },
-  { key: "studyTime", question: "How much time do you usually study each day?", options: ["Less than 30 minutes", "30–60 minutes", "1–2 hours", "2–4 hours", "More than 4 hours"] },
-  { key: "studyMethods", question: "How do you prefer to study?", subtext: "Select all that apply.", options: ["AI Tutor", "Flashcards", "Practice Questions", "Notes", "Mind Maps", "Videos"], multiple: true },
-  { key: "source", question: "How did you hear about Studium?", options: ["Google", "TikTok", "Instagram", "YouTube", "Friend", "School", "Reddit", "Other"] }
+  { key: "role", question: "What best describes you?", options: roleOptions },
+  { key: "goal", question: "What is your main goal?", options: goalOptions },
+  { key: "studyTime", question: "How much time do you usually study each day?", options: studyTimeOptions },
+  { key: "studyMethods", question: "How do you prefer to study?", subtext: "Select all that apply.", options: studyMethodOptions, multiple: true },
+  { key: "source", question: "How did you hear about Studium?", options: sourceOptions }
 ];
 
 const loadingMessages = ["Creating your personalized dashboard…", "Preparing your AI learning tools…", "Setting up your study profile…", "Almost ready…"];
