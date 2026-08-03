@@ -46,7 +46,7 @@ export function LanguageBar({ className = "" }: { className?: string }) {
 }
 export function LogoMark({ className = "h-8 w-8" }: { className?: string }) { return <Image src="/images/studium-logo.png" alt="Studium logo" width={64} height={64} className={`${className} rounded-[10px] object-cover shadow-sm`} priority />; }
 export function Wordmark({ className = "h-6 w-auto" }: { className?: string }) { return <Image src="/images/studium-wordmark.png" alt="Studium" width={920} height={230} className={className} priority />; }
-export function Logo() { return <Link href="/" className="flex cursor-pointer items-center gap-2"><LogoMark /><Wordmark /></Link>; }
+export function Logo({ href = "/" }: { href?: string }) { return <Link href={href} className="flex cursor-pointer items-center gap-2"><LogoMark /><Wordmark /></Link>; }
 export function Navigation() {
   const [open, setOpen] = useState(false); const [scrolled, setScrolled] = useState(false);
   useEffect(() => { const onScroll = () => setScrolled(window.scrollY > 12); onScroll(); window.addEventListener("scroll", onScroll); return () => window.removeEventListener("scroll", onScroll); }, []);

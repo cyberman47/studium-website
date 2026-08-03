@@ -1,10 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Bot, Brain, Clock3, Compass, FileQuestion, Layers, Play, Sparkles, Target } from "lucide-react";
+import { ArrowUpRight, Bot, Brain, CheckCircle2, Clock3, Compass, FileQuestion, Layers, Medal, Play, Sparkles, Stethoscope, Target } from "lucide-react";
 import { getOnboardingAnswers, getUser, OnboardingAnswers } from "@/lib/onboarding";
-import { getStreak, getTotalKP, getWeekLog, recordVisit, WeekDay } from "@/lib/progress";
+import { getLevelInfo, getStreak, getTotalKP, getWeekLog, LevelInfo, recordVisit, WeekDay } from "@/lib/progress";
+import { CaseAttempt, ClinicalCase, getCaseOfTheDay, getTodayCaseAttempt } from "@/lib/clinicalCases";
 import { StreakSummary } from "@/components/dashboard-shell";
+
+const difficultyClasses: Record<string, string> = {
+  Beginner: "bg-emerald-50 text-emerald-700",
+  Intermediate: "bg-amber-50 text-amber-700",
+  Advanced: "bg-rose-50 text-rose-700"
+};
 
 const weakAreas = [
   { label: "Renal System", accuracy: 48, tone: "rose" },
@@ -38,15 +45,22 @@ export default function DashboardHomePage() {
   const [streak, setStreak] = useState(0);
   const [totalKP, setTotalKP] = useState(0);
   const [week, setWeek] = useState<WeekDay[]>([]);
+  const [level, setLevel] = useState<LevelInfo | null>(null);
+  const [todaysCase, setTodaysCase] = useState<ClinicalCase | null>(null);
+  const [caseAttempt, setCaseAttempt] = useState<CaseAttempt | null>(null);
 
   useEffect(() => {
     const user = getUser();
     setName(user?.name?.split(" ")[0] || "there");
     setAnswers(getOnboardingAnswers());
     recordVisit();
+    const kp = getTotalKP();
     setStreak(getStreak());
-    setTotalKP(getTotalKP());
+    setTotalKP(kp);
     setWeek(getWeekLog());
+    setLevel(getLevelInfo(kp));
+    setTodaysCase(getCaseOfTheDay());
+    setCaseAttempt(getTodayCaseAttempt());
   }, []);
 
   const sessionDone = SESSION_TOTAL - SESSION_REMAINING;
@@ -80,6 +94,21 @@ export default function DashboardHomePage() {
             <a href="#" className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-accent-500 px-6 py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Resume Session<ArrowUpRight size={16} /></a>
           </div>
         </div>
+
+        {/* Clinical case of the day */}
+        {todaysCase && <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="eyebrow"><Stethoscope size={13} />Clinical Case of the Day</span>
+            {caseAttempt && <span className="flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-xs font-extrabold text-teal-700"><CheckCircle2 size={13} />Solved today</span>}
+          </div>
+          <h2 className="display mt-4 text-xl sm:text-2xl">{todaysCase.title}</h2>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-extrabold text-slate-600">{todaysCase.category}</span>
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-extrabold ${difficultyClasses[todaysCase.difficulty]}`}>{todaysCase.difficulty}</span>
+          </div>
+          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-slate-500">{todaysCase.stem}</p>
+          <a href="/dashboard/case-of-the-day" className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">{caseAttempt ? "Review your answer" : "Open case"}<ArrowUpRight size={15} /></a>
+        </div>}
 
         {/* Stat widgets */}
         <div className="grid gap-4 sm:grid-cols-3">
@@ -139,6 +168,11 @@ export default function DashboardHomePage() {
       <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
         <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft">
           <StreakSummary streak={streak} totalKP={totalKP} week={week} />
+          {level && <div className="mt-5 flex items-center gap-3 border-t border-slate-100 pt-5">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-teal-100 text-teal-700"><Medal size={18} /></span>
+            <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Level {level.level}</p><p className="truncate text-sm font-extrabold text-ink">{level.name}</p></div>
+          </div>}
+          <a href="/dashboard/progress" className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-accent-500 px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">View Your Progress<ArrowUpRight size={15} /></a>
         </div>
 
         {answers && (answers.role || answers.goal || answers.studyTime) && <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft">

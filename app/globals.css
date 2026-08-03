@@ -24,6 +24,8 @@
 
 @keyframes float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
 @keyframes pulse-ring { 0% { transform: scale(.85); opacity: .5 } 75%,100% { transform: scale(1.35); opacity: 0 } }
+@keyframes shimmer { 0% { background-position: -400px 0 } 100% { background-position: 400px 0 } }
 .float { animation: float 5s ease-in-out infinite; }
 .float-slow { animation: float 7s ease-in-out 1s infinite; }
 .pulse-ring { animation: pulse-ring 2.5s ease-out infinite; }
+.skeleton { background-image: linear-gradient(90deg, #eef2f4 25%, #e1e8eb 37%, #eef2f4 63%); background-size: 400px 100%; animation: shimmer 1.4s ease-in-out infinite; }

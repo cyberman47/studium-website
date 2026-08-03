@@ -13,7 +13,7 @@ const menuItems = [
   { label: "Help", icon: HelpCircle, href: "#" }
 ] as const;
 
-export function UserMenu({ name, onLogOut }: { name: string; onLogOut: () => void }) {
+export function UserMenu({ name, avatar, onLogOut }: { name: string; avatar?: string | null; onLogOut: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const initial = (name || "?").trim().charAt(0).toUpperCase();
@@ -31,7 +31,9 @@ export function UserMenu({ name, onLogOut }: { name: string; onLogOut: () => voi
 
   return <div ref={ref} className="relative">
     <button type="button" onClick={() => setOpen(o => !o)} aria-label="Account menu" aria-expanded={open} className="flex cursor-pointer items-center gap-1.5 rounded-full py-1 pl-1 pr-2 transition hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-teal-100">
-      <span className="grid h-9 w-9 place-items-center rounded-full bg-teal-100 text-sm font-extrabold text-teal-700">{initial}</span>
+      {avatar
+        ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={avatar} alt="" className="h-9 w-9 rounded-full object-cover" />
+        : <span className="grid h-9 w-9 place-items-center rounded-full bg-teal-100 text-sm font-extrabold text-teal-700">{initial}</span>}
       <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
     </button>
     <AnimatePresence>

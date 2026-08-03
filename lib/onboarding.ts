@@ -18,22 +18,40 @@ export const studyTimeOptions = ["Less than 30 minutes", "30â€“60 minutes", "1â€
 export const studyMethodOptions = ["AI Tutor", "Flashcards", "Practice Questions", "Notes", "Mind Maps", "Videos"];
 export const sourceOptions = ["Google", "TikTok", "Instagram", "YouTube", "Friend", "School", "Reddit", "Other"];
 
+export type User = { name: string; email: string; username: string; avatar: string | null; joinedAt: string };
+
+function defaultUsername(name: string, email: string): string {
+  const base = (name || email.split("@")[0] || "student").toLowerCase().replace(/[^a-z0-9]+/g, "");
+  return base || "student";
+}
+
 export function saveUser(name: string, email: string) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(USER_KEY, JSON.stringify({ name, email }));
+  const user: User = { name, email, username: defaultUsername(name, email), avatar: null, joinedAt: new Date().toISOString() };
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
   localStorage.removeItem(COMPLETE_KEY);
   localStorage.removeItem(ANSWERS_KEY);
 }
 
-export function updateUser(name: string, email: string) {
+export function updateUser(patch: Partial<User>) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(USER_KEY, JSON.stringify({ name, email }));
+  const current = getUser();
+  const next: User = { ...(current ?? { name: "", email: "", username: "", avatar: null, joinedAt: new Date().toISOString() }), ...patch };
+  localStorage.setItem(USER_KEY, JSON.stringify(next));
 }
 
-export function getUser(): { name: string; email: string } | null {
+export function getUser(): User | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(USER_KEY);
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+  const parsed = JSON.parse(raw);
+  return {
+    name: parsed.name ?? "",
+    email: parsed.email ?? "",
+    username: parsed.username ?? defaultUsername(parsed.name ?? "", parsed.email ?? ""),
+    avatar: parsed.avatar ?? null,
+    joinedAt: parsed.joinedAt ?? new Date().toISOString()
+  };
 }
 
 export function isOnboardingComplete(): boolean {
