@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, Brain, Home, Library, Map, Target, TrendingUp } from "lucide-react";
+import { BookA, Bot, Home, Library, Map, PenLine, TrendingUp } from "lucide-react";
 
 const navItems = [
   { label: "Home", href: "/dashboard", icon: Home },
   { label: "Learning Paths", href: "/dashboard/learning-paths", icon: Map },
   { label: "Library", href: "/dashboard/library", icon: Library },
-  { label: "AI Tutor", href: "/dashboard/ai-tutor", icon: Bot },
-  { label: "Flashcards", href: "/dashboard/flashcards", icon: Brain },
-  { label: "Progress", href: "/dashboard/progress", icon: TrendingUp },
-  { label: "Study Plan", href: "/dashboard/study-plan", icon: Target }
+  { label: "Create", href: "/dashboard/create", icon: PenLine },
+  { label: "Terminology", href: "/dashboard/terminology", icon: BookA },
+  { label: "Studium AI", href: "/dashboard/ai-tutor", icon: Bot },
+  { label: "Progress", href: "/dashboard/progress", icon: TrendingUp }
 ];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {

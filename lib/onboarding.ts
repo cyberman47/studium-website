@@ -1,5 +1,6 @@
 export type OnboardingAnswers = {
   role: string | null;
+  currentPath: string | null;
   goal: string | null;
   studyTime: string | null;
   studyMethods: string[];
@@ -10,7 +11,7 @@ const USER_KEY = "studium_user";
 const ANSWERS_KEY = "studium_onboarding_answers";
 const COMPLETE_KEY = "studium_onboarding_complete";
 
-export const emptyAnswers: OnboardingAnswers = { role: null, goal: null, studyTime: null, studyMethods: [], source: null };
+export const emptyAnswers: OnboardingAnswers = { role: null, currentPath: null, goal: null, studyTime: null, studyMethods: [], source: null };
 
 export const roleOptions = ["Medical Student", "Pre-Med Student", "Nursing Student", "Pharmacy Student", "Dentistry Student", "Graduate Student", "University Student", "Other"];
 export const goalOptions = ["Pass Exams", "Learn Faster", "Stay Organized", "Improve My Grades", "Build Long-Term Knowledge"];

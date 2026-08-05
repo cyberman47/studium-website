@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Award, Bone, BookOpen, Bot, Brain, CheckCircle2, ClipboardCheck, Clock3, Flame,
+  Award, Bone, BookA, BookOpen, Bot, Brain, CheckCircle2, ClipboardCheck, Clock3, Flame,
   FileText, GraduationCap, HeartPulse, Layers, Lock, Medal, PartyPopper, Sparkles, Star, Stethoscope, Target, Trophy
 } from "lucide-react";
 import { Reveal } from "@/components/ui";
@@ -13,6 +13,7 @@ import {
   getAchievements, getAverageQuizScore, getDaysActive, getLevelInfo, getLongestStreak, getRewardsStatus, getStats,
   getStreak, getTotalHours, getTotalKP, getWeeklyActivity, LevelInfo, levelDefs, recordVisit, rewardDefs, Stats
 } from "@/lib/progress";
+import { getTerminologyStats, TerminologyStats } from "@/lib/terminology";
 
 const rewardIcons: Record<string, typeof Flame> = {
   dailyLogin: Flame,
@@ -21,6 +22,7 @@ const rewardIcons: Record<string, typeof Flame> = {
   aiQuiz: ClipboardCheck,
   dailyGoal: Target,
   clinicalCase: Stethoscope,
+  termsReviewed: BookA,
   streak7: Trophy,
   streak30: Award
 };
@@ -36,8 +38,9 @@ const achievementIcons: Record<string, typeof Flame> = {
   cardiologyExpert: HeartPulse
 };
 
-const emptyStats: Stats = { studySessions: 0, flashcardsCompleted: 0, aiQuizzesCompleted: 0, studyMinutes: 0, notesCreated: 0, aiChats: 0, quizScores: [], longestSessionMinutes: 0, casesCompleted: 0 };
+const emptyStats: Stats = { studySessions: 0, flashcardsCompleted: 0, aiQuizzesCompleted: 0, studyMinutes: 0, notesCreated: 0, aiChats: 0, quizScores: [], longestSessionMinutes: 0, casesCompleted: 0, lessonsCreated: 0, flashcardsCreated: 0, quizzesCreated: 0, materialsUploaded: 0 };
 const emptyWeekly = { minutes: 0, flashcards: 0, notes: 0, aiChats: 0, quizzes: 0 };
+const emptyTermStats: TerminologyStats = { totalLearned: 0, masteredCount: 0, dueForReview: 0, masteryPercent: 0, todayCount: 0, dailyGoal: 20 };
 
 export default function ProgressPage() {
   const [totalKP, setTotalKP] = useState(0);
@@ -51,6 +54,7 @@ export default function ProgressPage() {
   const [totalHours, setTotalHours] = useState(0);
   const [rewardsStatus, setRewardsStatus] = useState<Record<string, boolean>>({});
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [termStats, setTermStats] = useState<TerminologyStats>(emptyTermStats);
 
   const [floatingReward, setFloatingReward] = useState<{ id: string; amount: number } | null>(null);
   const [justUnlockedIds, setJustUnlockedIds] = useState<Set<string>>(new Set());
@@ -69,6 +73,7 @@ export default function ProgressPage() {
     setTotalHours(getTotalHours());
     setRewardsStatus(getRewardsStatus());
     setAchievements(getAchievements());
+    setTermStats(getTerminologyStats());
   }
 
   useEffect(() => {
@@ -126,6 +131,12 @@ export default function ProgressPage() {
     { label: "Average Quiz Score", value: avgQuizScore !== null ? `${avgQuizScore}%` : "—" },
     { label: "Longest Study Session", value: `${stats.longestSessionMinutes} min` },
     { label: "Clinical Cases Solved", value: stats.casesCompleted.toLocaleString() },
+    { label: "Terms Learned", value: termStats.totalLearned.toLocaleString() },
+    { label: "Terms Mastered", value: termStats.masteredCount.toLocaleString() },
+    { label: "Lessons Created", value: stats.lessonsCreated.toLocaleString() },
+    { label: "Flashcards Created", value: stats.flashcardsCreated.toLocaleString() },
+    { label: "Quizzes Created", value: stats.quizzesCreated.toLocaleString() },
+    { label: "Materials Uploaded", value: stats.materialsUploaded.toLocaleString() },
     { label: "Current Streak", value: `${streak} days` },
     { label: "Longest Streak", value: `${longestStreak} days` }
   ];
@@ -188,7 +199,8 @@ export default function ProgressPage() {
           const completed = !!rewardsStatus[reward.id];
           const isCase = reward.id === "clinicalCase";
           const isPlan = reward.id === "dailyGoal";
-          const claimable = reward.kind === "daily" && reward.id !== "dailyLogin" && !isCase && !isPlan && !completed;
+          const isTerms = reward.id === "termsReviewed";
+          const claimable = reward.kind === "daily" && reward.id !== "dailyLogin" && !isCase && !isPlan && !isTerms && !completed;
           return <div key={reward.id} className="relative flex flex-wrap items-center gap-4 border-b border-slate-100 py-4 last:border-0 last:pb-0">
             <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${completed ? "bg-teal-100 text-teal-700" : "bg-slate-100 text-slate-400"}`}><Icon size={19} /></span>
             <div className="min-w-0 flex-1">
@@ -200,8 +212,10 @@ export default function ProgressPage() {
               : isCase && !completed
                 ? <Link href="/dashboard/case-of-the-day" className="shrink-0 cursor-pointer rounded-full bg-accent-500 px-4 py-2 text-xs font-extrabold text-white shadow-[0_10px_20px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Open case</Link>
                 : isPlan && !completed
-                  ? <Link href="/dashboard/study-plan" className="shrink-0 cursor-pointer rounded-full bg-accent-500 px-4 py-2 text-xs font-extrabold text-white shadow-[0_10px_20px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">View plan</Link>
-                  : completed
+                  ? <Link href="/dashboard" className="shrink-0 cursor-pointer rounded-full bg-accent-500 px-4 py-2 text-xs font-extrabold text-white shadow-[0_10px_20px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">View plan</Link>
+                  : isTerms && !completed
+                    ? <Link href="/dashboard/terminology/review" className="shrink-0 cursor-pointer rounded-full bg-accent-500 px-4 py-2 text-xs font-extrabold text-white shadow-[0_10px_20px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Review terms</Link>
+                    : completed
                     ? <span className="flex shrink-0 items-center gap-1.5 text-xs font-extrabold text-teal-600"><CheckCircle2 size={16} />{reward.kind === "milestone" ? "Unlocked" : "Done today"}</span>
                     : <span className="shrink-0 text-xs font-bold text-slate-400">Not yet</span>}
             <AnimatePresence>

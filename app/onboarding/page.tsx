@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, Sparkles } from "lucide-react";
 import { LogoMark } from "@/components/navigation";
 import { completeOnboarding, emptyAnswers, getUser, goalOptions, isOnboardingComplete, OnboardingAnswers, roleOptions, sourceOptions, studyMethodOptions, studyTimeOptions } from "@/lib/onboarding";
+import { currentPathLabels, labelToPathId, setCurrentPathId } from "@/lib/currentPath";
 
 type Question = {
   key: keyof Omit<OnboardingAnswers, "studyMethods">;
@@ -23,6 +24,7 @@ type Question = {
 
 const questions: Question[] = [
   { key: "role", question: "What best describes you?", options: roleOptions },
+  { key: "currentPath", question: "What are you currently studying?", subtext: "This becomes your default Learning Path—you can change it anytime.", options: currentPathLabels },
   { key: "goal", question: "What is your main goal?", options: goalOptions },
   { key: "studyTime", question: "How much time do you usually study each day?", options: studyTimeOptions },
   { key: "studyMethods", question: "How do you prefer to study?", subtext: "Select all that apply.", options: studyMethodOptions, multiple: true },
@@ -151,6 +153,8 @@ function LoadingScreen({ answers }: { answers: OnboardingAnswers }) {
     const messageTimer = setInterval(() => setMessageIndex(i => Math.min(i + 1, loadingMessages.length - 1)), 1150);
     const redirectTimer = setTimeout(() => {
       completeOnboarding(answers);
+      const pathId = labelToPathId(answers.currentPath);
+      if (pathId) setCurrentPathId(pathId);
       router.replace("/dashboard");
     }, 4600);
 

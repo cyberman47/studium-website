@@ -2,20 +2,16 @@
 
 import { useState } from "react";
 import {
-  ArrowUpRight, Bone, Brain, ClipboardCheck, FlaskConical, GraduationCap,
-  HeartHandshake, HeartPulse, Map, Pill, Search, Smile, Sparkles
+  ArrowUpRight, Bone, ClipboardCheck, GraduationCap,
+  HeartHandshake, HeartPulse, Map, Search, Sparkles
 } from "lucide-react";
 import { inputClass } from "@/components/ui";
 
 const categories = [
-  { name: "Medical School", icon: GraduationCap, color: "bg-teal-100 text-teal-700" },
-  { name: "MCAT", icon: ClipboardCheck, color: "bg-violet-100 text-violet-600" },
-  { name: "Nursing", icon: HeartHandshake, color: "bg-pink-100 text-pink-600" },
-  { name: "Dentistry", icon: Smile, color: "bg-sky-100 text-sky-600" },
-  { name: "Pharmacy", icon: Pill, color: "bg-amber-100 text-amber-600" },
-  { name: "Neuroscience", icon: Brain, color: "bg-indigo-100 text-indigo-600" },
-  { name: "Biochemistry", icon: FlaskConical, color: "bg-emerald-100 text-emerald-600" },
-  { name: "Anatomy", icon: Bone, color: "bg-red-100 text-red-600" }
+  { name: "Medical School", icon: GraduationCap, color: "bg-teal-100 text-teal-700", href: "/dashboard/learning-paths/medical-school" },
+  { name: "MCAT", icon: ClipboardCheck, color: "bg-violet-100 text-violet-600", href: "/dashboard/learning-paths/mcat" },
+  { name: "Nursing", icon: HeartHandshake, color: "bg-pink-100 text-pink-600", href: "/dashboard/learning-paths/nursing" },
+  { name: "Anatomy", icon: Bone, color: "bg-red-100 text-red-600", href: "/dashboard/learning-paths/anatomy" }
 ];
 
 export default function LearningPathsPage() {
@@ -54,7 +50,7 @@ export default function LearningPathsPage() {
       <h2 className="text-lg font-extrabold tracking-tight">Browse</h2>
       {filtered.length > 0
         ? <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {filtered.map(cat => <a key={cat.name} href="#" className="group flex cursor-pointer flex-col items-center gap-3 rounded-3xl border border-slate-100 bg-white p-5 text-center shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+          {filtered.map(cat => <a key={cat.name} href={cat.href} className="group flex cursor-pointer flex-col items-center gap-3 rounded-3xl border border-slate-100 bg-white p-5 text-center shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
             <span className={`grid h-12 w-12 place-items-center rounded-2xl transition group-hover:scale-105 ${cat.color}`}><cat.icon size={22} /></span>
             <p className="text-sm font-extrabold text-ink">{cat.name}</p>
           </a>)}

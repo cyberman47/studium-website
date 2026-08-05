@@ -110,6 +110,10 @@ export type Stats = {
   quizScores: number[];
   longestSessionMinutes: number;
   casesCompleted: number;
+  lessonsCreated: number;
+  flashcardsCreated: number;
+  quizzesCreated: number;
+  materialsUploaded: number;
 };
 
 const defaultStats: Stats = {
@@ -121,7 +125,11 @@ const defaultStats: Stats = {
   aiChats: 0,
   quizScores: [],
   longestSessionMinutes: 0,
-  casesCompleted: 0
+  casesCompleted: 0,
+  lessonsCreated: 0,
+  flashcardsCreated: 0,
+  quizzesCreated: 0,
+  materialsUploaded: 0
 };
 
 export function getStats(): Stats {
@@ -133,6 +141,28 @@ export function getStats(): Stats {
 function saveStats(stats: Stats) {
   if (typeof window === "undefined") return;
   localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+}
+
+// ---- Create feature tracking ----
+
+export function recordLessonCreated() {
+  const s = getStats();
+  saveStats({ ...s, lessonsCreated: s.lessonsCreated + 1 });
+}
+
+export function recordFlashcardsCreated(count: number) {
+  const s = getStats();
+  saveStats({ ...s, flashcardsCreated: s.flashcardsCreated + count });
+}
+
+export function recordQuizCreated() {
+  const s = getStats();
+  saveStats({ ...s, quizzesCreated: s.quizzesCreated + 1 });
+}
+
+export function recordMaterialUploaded() {
+  const s = getStats();
+  saveStats({ ...s, materialsUploaded: s.materialsUploaded + 1 });
 }
 
 export function getTotalHours(): number {
@@ -187,6 +217,22 @@ export function getWeeklyActivity(): DailyActivity {
     totals.quizzes += entry.quizzes;
   }
   return totals;
+}
+
+export type DailyActivityPoint = DailyActivity & { label: string; date: string; isToday: boolean };
+
+export function getWeeklyActivityByDay(): DailyActivityPoint[] {
+  const map = getDailyActivityMap();
+  const today = new Date();
+  const monday = mondayOf(today);
+  const labels = ["M", "T", "W", "T", "F", "S", "S"];
+  return labels.map((label, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const key = toDateKey(d);
+    const entry = map[key] ?? emptyActivity;
+    return { ...entry, label, date: key, isToday: key === toDateKey(today) };
+  });
 }
 
 // ---- Study Plan ----
@@ -338,6 +384,7 @@ export const rewardDefs: RewardDef[] = [
   { id: "aiQuiz", title: "Complete an AI Quiz", kp: 35, kind: "daily", description: "Finish a quiz from your AI tutor." },
   { id: "dailyGoal", title: "Reach Daily Study Goal", kp: 50, kind: "daily", description: "Complete all three of today's Study Plan goals. This is what keeps your streak alive." },
   { id: "clinicalCase", title: "Solve the Clinical Case of the Day", kp: 30, kind: "daily", description: "Work through today's clinical vignette." },
+  { id: "termsReviewed", title: "Hit Your Daily Terminology Goal", kp: 20, kind: "daily", description: "Learn or review your daily terminology goal." },
   { id: "streak7", title: "Maintain a 7-Day Streak", kp: 100, kind: "milestone", description: "Awarded automatically once your streak reaches 7 days." },
   { id: "streak30", title: "Maintain a 30-Day Streak", kp: 500, kind: "milestone", description: "Awarded automatically once your streak reaches 30 days." }
 ];
@@ -383,6 +430,7 @@ export function getRewardsStatus(): Record<string, boolean> {
     aiQuiz: claimed.has("aiQuiz"),
     dailyGoal: claimed.has("dailyGoal"),
     clinicalCase: claimed.has("clinicalCase"),
+    termsReviewed: claimed.has("termsReviewed"),
     streak7: milestones.streak7,
     streak30: milestones.streak30
   };
@@ -469,6 +517,29 @@ export function claimDailyGoal(): ClaimResult {
 
 export function claimClinicalCase(): ClaimResult {
   return claim("clinicalCase", 30, s => ({ ...s, casesCompleted: s.casesCompleted + 1 }));
+}
+
+export function claimTerminologyGoal(): ClaimResult {
+  return claim("termsReviewed", 20, s => s);
+}
+
+// Awards KP for completing a Learning Path lesson. Unlike the daily rewards above,
+// this isn't capped to once per day—each lesson you finish earns its own KP.
+export function awardLessonKP(kp: number): ClaimResult {
+  const beforeTotal = getTotalKP();
+  const beforeLevel = getLevelInfo(beforeTotal).level;
+  const totalKP = addKP(kp);
+  const toLevel = getLevelInfo(totalKP).level;
+  const achievements = getAchievements();
+  return {
+    awarded: true,
+    kpAwarded: kp,
+    totalKP,
+    leveledUp: toLevel > beforeLevel,
+    fromLevel: beforeLevel,
+    toLevel,
+    newlyUnlockedAchievements: achievements.filter(a => a.justUnlocked).map(a => a.id)
+  };
 }
 
 // ---- Achievements ----

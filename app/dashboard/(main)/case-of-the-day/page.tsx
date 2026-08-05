@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, Check, CheckCircle2, PartyPopper, Stethoscope, X } from "lucide-react";
 import { CaseAttempt, getCaseOfTheDay, getTodayCaseAttempt, submitCaseAnswer } from "@/lib/clinicalCases";
 import { claimClinicalCase, getLevelInfo } from "@/lib/progress";
+import { InteractiveText } from "@/components/interactive-text";
 
 const difficultyClasses: Record<string, string> = {
   Beginner: "bg-emerald-50 text-emerald-700",
@@ -57,7 +58,7 @@ export default function CaseOfTheDayPage() {
 
     <div className="mt-8 max-w-2xl space-y-6">
       <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
-        <p className="text-sm leading-relaxed text-slate-600">{todaysCase.stem}</p>
+        <p className="text-sm leading-relaxed text-slate-600"><InteractiveText text={todaysCase.stem} /></p>
       </div>
 
       <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">

@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/navigation";
-import { KnowledgePoints, UserMenu } from "@/components/dashboard-shell";
+import { LearningPathSwitcher, NotificationsBell, StudyStreak, UserMenu } from "@/components/dashboard-shell";
+import { CommandSearch } from "@/components/command-search";
+import { TermPanelProvider } from "@/components/term-panel";
 import { getUser } from "@/lib/onboarding";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -24,10 +26,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push("/");
   }
 
-  return <div className="min-h-screen bg-[#fcfdfd]">
-    <header className="border-b border-slate-200 bg-slate-50 py-4">
-      <div className="dashboard-shell flex items-center justify-between"><Logo href="/dashboard" /><div className="flex items-center gap-3"><KnowledgePoints /><UserMenu name={name} avatar={avatar} onLogOut={logOut} /></div></div>
-    </header>
-    {children}
-  </div>;
+  return <TermPanelProvider>
+    <div className="min-h-screen bg-[#fcfdfd]">
+      <header className="border-b border-slate-200 bg-slate-50 py-4">
+        <div className="dashboard-shell flex items-center justify-between gap-4"><Logo href="/dashboard" /><div className="flex flex-1 justify-center"><CommandSearch /></div><div className="flex items-center gap-3"><LearningPathSwitcher /><StudyStreak /><NotificationsBell /><UserMenu name={name} avatar={avatar} onLogOut={logOut} /></div></div>
+      </header>
+      {children}
+    </div>
+  </TermPanelProvider>;
 }

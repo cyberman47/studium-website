@@ -1,16 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Bot, Brain, CheckCircle2, Clock3, Compass, FileQuestion, Layers, Medal, Play, Sparkles, Stethoscope, Target } from "lucide-react";
-import { getOnboardingAnswers, getUser, OnboardingAnswers } from "@/lib/onboarding";
-import { getLevelInfo, getStreak, getTotalKP, getWeekLog, LevelInfo, recordVisit, WeekDay } from "@/lib/progress";
+import Link from "next/link";
+import { ArrowUpRight, BookOpen, ChevronRight, Flame, HelpCircle, Layers, Play, Stethoscope, Zap } from "lucide-react";
+import { getUser } from "@/lib/onboarding";
+import { getLevelInfo, getStreak, getStudyPlanProgress, getTotalKP, LevelInfo, recordVisit, StudyPlanProgress } from "@/lib/progress";
 import { CaseAttempt, ClinicalCase, getCaseOfTheDay, getTodayCaseAttempt } from "@/lib/clinicalCases";
-import { StreakSummary } from "@/components/dashboard-shell";
+import { CURRENT_PATH_EVENT, CurrentPathId, findCurrentPathDef, getCurrentPathId, pathEmoji } from "@/lib/currentPath";
+import { findSubject, getLessonStatus } from "@/lib/mcatPath";
+import { getTerminologyStats, TerminologyStats } from "@/lib/terminology";
+import { getTodaysStudyPlan, TodaysStudyPlan } from "@/lib/studyPlan";
+import { StudyPlanCard } from "@/components/study-plan-card";
+
+const pathRecommendations: Record<CurrentPathId, { label: string; href: string }[]> = {
+  "medical-school": [
+    { label: "Cardiovascular Physiology", href: "/dashboard/learning-paths/medical-school/physiology" },
+    { label: "Pharmacology Review", href: "/dashboard/learning-paths/medical-school/pharmacology" },
+    { label: "Clinical Case: Heart Failure", href: "/dashboard/case-of-the-day" }
+  ],
+  mcat: [
+    { label: "Cell Biology", href: "/dashboard/learning-paths/mcat/bio-biochem/biology" },
+    { label: "Organic Chemistry", href: "/dashboard/learning-paths/mcat/chem-phys" },
+    { label: "CARS Practice", href: "/dashboard/learning-paths/mcat/cars" }
+  ],
+  nursing: [
+    { label: "Clinical Skills", href: "/dashboard/learning-paths/nursing/clinical-skills" },
+    { label: "Pharmacology", href: "/dashboard/learning-paths/nursing/pharmacology" },
+    { label: "NCLEX Preparation", href: "/dashboard/learning-paths/nursing/nclex-preparation" }
+  ],
+  dentistry: [{ label: "Browse Learning Paths", href: "/dashboard/learning-paths" }],
+  pharmacy: [{ label: "Browse Learning Paths", href: "/dashboard/learning-paths" }],
+  "biomedical-sciences": [{ label: "Browse Learning Paths", href: "/dashboard/learning-paths" }],
+  other: [{ label: "Browse Learning Paths", href: "/dashboard/learning-paths" }]
+};
 
 const difficultyClasses: Record<string, string> = {
-  Beginner: "bg-emerald-50 text-emerald-700",
-  Intermediate: "bg-amber-50 text-amber-700",
-  Advanced: "bg-rose-50 text-rose-700"
+  Beginner: "bg-emerald-500/15 text-emerald-300",
+  Intermediate: "bg-amber-500/15 text-amber-300",
+  Advanced: "bg-rose-500/15 text-rose-300"
 };
 
 const weakAreas = [
@@ -25,12 +52,9 @@ const toneClasses: Record<string, { bar: string; text: string }> = {
   emerald: { bar: "bg-emerald-500", text: "text-emerald-600" }
 };
 
-const MCAT_TOTAL_DAYS = 180;
-const MCAT_DAYS_LEFT = 120;
-const CARDS_DUE = 42;
-const MASTERY_PERCENT = 65;
-const SESSION_TOTAL = 40;
-const SESSION_REMAINING = 25;
+const cardClass = "rounded-3xl border border-black/[0.06] bg-white shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]";
+
+type NextLesson = { id: string; title: string; completedCount: number; total: number };
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -41,168 +65,182 @@ function getGreeting(): string {
 
 export default function DashboardHomePage() {
   const [name, setName] = useState("");
-  const [answers, setAnswers] = useState<OnboardingAnswers | null>(null);
   const [streak, setStreak] = useState(0);
   const [totalKP, setTotalKP] = useState(0);
-  const [week, setWeek] = useState<WeekDay[]>([]);
   const [level, setLevel] = useState<LevelInfo | null>(null);
   const [todaysCase, setTodaysCase] = useState<ClinicalCase | null>(null);
   const [caseAttempt, setCaseAttempt] = useState<CaseAttempt | null>(null);
+  const [pathId, setPathId] = useState<CurrentPathId | null>(null);
+  const [nextLesson, setNextLesson] = useState<NextLesson | null>(null);
+  const [term, setTerm] = useState<TerminologyStats | null>(null);
+  const [planProgress, setPlanProgress] = useState<StudyPlanProgress | null>(null);
+  const [plan, setPlan] = useState<TodaysStudyPlan | null>(null);
+
+  function refresh() {
+    const kp = getTotalKP();
+    setStreak(getStreak());
+    setTotalKP(kp);
+    setLevel(getLevelInfo(kp));
+    setTodaysCase(getCaseOfTheDay());
+    setCaseAttempt(getTodayCaseAttempt());
+    const currentPath = getCurrentPathId();
+    setPathId(currentPath);
+    setTerm(getTerminologyStats());
+    setPlanProgress(getStudyPlanProgress());
+    setPlan(getTodaysStudyPlan(currentPath));
+
+    const biology = findSubject("bio-biochem", "biology");
+    if (biology) {
+      const ids = biology.lessons.map(l => l.id);
+      const completedCount = ids.filter(id => getLessonStatus(ids, id) === "completed").length;
+      const next = biology.lessons.find(l => getLessonStatus(ids, l.id) !== "locked" && getLessonStatus(ids, l.id) !== "completed");
+      setNextLesson(next ? { id: next.id, title: next.title, completedCount, total: ids.length } : { id: "", title: "", completedCount, total: ids.length });
+    }
+  }
 
   useEffect(() => {
     const user = getUser();
     setName(user?.name?.split(" ")[0] || "there");
-    setAnswers(getOnboardingAnswers());
     recordVisit();
-    const kp = getTotalKP();
-    setStreak(getStreak());
-    setTotalKP(kp);
-    setWeek(getWeekLog());
-    setLevel(getLevelInfo(kp));
-    setTodaysCase(getCaseOfTheDay());
-    setCaseAttempt(getTodayCaseAttempt());
+    refresh();
+
+    function onPathChange() { refresh(); }
+    window.addEventListener(CURRENT_PATH_EVENT, onPathChange);
+    return () => window.removeEventListener(CURRENT_PATH_EVENT, onPathChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sessionDone = SESSION_TOTAL - SESSION_REMAINING;
-  const sessionPercent = Math.round((sessionDone / SESSION_TOTAL) * 100);
+  const currentPathDef = findCurrentPathDef(pathId);
+  const recommendations = pathId ? pathRecommendations[pathId] : null;
+  const lessonsCompleted = nextLesson?.completedCount ?? 0;
 
-  const launchTiles = [
-    { title: "AI Tutor", subtitle: "Ask about today's topics", icon: Bot, href: "/dashboard/ai-tutor", color: "bg-violet-100 text-violet-600" },
-    { title: "Flashcard Decks", subtitle: `${CARDS_DUE} cards due`, icon: Layers, href: "/dashboard/flashcards", color: "bg-teal-100 text-teal-700" },
-    { title: "Q-Banks", subtitle: "3 practice sets available", icon: FileQuestion, href: "#", color: "bg-amber-100 text-amber-600" }
-  ];
+  return <section className="relative bg-[#F8FAFC] py-8 sm:py-10">
+    <div className="absolute inset-x-0 top-0 -z-10 h-[220px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
 
-  return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
-    <span className="eyebrow"><Sparkles size={13} />Your dashboard</span>
-    <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">{getGreeting()}, {name} 🩺</h1>
+    {/* Compact greeting */}
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <span className="eyebrow">YOUR DASHBOARD</span>
+        <h1 className="display mt-2 text-[22px] leading-tight sm:text-2xl">{getGreeting()}, {name} 👋</h1>
+      </div>
+      {currentPathDef
+        ? <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3.5 py-1.5 text-xs font-bold text-ink shadow-sm">{pathId && pathEmoji[pathId]} {currentPathDef.label}</span>
+        : <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3.5 py-1.5 text-xs font-bold text-slate-400 shadow-sm">Pick a path from the menu above</span>}
+    </div>
 
-    <div className="mt-10 grid gap-6 xl:grid-cols-[1fr_340px] xl:items-start xl:gap-8">
-      {/* Main feed */}
-      <div className="min-w-0 space-y-8">
-        {/* Hero: Jump back in */}
-        <div className="relative overflow-hidden rounded-3xl bg-ink p-7 text-white shadow-lift sm:p-8">
-          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-teal-500/20 blur-3xl" />
-          <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+    <div className="mt-6 space-y-6">
+      {/* Top row: Continue Studying (50%) · Progress (25%) · Daily Case (25%) */}
+      <div className="grid gap-4 lg:grid-cols-4">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F8B8D] to-[#0b6467] p-6 text-white shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] lg:col-span-2">
+          <div className="absolute -right-14 -top-14 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+          <div className="relative">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white/90">⚡ Continue Studying</span>
+            {nextLesson?.id ? <>
+              <h2 className="display mt-4 text-2xl">{nextLesson.title}</h2>
+              <p className="mt-1.5 text-sm text-white/75">Next lesson · {nextLesson.completedCount} / {nextLesson.total} in Biology</p>
+              <Link href={`/dashboard/learning-paths/mcat/bio-biochem/biology/${nextLesson.id}`} className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-[#0c6c6e] shadow-lg transition hover:-translate-y-0.5">
+                <Play size={13} fill="currentColor" />Resume
+              </Link>
+            </> : <>
+              <h2 className="display mt-4 text-2xl">{currentPathDef ? `Continue ${currentPathDef.label}` : "Choose your learning path"}</h2>
+              <p className="mt-1.5 max-w-sm text-sm text-white/75">{currentPathDef ? "Explore your path to pick up where you left off." : "Pick what you're studying from the menu above to get a personalized plan."}</p>
+              <Link href={currentPathDef ? currentPathDef.href : "/dashboard/learning-paths"} className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-[#0c6c6e] shadow-lg transition hover:-translate-y-0.5">
+                <Play size={13} fill="currentColor" />Resume
+              </Link>
+            </>}
+          </div>
+        </div>
+
+        <div className={`${cardClass} p-5 lg:col-span-1`}>
+          <span className="eyebrow">🏆 Progress</span>
+          <div className="mt-4 flex items-center gap-4">
+            <MiniRing percent={plan?.percent ?? 0} size={58} stroke={6} />
             <div className="min-w-0">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-teal-300"><Play size={11} fill="currentColor" />Jump back in</span>
-              <h2 className="display mt-4 text-2xl sm:text-3xl">Cardiac Physiology</h2>
-              <p className="mt-2 text-sm text-slate-300">{SESSION_REMAINING} questions remaining in this set</p>
-              <div className="mt-4 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-teal-400" style={{ width: `${sessionPercent}%` }} /></div>
-              <p className="mt-1.5 text-xs text-slate-400">{sessionDone} of {SESSION_TOTAL} complete</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Level {level?.level ?? 1}</p>
+              <p className="truncate text-sm font-extrabold text-ink">{level?.name ?? "Beginner"}</p>
             </div>
-            <a href="#" className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-accent-500 px-6 py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Resume Session<ArrowUpRight size={16} /></a>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-sm">
+            <span className="flex items-center gap-1.5 font-bold text-ink"><Zap size={14} className="text-teal-600" fill="currentColor" />{totalKP} pts</span>
+            <span className="flex items-center gap-1.5 font-bold text-ink"><Flame size={14} className="text-amber-500" fill="currentColor" />{streak} day{streak === 1 ? "" : "s"}</span>
           </div>
         </div>
 
-        {/* Clinical case of the day */}
-        {todaysCase && <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="eyebrow"><Stethoscope size={13} />Clinical Case of the Day</span>
-            {caseAttempt && <span className="flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-xs font-extrabold text-teal-700"><CheckCircle2 size={13} />Solved today</span>}
+        {todaysCase && <div className="relative overflow-hidden rounded-3xl bg-[#0F172A] p-5 text-white shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] lg:col-span-1">
+          <Stethoscope size={110} className="pointer-events-none absolute -right-6 -top-6 text-white/5" />
+          <div className="relative">
+            <span className="text-[10px] font-extrabold uppercase tracking-wide text-teal-300">Daily Clinical Case</span>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-extrabold text-white/80">{todaysCase.category}</span>
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${difficultyClasses[todaysCase.difficulty]}`}>{todaysCase.difficulty}</span>
+            </div>
+            <h3 className="mt-2.5 line-clamp-2 text-sm font-extrabold leading-snug">{todaysCase.title}</h3>
+            <Link href="/dashboard/case-of-the-day" className="mt-3 inline-flex cursor-pointer items-center gap-1 text-xs font-extrabold text-teal-300 transition hover:text-teal-200">{caseAttempt ? "Review answer" : "Open case"}<ArrowUpRight size={13} /></Link>
           </div>
-          <h2 className="display mt-4 text-xl sm:text-2xl">{todaysCase.title}</h2>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-extrabold text-slate-600">{todaysCase.category}</span>
-            <span className={`rounded-full px-2.5 py-1 text-[11px] font-extrabold ${difficultyClasses[todaysCase.difficulty]}`}>{todaysCase.difficulty}</span>
-          </div>
-          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-slate-500">{todaysCase.stem}</p>
-          <a href="/dashboard/case-of-the-day" className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">{caseAttempt ? "Review your answer" : "Open case"}<ArrowUpRight size={15} /></a>
         </div>}
+      </div>
 
-        {/* Stat widgets */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="flex flex-col items-center rounded-3xl border border-slate-100 bg-white p-5 text-center shadow-soft">
-            <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Target size={13} />MCAT Countdown</div>
-            <div className="mt-3"><RingStat percent={(MCAT_DAYS_LEFT / MCAT_TOTAL_DAYS) * 100} value={MCAT_DAYS_LEFT} /></div>
-            <p className="mt-2 text-xs text-slate-500">days remaining</p>
-          </div>
-          <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
-            <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Brain size={13} />Cardiology Mastery</div>
-            <p className="mt-3 text-3xl font-extrabold text-ink">{MASTERY_PERCENT}%</p>
-            <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500" style={{ width: `${MASTERY_PERCENT}%` }} /></div>
-            <p className="mt-2 text-xs text-slate-500">+8% this week</p>
-          </div>
-          <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
-            <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Layers size={13} />Cards Due</div>
-            <div className="mt-4 flex items-center gap-4">
-              <div className="relative h-12 w-14 shrink-0">
-                <div className="absolute inset-0 translate-x-1.5 translate-y-1.5 rounded-lg border-2 border-teal-100 bg-white" />
-                <div className="absolute inset-0 translate-x-[3px] translate-y-[3px] rounded-lg border-2 border-teal-200 bg-white" />
-                <div className="absolute inset-0 grid place-items-center rounded-lg border-2 border-teal-500 bg-teal-50 text-sm font-extrabold text-teal-700">{CARDS_DUE}</div>
-              </div>
-              <a href="/dashboard/flashcards" className="cursor-pointer text-sm font-bold text-teal-600 transition hover:text-teal-700">Review now →</a>
-            </div>
-          </div>
-        </div>
+      {/* Today's Study Plan — compact */}
+      {plan && <StudyPlanCard plan={plan} onChange={refresh} />}
 
-        {/* Weak areas action center */}
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
-          <h2 className="text-lg font-extrabold tracking-tight">Your Weak Areas</h2>
+      {/* Secondary grid: AI Recommendations · Upcoming Reviews */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className={`${cardClass} p-5 sm:p-6`}>
+          <span className="eyebrow">🎯 AI Recommendations</span>
+          {recommendations && <div className="mt-4 flex flex-wrap gap-2">
+            {recommendations.map(item => <Link key={item.label} href={item.href} className="cursor-pointer rounded-full bg-teal-50 px-3.5 py-2 text-xs font-bold text-teal-700 transition hover:bg-teal-100">{item.label}</Link>)}
+          </div>}
+
+          <p className="mt-5 text-[11px] font-extrabold uppercase tracking-wide text-slate-500">Focus Areas</p>
           <div className="mt-1">
-            {weakAreas.map(area => <div key={area.label} className="flex items-center gap-4 border-b border-slate-100 py-3.5 last:border-0 last:pb-0">
+            {weakAreas.map(area => <div key={area.label} className="flex items-center gap-3 border-b border-slate-100 py-3 last:border-0 last:pb-0">
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-3"><span className="text-sm font-bold text-ink">{area.label}</span><span className={`text-xs font-extrabold ${toneClasses[area.tone].text}`}>{area.accuracy}% accuracy</span></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-sm font-bold text-ink">{area.label}</span><span className={`text-xs font-extrabold ${toneClasses[area.tone].text}`}>{area.accuracy}%</span></div>
                 <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100"><div className={`h-full rounded-full ${toneClasses[area.tone].bar}`} style={{ width: `${area.accuracy}%` }} /></div>
               </div>
-              <a href="#" className="shrink-0 cursor-pointer rounded-full bg-teal-50 px-3.5 py-1.5 text-xs font-extrabold text-teal-700 transition hover:bg-teal-100">Practice</a>
+              <Link href="/dashboard/terminology" className="shrink-0 cursor-pointer rounded-full bg-teal-50 px-3 py-1.5 text-xs font-extrabold text-teal-700 transition hover:bg-teal-100">{area.accuracy >= 85 ? "Review" : "Practice"}</Link>
             </div>)}
           </div>
+          <p className="mt-3 text-[11px] leading-relaxed text-slate-400">Focus areas use sample accuracy data—per-topic performance tracking isn't wired up yet.</p>
         </div>
 
-        {/* Quick launch hub */}
-        <div>
-          <h2 className="text-lg font-extrabold tracking-tight">Quick Launch</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            {launchTiles.map(tile => <a key={tile.title} href={tile.href} className="group flex cursor-pointer flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
-              <span className={`grid h-11 w-11 place-items-center rounded-2xl ${tile.color}`}><tile.icon size={21} /></span>
-              <h3 className="mt-4 text-base font-extrabold tracking-tight">{tile.title}</h3>
-              <p className="mt-1 text-sm text-slate-500">{tile.subtitle}</p>
-              <span className="mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-teal-600 opacity-0 transition group-hover:opacity-100">Open <ArrowUpRight size={12} /></span>
-            </a>)}
+        <div className={`${cardClass} p-5 sm:p-6`}>
+          <span className="eyebrow">⏰ Upcoming Reviews</span>
+          <div className="mt-4 divide-y divide-slate-100">
+            <Link href={term && term.dueForReview > 0 ? "/dashboard/terminology/review" : "/dashboard/terminology"} className="flex cursor-pointer items-center gap-3.5 py-3 transition hover:opacity-80">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-teal-100 text-teal-700 text-sm">🔤</span>
+              <div className="min-w-0 flex-1"><p className="text-sm font-bold text-ink">Terminology</p><p className="text-xs text-slate-500">{term ? (term.dueForReview > 0 ? `${term.dueForReview} term${term.dueForReview === 1 ? "" : "s"} due` : `${Math.max(0, term.dailyGoal - term.todayCount)} new term${Math.max(0, term.dailyGoal - term.todayCount) === 1 ? "" : "s"} to learn`) : "—"}</p></div>
+              <ChevronRight size={15} className="shrink-0 text-slate-300" />
+            </Link>
+            <div className="flex items-center gap-3.5 py-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-600"><Layers size={15} /></span>
+              <div className="min-w-0 flex-1"><p className="text-sm font-bold text-ink">Flashcards</p><p className="text-xs text-slate-500">{planProgress ? `${Math.max(0, planProgress.goals.flashcards - planProgress.flashcards)} cards due` : "—"}</p></div>
+              <span className="shrink-0 text-[11px] font-bold text-slate-400">In today's plan</span>
+            </div>
+            <div className="flex items-center gap-3.5 py-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-600"><HelpCircle size={15} /></span>
+              <div className="min-w-0 flex-1"><p className="text-sm font-bold text-ink">Quizzes</p><p className="text-xs text-slate-500">{planProgress ? `${planProgress.goals.quizzes} quiz${planProgress.goals.quizzes === 1 ? "" : "zes"} ready` : "—"}</p></div>
+              <span className="shrink-0 text-[11px] font-bold text-slate-400">In today's plan</span>
+            </div>
           </div>
+          <Link href="/dashboard/progress" className="mt-4 flex items-center justify-center gap-2 rounded-full border border-slate-200 py-2.5 text-xs font-extrabold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc]"><BookOpen size={13} />View Full Progress</Link>
         </div>
       </div>
 
-      {/* Right sidebar */}
-      <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft">
-          <StreakSummary streak={streak} totalKP={totalKP} week={week} />
-          {level && <div className="mt-5 flex items-center gap-3 border-t border-slate-100 pt-5">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-teal-100 text-teal-700"><Medal size={18} /></span>
-            <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Level {level.level}</p><p className="truncate text-sm font-extrabold text-ink">{level.name}</p></div>
-          </div>}
-          <a href="/dashboard/progress" className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-accent-500 px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">View Your Progress<ArrowUpRight size={15} /></a>
-        </div>
-
-        {answers && (answers.role || answers.goal || answers.studyTime) && <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft">
-          <h3 className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Your profile</h3>
-          <div className="mt-3 space-y-3">
-            {answers.role && <ProfileRow icon={Compass} label="You are a" value={answers.role} />}
-            {answers.goal && <ProfileRow icon={Target} label="Main goal" value={answers.goal} />}
-            {answers.studyTime && <ProfileRow icon={Clock3} label="Daily study time" value={answers.studyTime} />}
-          </div>
-        </div>}
-
-        <p className="px-1 text-xs leading-relaxed text-slate-400">This is a demo dashboard—no real account or study data lives here yet.</p>
-      </aside>
+      <p className="px-1 text-xs leading-relaxed text-slate-400">This is a demo dashboard—no real account or study data lives here yet.</p>
     </div>
   </section>;
 }
 
-function RingStat({ percent, value, size = 84, stroke = 8 }: { percent: number; value: number; size?: number; stroke?: number }) {
+function MiniRing({ percent, size = 58, stroke = 6 }: { percent: number; size?: number; stroke?: number }) {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - Math.min(Math.max(percent, 0), 100) / 100);
-  return <div className="relative grid place-items-center" style={{ width: size, height: size }}>
+  return <div className="relative grid shrink-0 place-items-center" style={{ width: size, height: size }}>
     <svg width={size} height={size} className="-rotate-90">
       <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#e2f5f3" strokeWidth={stroke} />
       <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#0F8B8D" strokeWidth={stroke} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
     </svg>
-    <span className="absolute text-xl font-extrabold text-ink">{value}</span>
+    <span className="absolute text-[11px] font-extrabold text-ink">{percent}%</span>
   </div>;
-}
-
-function ProfileRow({ icon: Icon, label, value }: { icon: typeof Compass; label: string; value: string }) {
-  return <div className="flex items-center gap-3"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-teal-50 text-teal-700"><Icon size={15} /></span><div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">{label}</p><p className="truncate text-sm font-extrabold text-ink">{value}</p></div></div>;
 }

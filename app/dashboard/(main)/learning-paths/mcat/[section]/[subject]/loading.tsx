@@ -1,5 +1,5 @@
 import { SettingsSkeleton } from "@/components/skeleton";
 
 export default function Loading() {
-  return <SettingsSkeleton cards={2} />;
+  return <SettingsSkeleton cards={5} />;
 }
