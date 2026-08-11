@@ -12,7 +12,8 @@ import {
   getAllMcatPracticeQuestions, getMcatContinueRecommendation, getMcatReadiness, getQuestionOfTheDay,
   hasSeenMcatStartHere, McatContinueRecommendation, McatReadiness, SectionPracticeQuestion
 } from "@/lib/mcatConcepts";
-import { getDaysUntilTestDate, getMcatGoals, McatGoals, setMcatGoals } from "@/lib/mcatGoals";
+import { getMcatGoals, McatGoals, setMcatGoals } from "@/lib/mcatGoals";
+import { getDaysRemaining, getExamConfig, STUDY_PLANNER_EVENT } from "@/lib/studyPlanner";
 import { logAttempt } from "@/lib/practiceHistory";
 import {
   CARD_PROGRESS_EVENT, getAllLibraryCards, getCardProgress, isCardDue, LibraryCard, restoreLibraryCard, reviewLibraryCard
@@ -78,7 +79,7 @@ function CircularProgress({ percent, size = 48, stroke = 4.5 }: { percent: numbe
   </svg>;
 }
 
-const defaultGoals: McatGoals = { testDate: null, targetScore: null };
+const defaultGoals: McatGoals = { targetScore: null };
 const defaultReadiness: McatReadiness = { learnPercent: 0, accuracyPercent: null, readinessPercent: 0 };
 
 export default function MCATPathPage() {
@@ -89,10 +90,9 @@ export default function MCATPathPage() {
   const [readiness, setReadiness] = useState<McatReadiness>(defaultReadiness);
   const [dueCards, setDueCards] = useState<LibraryCard[]>([]);
   const [questionOfDay, setQuestionOfDay] = useState<SectionPracticeQuestion | null>(null);
+  const [examDate, setExamDate] = useState<string | null>(null);
 
-  const [editingDate, setEditingDate] = useState(false);
   const [editingScore, setEditingScore] = useState(false);
-  const [dateDraft, setDateDraft] = useState("");
   const [scoreDraft, setScoreDraft] = useState("");
 
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -112,6 +112,7 @@ export default function MCATPathPage() {
       setContinueRec(getMcatContinueRecommendation());
       setShowStartHereNudge(!hasSeenMcatStartHere());
       setGoals(getMcatGoals());
+      setExamDate(getExamConfig()?.examDate ?? null);
       setReadiness(getMcatReadiness());
       setDueCards(getAllLibraryCards().filter(c => isCardDue(c.id)));
       setQuestionOfDay(getQuestionOfTheDay());
@@ -120,22 +121,18 @@ export default function MCATPathPage() {
     window.addEventListener(CARD_PROGRESS_EVENT, refresh);
     window.addEventListener(TERM_PROGRESS_EVENT, refresh);
     window.addEventListener(PERSONAL_FLASHCARDS_EVENT, refresh);
+    window.addEventListener(STUDY_PLANNER_EVENT, refresh);
     return () => {
       window.removeEventListener(CARD_PROGRESS_EVENT, refresh);
       window.removeEventListener(TERM_PROGRESS_EVENT, refresh);
       window.removeEventListener(PERSONAL_FLASHCARDS_EVENT, refresh);
+      window.removeEventListener(STUDY_PLANNER_EVENT, refresh);
     };
   }, []);
 
-  const daysLeft = getDaysUntilTestDate(goals);
+  const daysLeft = examDate ? getDaysRemaining(examDate) : null;
 
   const diagnosticQuestions = useMemo(() => shuffle(getAllMcatPracticeQuestions()).map(toQuizItem), [diagnosticOpen]);
-
-  function commitDate() {
-    setMcatGoals({ testDate: dateDraft || null });
-    setGoals(getMcatGoals());
-    setEditingDate(false);
-  }
 
   function commitScore() {
     const n = Number(scoreDraft);
@@ -219,12 +216,13 @@ export default function MCATPathPage() {
       <div className="mt-6 flex flex-wrap items-center gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-7">
         <div className="min-w-[130px]">
           <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-400"><Calendar size={12} />Test Date</p>
-          {editingDate
-            ? <input autoFocus type="date" value={dateDraft} onChange={e => setDateDraft(e.target.value)} onBlur={commitDate} onKeyDown={e => e.key === "Enter" && commitDate()} className="mt-1.5 rounded-lg border border-slate-200 px-2 py-1 text-sm font-bold text-ink outline-none focus:border-teal-400" />
-            : <button type="button" onClick={() => { setDateDraft(goals.testDate ?? ""); setEditingDate(true); }} className="mt-1 block cursor-pointer text-left">
-              <span className="text-lg font-extrabold text-ink hover:text-teal-700">{goals.testDate ? formatDate(goals.testDate) : "Set date"}</span>
-              {daysLeft !== null && <span className="ml-2 text-xs font-bold text-teal-600">{daysLeft >= 0 ? `${daysLeft}d left` : "date passed"}</span>}
-            </button>}
+          {/* Read-only here—the real editable source is the Study Planner's
+              exam setup (lib/studyPlanner.ts), so this widget and the
+              Planner's own countdown can never disagree. */}
+          <Link href="/dashboard/study-plan" className="mt-1 block cursor-pointer text-left">
+            <span className="text-lg font-extrabold text-ink hover:text-teal-700">{examDate ? formatDate(examDate) : "Set date"}</span>
+            {daysLeft !== null && <span className="ml-2 text-xs font-bold text-teal-600">{daysLeft >= 0 ? `${daysLeft}d left` : "date passed"}</span>}
+          </Link>
         </div>
 
         <div className="hidden h-10 w-px bg-slate-100 sm:block" />

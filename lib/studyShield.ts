@@ -20,17 +20,17 @@
 // here) would be circular. This file safely imports one-directionally from
 // progress.ts, terminology.ts, and clinicalCases.ts instead.
 //
-// The target itself is adaptive once a real exam date is set (see
-// lib/adaptivePacing.ts): the Study Planner's dynamic daily KP target IS
+// The target itself is adaptive once a real exam plan is set up (see
+// lib/studyPlanner.ts): the Study Planner's dynamic daily KP target IS
 // the real number that secures today's streak, not a second, disconnected
 // target—so the header pill, the planner's progress bar, and "streak
 // secured" all agree on one real number. Falls back to the flat default
-// until an exam date exists.
+// until an exam is configured.
 
 import { getTodayActivity, getStreak, markStreakDaySecured } from "./progress";
 import { getTerminologyStats } from "./terminology";
 import { getTodayCaseAttempt } from "./clinicalCases";
-import { getAdaptivePace, getExamDate, getIntensity } from "./adaptivePacing";
+import { getTodaysPlan } from "./studyPlanner";
 
 export const SHIELD_TARGET_KP = 50;
 
@@ -64,9 +64,8 @@ export function getTodayShieldProgress(): ShieldProgress {
 
   const currentKP = activities.filter(a => a.done).reduce((sum, a) => sum + a.kp, 0);
 
-  const examDate = getExamDate();
-  const adaptive = examDate ? getAdaptivePace(examDate, getIntensity()) : null;
-  const targetKP = adaptive?.dailyKPTarget ?? SHIELD_TARGET_KP;
+  const plan = getTodaysPlan();
+  const targetKP = plan?.kpTarget ?? SHIELD_TARGET_KP;
   const secured = currentKP >= targetKP;
 
   return {

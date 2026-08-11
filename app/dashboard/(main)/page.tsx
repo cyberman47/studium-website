@@ -12,7 +12,7 @@ import { getAllMcatPracticeQuestions, getUnusedMcatPracticeQuestions } from "@/l
 import { getAllLibraryCards, isCardDue } from "@/lib/flashcardLibrary";
 import { getTerminologyStats, TerminologyStats } from "@/lib/terminology";
 import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
-import { AdaptivePace, getAdaptivePace, getDaysRemaining, getExamDate, getIntensity } from "@/lib/adaptivePacing";
+import { getDaysRemaining, getExamConfig } from "@/lib/studyPlanner";
 
 const pathRecommendations: Record<CurrentPathId, { label: string; href: string }[]> = {
   "medical-school": [
@@ -77,7 +77,6 @@ export default function DashboardHomePage() {
   const [term, setTerm] = useState<TerminologyStats | null>(null);
   const [shield, setShield] = useState<ShieldProgress | null>(null);
   const [examDate, setExamDate] = useState<string | null>(null);
-  const [pace, setPace] = useState<AdaptivePace | null>(null);
   const [dueCards, setDueCards] = useState(0);
   const [unusedQuizzes, setUnusedQuizzes] = useState(0);
 
@@ -96,9 +95,7 @@ export default function DashboardHomePage() {
     ensureShieldSecured(s);
     if (s.secured) s = getTodayShieldProgress();
     setShield(s);
-    const date = getExamDate();
-    setExamDate(date);
-    setPace(getAdaptivePace(date, getIntensity()));
+    setExamDate(getExamConfig()?.examDate ?? null);
     setDueCards(getAllLibraryCards().filter(c => isCardDue(c.id)).length);
     setUnusedQuizzes(getUnusedMcatPracticeQuestions(getAllMcatPracticeQuestions()).length);
 
@@ -193,15 +190,15 @@ export default function DashboardHomePage() {
         </div>}
       </div>
 
-      {/* Study Planner summary—real Adaptive Pacing Hub data, not a second
-          copy of its logic. Blank prompt until a real exam date is set. */}
+      {/* Study Planner summary—real Study Planner data, not a second copy
+          of its logic. Blank prompt until a real exam plan is set up. */}
       {examDate === null && <div className={`${cardClass} p-6 text-center sm:p-8`}>
         <span className="eyebrow justify-center text-[#0F8B8D]">📅 Study Planner</span>
-        <h3 className="display mt-3 text-xl">Set a target exam date.</h3>
-        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-slate-500">Studium adapts your daily KP target automatically as the date gets closer.</p>
-        <Link href="/dashboard/study-plan" className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#0F8B8D] px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0f8b8d] transition hover:-translate-y-0.5 hover:bg-[#0c7375]"><Calendar size={15} />Set Exam Date</Link>
+        <h3 className="display mt-3 text-xl">Set up your study plan.</h3>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-slate-500">Studium builds a personalized daily KP goal from your exam date, confidence, and real performance.</p>
+        <Link href="/dashboard/study-plan" className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#0F8B8D] px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0f8b8d] transition hover:-translate-y-0.5 hover:bg-[#0c7375]"><Calendar size={15} />Set Up Study Plan</Link>
       </div>}
-      {examDate !== null && pace && shield && <Link href="/dashboard/study-plan" className={`${cardClass} block cursor-pointer p-5 transition hover:-translate-y-0.5 hover:shadow-lift sm:p-6`}>
+      {examDate !== null && shield && <Link href="/dashboard/study-plan" className={`${cardClass} block cursor-pointer p-5 transition hover:-translate-y-0.5 hover:shadow-lift sm:p-6`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="eyebrow text-[#0F8B8D]">📅 Study Planner</span>
           <span className="flex items-center gap-1.5 text-xs font-extrabold text-[#0F8B8D]">View full plan<ArrowUpRight size={12} /></span>

@@ -381,8 +381,8 @@ export function getWeeklyActivityByDay(): DailyActivityPoint[] {
 }
 
 // ---- Streak ----
-// Your streak is kept alive by the real Study Shield / Adaptive Pacing
-// system (lib/studyShield.ts, lib/adaptivePacing.ts)—earning enough real
+// Your streak is kept alive by the real Study Shield / Study Planner
+// system (lib/studyShield.ts, lib/studyPlanner.ts)—earning enough real
 // KP today, not simply opening the app. This file just owns the actual
 // streak-day storage those systems write to.
 
@@ -538,6 +538,22 @@ export function getRewardsStatus(): Record<string, boolean> {
     streak7: milestones.streak7,
     streak30: milestones.streak30
   };
+}
+
+// Exposes the last N real days' "did the student hit their daily goal"
+// history from the exact same claim records rewardDefs/getRewardsStatus
+// already read—no second store. Added for the Study Planner (lib/studyPlanner.ts),
+// which uses this as a consistency signal to gently nudge tomorrow's KP
+// target up or down rather than staying stuck at an unrealistic number.
+export function getRecentDailyGoalHistory(days: number): boolean[] {
+  const out: boolean[] = [];
+  const today = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    out.push(getDailyClaims(toDateKey(d)).includes("dailyGoal"));
+  }
+  return out;
 }
 
 export type ClaimResult = {

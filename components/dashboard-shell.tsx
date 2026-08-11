@@ -11,7 +11,7 @@ import {
   ensureStreakFreezesGranted, ensureStreakGapsFrozen, getLongestStreak, getStreakFreezeCount, getWeekLog,
   PROGRESS_EVENT, WeekDay
 } from "@/lib/progress";
-import { ADAPTIVE_PACING_EVENT } from "@/lib/adaptivePacing";
+import { STUDY_PLANNER_EVENT } from "@/lib/studyPlanner";
 import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
 import { currentPathOptions, CurrentPathId, findCurrentPathDef, getCurrentPathId, setCurrentPathId } from "@/lib/currentPath";
 import { formatRelativeTime, getNotifications, getUnreadCount, markAllNotificationsRead, markNotificationRead, NotificationItem } from "@/lib/notifications";
@@ -161,14 +161,14 @@ export function StudyStreak() {
     // The Shield lives in the persistent header, but the actions that
     // change it happen on other pages entirely—without these listeners
     // it'd only ever reflect whatever was true the moment it first
-    // mounted. Its target is adaptive once an exam date exists (see
-    // lib/adaptivePacing.ts), so it also needs to hear about exam-date/
-    // intensity changes, not just KP changes.
+    // mounted. Its target is adaptive once a Study Planner exam is set up
+    // (see lib/studyPlanner.ts), so it also needs to hear about plan
+    // changes, not just KP changes.
     window.addEventListener(PROGRESS_EVENT, refresh);
-    window.addEventListener(ADAPTIVE_PACING_EVENT, refresh);
+    window.addEventListener(STUDY_PLANNER_EVENT, refresh);
     return () => {
       window.removeEventListener(PROGRESS_EVENT, refresh);
-      window.removeEventListener(ADAPTIVE_PACING_EVENT, refresh);
+      window.removeEventListener(STUDY_PLANNER_EVENT, refresh);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

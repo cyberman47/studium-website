@@ -1,224 +1,411 @@
 "use client";
 
+// The AI Study Planner: a personal study coach, not a calendar. Every
+// number on this page comes from lib/studyPlanner.ts's deterministic
+// engine (itself built entirely from real tracked signals elsewhere in the
+// app—lesson completion, quiz accuracy, weak concepts, self-rated
+// confidence) with an optional short interpretation layered on top by
+// lib/studyPlannerAI.ts. The page stays fully useful with the AI card
+// simply absent if that call fails—nothing here depends on it to function.
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  Calendar, Check, Circle, Clock3, HelpCircle, Layers, Plus, Sparkles, Stethoscope, Target, Trash2, Zap
+  AlertTriangle, ArrowRight, BookOpen, Calendar, Check, ChevronLeft, ChevronRight, Clock3, Flag, HelpCircle, Layers,
+  RefreshCw, Sparkles, Target, TrendingDown, TrendingUp, Type, Zap
 } from "lucide-react";
 import { PROGRESS_EVENT } from "@/lib/progress";
-import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
+import { getMcatReadiness } from "@/lib/mcatConcepts";
+import { PRACTICE_HISTORY_EVENT } from "@/lib/practiceHistory";
+import { TERM_PROGRESS_EVENT } from "@/lib/terminology";
 import {
-  ADAPTIVE_PACING_EVENT, addCustomTask, AdaptivePace, deleteCustomTask, getAdaptivePace, getDaysRemaining, getExamDate,
-  getIntensity, getSyllabusProgress, getTodaysPacingTasks, Intensity, intensityLabels, PacingTask, setExamDate,
-  setIntensity, SyllabusProgress, toggleCustomTask
-} from "@/lib/adaptivePacing";
+  ActivityKind, Adjustment, ConfidenceLevel, ExamConfig, generateDailyPlan, getAdjustments, getAllSubjectSignals,
+  getDaysRemaining, getExamConfig, getRealSubjects, getTodayPlannerKPProgress, getTodaysPlan, getWeeklyKPProgress,
+  intensityMeta, markTaskDone, PlannedTask, RealSubject, refreshTodaysPlan, setExamConfig, setTopicConfidence,
+  STUDY_PLANNER_EVENT, SubjectSignals, Weekday, weekdayOptions
+} from "@/lib/studyPlanner";
+import { refreshAIRecommendation } from "@/lib/studyPlannerAI";
 
 const cardClass = "rounded-3xl border border-black/[0.06] bg-white shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]";
 
-const paceMeta = {
-  relaxed: { icon: "🐢", label: "Relaxed Pace", classes: "border-sky-200 bg-sky-50 text-sky-700" },
-  optimal: { icon: "🎯", label: "Optimal Pace", classes: "border-[#0F8B8D]/30 bg-[#effbfa] text-[#0c6c6e]" },
-  sprint: { icon: "⚡", label: "Sprint Pace", classes: "border-amber-200 bg-amber-50 text-amber-700" }
-} as const;
+const activityIcon: Record<ActivityKind, typeof BookOpen> = { lesson: BookOpen, practice: HelpCircle, flashcards: Layers, terminology: Type };
 
-const taskIcon: Record<PacingTask["kind"], typeof Layers> = { case: Stethoscope, flashcards: Layers, quiz: HelpCircle, custom: Circle };
-const intensityOrder: Intensity[] = ["comfort", "balanced", "aggressive"];
+const confidenceOptions: { level: ConfidenceLevel; label: string }[] = [
+  { level: 1, label: "I don't understand this" },
+  { level: 2, label: "I struggle with this" },
+  { level: 3, label: "I somewhat understand this" },
+  { level: 4, label: "I'm comfortable with this" },
+  { level: 5, label: "I could teach this" }
+];
 
-// The Adaptive Pacing & Daily Execution Hub—one real exam-date anchor plus
-// a real syllabus-completion percentage drive a dynamically recalculated
-// daily KP target (lib/adaptivePacing.ts), which IS the same number that
-// secures today's streak (lib/studyShield.ts reads the same adaptive
-// target). Replaces the earlier per-topic Mastery Goals planner entirely.
+function formatMinutes(total: number): string {
+  const h = Math.floor(total / 60), m = total % 60;
+  if (h === 0) return `${m}m`;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+}
+
+function trendIcon(trend: SubjectSignals["trend"]) {
+  if (trend === "improving") return <TrendingUp size={12} className="text-teal-600" />;
+  if (trend === "declining") return <TrendingDown size={12} className="text-rose-500" />;
+  return null;
+}
+
 export default function StudyPlanPage() {
   const [loaded, setLoaded] = useState(false);
-  const [examDate, setExamDateState] = useState<string | null>(null);
-  const [intensity, setIntensityState] = useState<Intensity>("balanced");
-  const [pace, setPace] = useState<AdaptivePace | null>(null);
-  const [syllabus, setSyllabus] = useState<SyllabusProgress | null>(null);
-  const [shield, setShield] = useState<ShieldProgress | null>(null);
-  const [tasks, setTasks] = useState<PacingTask[]>([]);
-
-  const [editingDate, setEditingDate] = useState(false);
-  const [dateInput, setDateInput] = useState("");
-  const [addingTask, setAddingTask] = useState(false);
-  const [taskInput, setTaskInput] = useState("");
+  const [config, setConfig] = useState<ExamConfig | null>(null);
+  const [signals, setSignals] = useState<SubjectSignals[]>([]);
+  const [plan, setPlan] = useState<ReturnType<typeof getTodaysPlan>>(null);
+  const [todayProgress, setTodayProgress] = useState({ earned: 0, target: 0, percent: 0 });
+  const [weeklyProgress, setWeeklyProgress] = useState({ earned: 0, target: 0 });
+  const [readiness, setReadiness] = useState(0);
+  const [adjustments, setAdjustments] = useState<Adjustment[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   function refresh() {
-    const date = getExamDate();
-    const int = getIntensity();
-    setExamDateState(date);
-    setIntensityState(int);
-    setSyllabus(getSyllabusProgress());
-
-    const p = getAdaptivePace(date, int);
-    setPace(p);
-    setTasks(p ? getTodaysPacingTasks(p) : []);
-
-    let s = getTodayShieldProgress();
-    ensureShieldSecured(s);
-    if (s.secured) s = getTodayShieldProgress();
-    setShield(s);
+    const c = getExamConfig();
+    setConfig(c);
+    setSignals(getAllSubjectSignals());
+    setPlan(getTodaysPlan());
+    setTodayProgress(getTodayPlannerKPProgress());
+    setWeeklyProgress(getWeeklyKPProgress());
+    setReadiness(getMcatReadiness().readinessPercent);
+    setAdjustments(getAdjustments());
     setLoaded(true);
+  }
+
+  // Real adaptive scheduling (spec §8): a practice attempt or a terminology
+  // rating anywhere else in the app is exactly the kind of signal change
+  // that should shift today's priorities, so those events force a genuine
+  // recompute (not just a re-read of the cached plan) rather than waiting
+  // for tomorrow's regeneration.
+  function onSignalChange() {
+    refreshTodaysPlan();
+    refresh();
   }
 
   useEffect(() => {
     refresh();
-    window.addEventListener(ADAPTIVE_PACING_EVENT, refresh);
+    window.addEventListener(STUDY_PLANNER_EVENT, refresh);
     window.addEventListener(PROGRESS_EVENT, refresh);
+    window.addEventListener(PRACTICE_HISTORY_EVENT, onSignalChange);
+    window.addEventListener(TERM_PROGRESS_EVENT, onSignalChange);
     return () => {
-      window.removeEventListener(ADAPTIVE_PACING_EVENT, refresh);
+      window.removeEventListener(STUDY_PLANNER_EVENT, refresh);
       window.removeEventListener(PROGRESS_EVENT, refresh);
+      window.removeEventListener(PRACTICE_HISTORY_EVENT, onSignalChange);
+      window.removeEventListener(TERM_PROGRESS_EVENT, onSignalChange);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function saveExamDate() {
-    if (!dateInput) return;
-    setExamDate(dateInput);
-    setEditingDate(false);
+  async function runAIRecommendation(force: boolean) {
+    setAiLoading(true);
+    setAiError("");
+    const result = await refreshAIRecommendation(force);
+    setAiLoading(false);
+    if (!result.ok) setAiError(result.error);
+    else refresh();
   }
 
-  function submitCustomTask() {
-    if (!taskInput.trim()) return;
-    addCustomTask(taskInput);
-    setTaskInput("");
-    setAddingTask(false);
-  }
+  // Fires once, right after a real exam config first exists—an honest
+  // background attempt, not a blocking gate on the rest of the page.
+  useEffect(() => {
+    if (config && !plan?.aiRecommendation && !aiLoading && !aiError) runAIRecommendation(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config?.examDate]);
 
   if (!loaded) return null; // hydration-safe: real localStorage reads happen post-mount only
 
-  const todayMin = new Date().toISOString().slice(0, 10);
-
-  if (!examDate) {
-    return <section className="mx-auto max-w-xl bg-[#F8FAFC] px-4 py-10 sm:px-6 sm:py-14">
-      <span className="eyebrow"><Target size={13} />Study Planner</span>
-      <h1 className="display mt-4 text-3xl leading-tight sm:text-4xl">Set your target exam date.</h1>
-      <p className="mt-3 text-base leading-relaxed text-slate-500">Studium works backward from a single real date—your daily KP target adapts automatically as it gets closer or as you cover more of the syllabus.</p>
-      <div className={`${cardClass} mt-6 p-6 sm:p-7`}>
-        <label className="flex items-center gap-1.5 text-sm font-bold text-ink"><Calendar size={15} className="text-[#0F8B8D]" />Exam date</label>
-        <input
-          type="date" min={todayMin} value={dateInput}
-          onChange={e => setDateInput(e.target.value)}
-          className="mt-3 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-ink outline-none focus:border-[#0F8B8D]"
-        />
-        <button type="button" onClick={saveExamDate} disabled={!dateInput} className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#0F8B8D] py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0f8b8d] transition hover:-translate-y-0.5 hover:bg-[#0c7375] disabled:cursor-not-allowed disabled:opacity-40">Activate Adaptive Pacing</button>
-      </div>
-    </section>;
+  if (!config) {
+    return <SetupWizard onComplete={() => { refresh(); }} />;
   }
 
-  const daysRemaining = getDaysRemaining(examDate);
-  const meta = pace ? paceMeta[pace.paceState] : null;
+  const daysRemaining = getDaysRemaining(config.examDate);
+  const intensity = plan ? intensityMeta[plan.intensity] : null;
+  const totalMinutes = plan ? plan.tasks.reduce((sum, t) => sum + t.estimatedMinutes, 0) : 0;
+  const weaknesses = signals.filter(s => s.quadrant.label === "weakness" || s.quadrant.label === "overconfident");
+  const strengths = signals.filter(s => s.quadrant.label === "strength");
 
-  return <section className="mx-auto max-w-2xl bg-[#F8FAFC] px-4 py-10 sm:px-6 sm:py-14">
+  return <section className="mx-auto max-w-3xl bg-[#F8FAFC] px-4 py-10 sm:px-6 sm:py-14">
     <span className="eyebrow"><Sparkles size={13} />Study Planner</span>
-    <h1 className="display mt-4 text-3xl leading-tight sm:text-4xl">Today's Plan.</h1>
+    <h1 className="display mt-4 text-3xl leading-tight sm:text-4xl">Your plan adapts as you learn.</h1>
 
-    {/* Exam Anchor Banner */}
-    <div className={`${cardClass} mt-6 flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6`}>
-      <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-ink">
-        <Target size={15} className="text-[#0F8B8D]" />Target: MCAT Exam — {new Date(`${examDate}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-        <span className="text-slate-300">•</span>{daysRemaining} Days Remaining
-        <span className="text-slate-300">•</span>{syllabus?.percent ?? 0}% Syllabus Covered
-      </p>
-      <button type="button" onClick={() => { setDateInput(examDate); setEditingDate(true); }} className="shrink-0 cursor-pointer rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-ink transition hover:border-[#0F8B8D]/40 hover:text-[#0F8B8D]">Adjust Exam Date</button>
+    {/* Header: exam countdown, readiness, KP goals */}
+    <div className={`${cardClass} mt-6 grid grid-cols-2 gap-4 p-5 sm:grid-cols-4 sm:p-6`}>
+      <HeaderStat icon={Calendar} label="Exam" value={`${daysRemaining}d`} sub="days remaining" />
+      <HeaderStat icon={Target} label="Readiness" value={`${readiness}%`} sub="learn + practice" />
+      <HeaderStat icon={Zap} label="Today" value={`${todayProgress.target} KP`} sub="daily goal" />
+      <HeaderStat icon={Flag} label="This Week" value={`${weeklyProgress.target} KP`} sub="weekly goal" />
     </div>
-    {syllabus && syllabus.totalLessonsWithContent < 20 && <p className="mt-2 text-[11px] leading-relaxed text-slate-400">Syllabus % only counts the {syllabus.totalLessonsWithContent} lessons that are actually written so far (Biology is the current preview)—it'll reflect more of the real MCAT curriculum as more gets built out.</p>}
+    <EditPlanBar config={config} onSaved={refresh} />
 
-    {editingDate && <div className={`${cardClass} mt-4 p-5`}>
-      <label className="text-xs font-bold text-slate-500">New exam date</label>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
-        <input type="date" min={todayMin} value={dateInput} onChange={e => setDateInput(e.target.value)} className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-ink outline-none focus:border-[#0F8B8D]" />
-        <button type="button" onClick={saveExamDate} className="cursor-pointer rounded-full bg-[#0F8B8D] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#0c7375]">Save</button>
-        <button type="button" onClick={() => setEditingDate(false)} className="cursor-pointer text-xs font-bold text-slate-500 hover:text-ink">Cancel</button>
-      </div>
-    </div>}
-
-    {/* Pace Meter */}
-    {pace && meta && <div className={`mt-4 rounded-3xl border p-5 sm:p-6 ${meta.classes}`}>
-      <div className="flex items-center gap-2">
-        <span className="text-lg">{meta.icon}</span>
-        <span className="text-sm font-extrabold">{meta.label}</span>
-        <span className="ml-auto text-sm font-extrabold">{pace.dailyKPTarget} KP/day</span>
-      </div>
-      <p className="mt-2 text-xs leading-relaxed opacity-90">{pace.message}</p>
-    </div>}
-
-    {/* Daily Target & Intensity Bar */}
-    {pace && <div className={`${cardClass} mt-4 p-5 sm:p-6`}>
-      <p className="flex flex-wrap items-center gap-3 text-sm font-extrabold text-ink">
-        Today's Target:
-        <span className="flex items-center gap-1"><Target size={13} className="text-[#0F8B8D]" />{pace.dailyKPTarget} KP</span>
-        <span className="flex items-center gap-1"><Layers size={13} className="text-[#0F8B8D]" />{pace.flashcardsTarget} Flashcards</span>
-        <span className="flex items-center gap-1"><HelpCircle size={13} className="text-[#0F8B8D]" />{pace.quizTarget} Quiz{pace.quizTarget === 1 ? "" : "zes"}</span>
-      </p>
-      <div className="mt-4 flex gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
-        {intensityOrder.map(level => <button
-          key={level} type="button" onClick={() => setIntensity(level)}
-          className={`flex-1 cursor-pointer rounded-lg py-2 text-xs font-extrabold transition ${intensity === level ? "bg-white text-ink shadow-sm" : "text-slate-500 hover:text-ink"}`}
-        >{intensityLabels[level]}</button>)}
-      </div>
-    </div>}
-
-    {/* Today's Progress */}
-    {shield && <div className={`${cardClass} mt-4 p-5 sm:p-6`}>
+    {/* Today's Goal */}
+    {plan && intensity && <div className={`${cardClass} mt-4 p-5 sm:p-6`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Today's Progress</p>
-        <span className="text-sm font-extrabold text-ink">{shield.currentKP} / {shield.targetKP} KP</span>
+        <p className="text-xs font-extrabold uppercase tracking-wide text-slate-400">Today's Goal</p>
+        <button type="button" onClick={() => runAIRecommendation(true)} disabled={aiLoading} className="flex cursor-pointer items-center gap-1.5 text-[11px] font-bold text-[#0F8B8D] hover:text-[#0c7375] disabled:cursor-not-allowed disabled:opacity-50">
+          <RefreshCw size={12} className={aiLoading ? "animate-spin" : ""} />Refresh Plan
+        </button>
       </div>
-      <div className="mt-2.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-        <div className={`h-full rounded-full transition-[width] duration-500 ${shield.secured ? "bg-[#0F8B8D]" : "bg-amber-400"}`} style={{ width: `${shield.percent}%` }} />
+      <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+        <span className="flex items-center gap-1.5 text-2xl font-extrabold text-ink"><Target size={20} className="text-[#0F8B8D]" />{plan.kpTarget} KP</span>
+        <span className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><Clock3 size={14} />Approximately {formatMinutes(totalMinutes)}</span>
       </div>
-      {shield.secured
-        ? <p className="mt-2 flex items-center gap-1.5 text-xs font-extrabold text-[#0c6c6e]"><Check size={13} strokeWidth={3} />Streak secured for today</p>
-        : <p className="mt-2 flex items-center gap-1.5 text-xs font-extrabold text-amber-700"><Zap size={13} />{shield.kpUntilSecured} KP remaining to secure today's streak</p>}
+      <p className="mt-2 flex items-center gap-1.5 text-sm font-extrabold"><span>{intensity.emoji}</span>{intensity.label}</p>
+      {plan.focusSubjectIds.length > 0 && <p className="mt-1 text-xs text-slate-500">Focus: {signals.filter(s => plan.focusSubjectIds.includes(s.subject.subjectId)).slice(0, 3).map(s => s.subject.subjectName).join(" + ")}</p>}
+
+      <div className="mt-4">
+        <div className="flex items-center justify-between text-xs font-extrabold text-ink">
+          <span>{todayProgress.earned} / {todayProgress.target} KP</span>
+          <span className="text-slate-400">{Math.max(0, todayProgress.target - todayProgress.earned)} KP remaining</span>
+        </div>
+        <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+          <div className="h-full rounded-full bg-[#0F8B8D] transition-[width] duration-500" style={{ width: `${Math.min(100, todayProgress.percent)}%` }} />
+        </div>
+      </div>
     </div>}
 
-    {/* Live Daily Execution Checklist */}
-    <div className="mt-6 space-y-2.5">
-      {tasks.map(task => {
-        const Icon = taskIcon[task.kind];
-        const content = <>
-          <button
-            type="button"
-            onClick={() => task.kind === "custom" ? toggleCustomTask(task.id) : undefined}
-            className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition ${task.done ? "bg-[#0F8B8D] text-white" : task.kind === "custom" ? "cursor-pointer border-2 border-slate-200 text-transparent hover:border-[#0F8B8D]/40" : "border-2 border-slate-200"}`}
-            aria-label={task.done ? "Completed" : "Not completed"}
-          >{task.done && <Check size={14} strokeWidth={3} />}</button>
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#effbfa] text-[#0F8B8D]"><Icon size={18} /></span>
-          <span className="min-w-0 flex-1">
-            <span className={`block truncate text-sm font-extrabold ${task.done ? "text-slate-400 line-through" : "text-ink"}`}>{task.title}</span>
-            <span className="mt-0.5 block truncate text-xs text-slate-500">{task.detail}</span>
-          </span>
-          {task.kp > 0 && <span className="shrink-0 text-xs font-extrabold text-[#0F8B8D]">+{task.kp} KP</span>}
-        </>;
-
-        if (task.kind === "custom") {
-          return <div key={task.id} className={`${cardClass} flex items-center gap-4 p-4 sm:p-5`}>
-            {content}
-            <button type="button" onClick={() => deleteCustomTask(task.id)} className="shrink-0 cursor-pointer rounded-full p-1.5 text-slate-300 hover:bg-rose-50 hover:text-rose-500" aria-label="Delete task"><Trash2 size={14} /></button>
-          </div>;
-        }
-
-        return <Link key={task.id} href={task.href ?? "#"} className={`${cardClass} flex cursor-pointer items-center gap-4 p-4 transition hover:-translate-y-0.5 hover:shadow-lift sm:p-5`}>
-          {content}
-          {!task.done && <span className="shrink-0 rounded-full bg-[#0F8B8D] px-4 py-2 text-xs font-bold text-white">{task.kind === "case" ? "Solve" : task.kind === "quiz" ? "Start Quiz" : "Review"}</span>}
-        </Link>;
-      })}
-
-      {addingTask
-        ? <div className={`${cardClass} flex items-center gap-3 p-4 sm:p-5`}>
-          <input
-            autoFocus value={taskInput} onChange={e => setTaskInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && submitCustomTask()}
-            placeholder="Custom task name…"
-            className="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-[#0F8B8D]"
-          />
-          <button type="button" onClick={submitCustomTask} className="shrink-0 cursor-pointer rounded-full bg-[#0F8B8D] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#0c7375]">Add</button>
-          <button type="button" onClick={() => { setAddingTask(false); setTaskInput(""); }} className="shrink-0 cursor-pointer text-xs font-bold text-slate-500 hover:text-ink">Cancel</button>
-        </div>
-        : <button type="button" onClick={() => setAddingTask(true)} className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 py-3.5 text-xs font-extrabold text-slate-500 transition hover:border-[#0F8B8D]/50 hover:text-[#0F8B8D]"><Plus size={14} />Add Custom Task</button>}
+    {/* AI Recommendation */}
+    <div className={`${cardClass} mt-4 p-5 sm:p-6`}>
+      <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-400"><Sparkles size={12} className="text-[#0F8B8D]" />Studium AI Recommends</p>
+      {plan?.aiRecommendation
+        ? <p className="mt-2 text-sm leading-relaxed text-ink">{plan.aiRecommendation}</p>
+        : aiLoading
+          ? <p className="mt-2 text-sm text-slate-400">Thinking through your recent performance…</p>
+          : aiError
+            ? <p className="mt-2 text-sm text-slate-400">{aiError} The plan above is still real and fully usable without it.</p>
+            : <p className="mt-2 text-sm text-slate-400">No recommendation yet.</p>}
     </div>
 
-    <p className="mt-4 text-[11px] leading-relaxed text-slate-400">Custom tasks are a personal checklist—completing one doesn't award KP, since real Knowledge Points stay tied to verified study activity.</p>
+    {/* Recent adjustments—transparency for spec §8's adaptive scheduling:
+        real, specific reasons the plan changed, not silent reshuffling. */}
+    {adjustments.length > 0 && <div className="mt-3 space-y-1.5 rounded-2xl border border-slate-100 bg-white/60 p-4">
+      <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">Recent adjustments</p>
+      {adjustments.slice(0, 3).map(a => <p key={a.id} className="text-xs text-slate-500">{a.message}</p>)}
+    </div>}
+
+    {/* Today's Plan tasks */}
+    {plan && plan.tasks.length > 0 && <div className="mt-6 space-y-2.5">
+      <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Today's Plan</p>
+      {plan.tasks.map(task => <TaskCard key={task.id} task={task} onComplete={() => markTaskDone(task.id)} />)}
+    </div>}
+
+    {/* Weaknesses */}
+    {weaknesses.length > 0 && <div className="mt-6">
+      <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><AlertTriangle size={13} className="text-rose-500" />Needs Attention</p>
+      <div className="mt-2.5 space-y-2">
+        {weaknesses.map(s => <SubjectSignalCard key={s.subject.subjectId} signals={s} tone="rose" onRate={level => { setTopicConfidence(s.subject.subjectId, level); refresh(); }} />)}
+      </div>
+    </div>}
+
+    {/* Strengths */}
+    {strengths.length > 0 && <div className="mt-6">
+      <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Check size={13} className="text-teal-600" />Maintenance—Your Strengths</p>
+      <div className="mt-2.5 space-y-2">
+        {strengths.map(s => <SubjectSignalCard key={s.subject.subjectId} signals={s} tone="teal" onRate={level => { setTopicConfidence(s.subject.subjectId, level); refresh(); }} />)}
+      </div>
+    </div>}
+
+    {/* Weekly schedule */}
+    <div className={`${cardClass} mt-6 p-5 sm:p-6`}>
+      <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">This Week</p>
+      <div className="mt-3 flex items-center justify-between gap-2 text-sm font-bold text-ink">
+        <span>{weeklyProgress.earned} / {weeklyProgress.target} KP</span>
+      </div>
+      <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="h-full rounded-full bg-[#0F8B8D] transition-[width] duration-500" style={{ width: `${weeklyProgress.target > 0 ? Math.min(100, Math.round((weeklyProgress.earned / weeklyProgress.target) * 100)) : 0}%` }} />
+      </div>
+      <div className="mt-4 grid grid-cols-7 gap-1.5">
+        {weekdayOptions.map(d => <div key={d.id} className={`rounded-xl py-2 text-center text-[10px] font-extrabold uppercase ${config.availableDays.includes(d.id) ? "bg-[#effbfa] text-[#0c6c6e]" : "bg-slate-50 text-slate-300"}`}>{d.label}</div>)}
+      </div>
+      <p className="mt-2 text-[11px] text-slate-400">Highlighted days are your planned study days ({config.availableDays.length}/week, {config.hoursPerDay}h each).</p>
+    </div>
+
+    {signals.length === 0 && <p className="mt-6 text-center text-sm text-slate-400">No MCAT subjects with real content are available to plan around yet.</p>}
+  </section>;
+}
+
+function HeaderStat({ icon: Icon, label, value, sub }: { icon: typeof Target; label: string; value: string; sub: string }) {
+  return <div>
+    <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-400"><Icon size={12} className="text-[#0F8B8D]" />{label}</p>
+    <p className="mt-1 text-xl font-extrabold text-ink">{value}</p>
+    <p className="text-[11px] text-slate-400">{sub}</p>
+  </div>;
+}
+
+function TaskCard({ task, onComplete }: { task: PlannedTask; onComplete: () => void }) {
+  const Icon = activityIcon[task.activity];
+  return <div className={`${cardClass} flex items-center gap-4 p-4 sm:p-5`}>
+    <button
+      type="button" onClick={onComplete} disabled={task.done}
+      aria-label={task.done ? "Completed" : "Mark complete"}
+      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition ${task.done ? "bg-[#0F8B8D] text-white" : "cursor-pointer border-2 border-slate-200 text-transparent hover:border-[#0F8B8D]/40"}`}
+    >{task.done && <Check size={14} strokeWidth={3} />}</button>
+    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#effbfa] text-[#0F8B8D]"><Icon size={18} /></span>
+    <span className="min-w-0 flex-1">
+      <span className={`block truncate text-sm font-extrabold ${task.done ? "text-slate-400 line-through" : "text-ink"}`}>{task.subjectName} — {task.label}</span>
+      <span className="mt-0.5 block truncate text-xs text-slate-500">{task.priorityReason}</span>
+      <span className="mt-0.5 flex items-center gap-2 text-[11px] font-bold text-slate-400"><Clock3 size={11} />{task.estimatedMinutes} min<span className="text-[#0F8B8D]">+{task.kp} KP</span></span>
+    </span>
+    {!task.done && <Link href={task.href} className="shrink-0 rounded-full bg-[#0F8B8D] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#0c7375]">Start</Link>}
+  </div>;
+}
+
+const quadrantTone: Record<string, string> = {
+  rose: "border-rose-100 bg-rose-50/40",
+  teal: "border-teal-100 bg-teal-50/40"
+};
+
+function SubjectSignalCard({ signals, tone, onRate }: { signals: SubjectSignals; tone: "rose" | "teal"; onRate: (level: ConfidenceLevel) => void }) {
+  const [rating, setRating] = useState(false);
+  return <div className={`rounded-2xl border p-4 ${quadrantTone[tone]}`}>
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <p className="flex items-center gap-1.5 text-sm font-extrabold text-ink">{signals.subject.subjectName}{trendIcon(signals.trend)}</p>
+      <button type="button" onClick={() => setRating(r => !r)} className="cursor-pointer text-[11px] font-bold text-slate-400 hover:text-ink">{rating ? "Close" : "Re-rate confidence"}</button>
+    </div>
+    <p className="mt-1 text-xs leading-relaxed text-slate-500">{signals.quadrant.insight}</p>
+    <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-bold text-slate-500">
+      <span>Confidence: {signals.confidence ?? "not rated"}/5</span>
+      <span>Accuracy: {signals.accuracy.percent === null ? "no data yet" : `${signals.accuracy.percent}%`}</span>
+      <span>Progress: {signals.progressPercent}%</span>
+    </div>
+    {rating && <div className="mt-3 flex flex-wrap gap-1.5">
+      {confidenceOptions.map(o => <button key={o.level} type="button" title={o.label} onClick={() => { onRate(o.level); setRating(false); }} className={`grid h-7 w-7 cursor-pointer place-items-center rounded-full border-2 text-xs font-bold transition ${signals.confidence === o.level ? "border-[#0F8B8D] bg-[#0F8B8D] text-white" : "border-slate-200 text-slate-500 hover:border-[#0F8B8D]/40"}`}>{o.level}</button>)}
+    </div>}
+  </div>;
+}
+
+function EditPlanBar({ config, onSaved }: { config: ExamConfig; onSaved: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [dateDraft, setDateDraft] = useState(config.examDate);
+  const [hoursDraft, setHoursDraft] = useState(config.hoursPerDay);
+  const [daysDraft, setDaysDraft] = useState<Weekday[]>(config.availableDays);
+  const todayMin = new Date().toISOString().slice(0, 10);
+
+  function toggleDay(day: Weekday) {
+    setDaysDraft(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]);
+  }
+
+  function save() {
+    setExamConfig({ examDate: dateDraft, hoursPerDay: hoursDraft, availableDays: daysDraft, overallConfidence: config.overallConfidence });
+    setOpen(false);
+    onSaved();
+  }
+
+  if (!open) return <button type="button" onClick={() => setOpen(true)} className="mt-2 cursor-pointer text-xs font-bold text-slate-500 hover:text-[#0F8B8D]">Adjust exam date, hours, or days →</button>;
+
+  return <div className={`${cardClass} mt-2 p-5`}>
+    <label className="text-xs font-bold text-slate-500">Exam date</label>
+    <input type="date" min={todayMin} value={dateDraft} onChange={e => setDateDraft(e.target.value)} className="mt-1.5 block rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-ink outline-none focus:border-[#0F8B8D]" />
+    <label className="mt-3 block text-xs font-bold text-slate-500">Hours per day</label>
+    <input type="number" min={0.5} max={12} step={0.5} value={hoursDraft} onChange={e => setHoursDraft(Number(e.target.value))} className="mt-1.5 block w-24 rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-ink outline-none focus:border-[#0F8B8D]" />
+    <label className="mt-3 block text-xs font-bold text-slate-500">Study days</label>
+    <div className="mt-1.5 flex flex-wrap gap-1.5">
+      {weekdayOptions.map(d => <button key={d.id} type="button" onClick={() => toggleDay(d.id)} className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-extrabold transition ${daysDraft.includes(d.id) ? "border-[#0F8B8D] bg-[#effbfa] text-[#0c6c6e]" : "border-slate-200 text-slate-500"}`}>{d.label}</button>)}
+    </div>
+    <div className="mt-4 flex items-center gap-3">
+      <button type="button" onClick={save} className="cursor-pointer rounded-full bg-[#0F8B8D] px-5 py-2.5 text-xs font-bold text-white transition hover:bg-[#0c7375]">Save</button>
+      <button type="button" onClick={() => setOpen(false)} className="cursor-pointer text-xs font-bold text-slate-500 hover:text-ink">Cancel</button>
+    </div>
+  </div>;
+}
+
+// ---- Setup wizard (spec §5/§6): exam basics, then real-subject confidence ----
+
+function SetupWizard({ onComplete }: { onComplete: () => void }) {
+  const [step, setStep] = useState(0);
+  const [examDate, setExamDate] = useState("");
+  const [hoursPerDay, setHoursPerDay] = useState(2);
+  const [availableDays, setAvailableDays] = useState<Weekday[]>(["mon", "tue", "wed", "thu", "fri"]);
+  const [overallConfidence, setOverallConfidence] = useState<ConfidenceLevel>(3);
+  const [topicDrafts, setTopicDrafts] = useState<Record<string, ConfidenceLevel>>({});
+  const todayMin = new Date().toISOString().slice(0, 10);
+  const realSubjects: RealSubject[] = getRealSubjects();
+
+  function toggleDay(day: Weekday) {
+    setAvailableDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]);
+  }
+
+  function finish() {
+    // Order matters: topic confidence must be saved *before* the exam
+    // config. setExamConfig's own change notification is what triggers the
+    // very first plan generation (via the page's event listener)—saving
+    // confidence afterward would let that first plan get generated and
+    // cached with stale "unrated" data, one event tick before the real
+    // ratings landed. The explicit generateDailyPlan() below is a second,
+    // belt-and-suspenders guarantee that today's plan reflects everything
+    // once all of it is actually saved.
+    for (const [subjectId, level] of Object.entries(topicDrafts)) setTopicConfidence(subjectId, level);
+    setExamConfig({ examDate, hoursPerDay, availableDays, overallConfidence });
+    generateDailyPlan();
+    onComplete();
+  }
+
+  const step0Valid = !!examDate && hoursPerDay > 0 && availableDays.length > 0;
+
+  return <section className="mx-auto max-w-xl bg-[#F8FAFC] px-4 py-10 sm:px-6 sm:py-14">
+    <span className="eyebrow"><Target size={13} />Study Planner</span>
+    <h1 className="display mt-4 text-3xl leading-tight sm:text-4xl">Let's build your plan.</h1>
+    <p className="mt-3 text-base leading-relaxed text-slate-500">A few real questions, then Studium calculates exactly how much and what to study—using what it already knows about your progress.</p>
+
+    {step === 0 && <div className={`${cardClass} mt-6 space-y-5 p-6 sm:p-7`}>
+      <div>
+        <label className="flex items-center gap-1.5 text-sm font-bold text-ink"><Calendar size={15} className="text-[#0F8B8D]" />What exam are you preparing for?</label>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <span className="rounded-full border-2 border-[#0F8B8D] bg-[#effbfa] px-4 py-2 text-xs font-extrabold text-[#0c6c6e]">MCAT</span>
+          <span title="Coming soon—no authored content yet" className="cursor-not-allowed rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-300">USMLE (coming soon)</span>
+          <span title="Coming soon—no authored content yet" className="cursor-not-allowed rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-300">Pharmacology (coming soon)</span>
+        </div>
+      </div>
+      <div>
+        <label className="text-sm font-bold text-ink">When is your exam?</label>
+        <input type="date" min={todayMin} value={examDate} onChange={e => setExamDate(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-ink outline-none focus:border-[#0F8B8D]" />
+      </div>
+      <div>
+        <label className="text-sm font-bold text-ink">How many hours can you study per day?</label>
+        <input type="number" min={0.5} max={12} step={0.5} value={hoursPerDay} onChange={e => setHoursPerDay(Number(e.target.value))} className="mt-2 w-28 rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-ink outline-none focus:border-[#0F8B8D]" />
+      </div>
+      <div>
+        <label className="text-sm font-bold text-ink">Which days can you study?</label>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {weekdayOptions.map(d => <button key={d.id} type="button" onClick={() => toggleDay(d.id)} className={`cursor-pointer rounded-full border px-3.5 py-2 text-xs font-extrabold transition ${availableDays.includes(d.id) ? "border-[#0F8B8D] bg-[#effbfa] text-[#0c6c6e]" : "border-slate-200 text-slate-500"}`}>{d.label}</button>)}
+        </div>
+      </div>
+      <button type="button" onClick={() => setStep(1)} disabled={!step0Valid} className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#0F8B8D] py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0f8b8d] transition hover:-translate-y-0.5 hover:bg-[#0c7375] disabled:cursor-not-allowed disabled:opacity-40">Next<ChevronRight size={15} /></button>
+    </div>}
+
+    {step === 1 && <div className={`${cardClass} mt-6 space-y-5 p-6 sm:p-7`}>
+      <label className="text-sm font-bold text-ink">Overall, how confident do you feel right now?</label>
+      <div className="space-y-2">
+        {confidenceOptions.map(o => <button key={o.level} type="button" onClick={() => setOverallConfidence(o.level)} className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm font-bold transition ${overallConfidence === o.level ? "border-[#0F8B8D] bg-[#effbfa] text-[#0c6c6e]" : "border-slate-200 text-ink hover:border-[#0F8B8D]/30"}`}>
+          <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-extrabold ${overallConfidence === o.level ? "bg-[#0F8B8D] text-white" : "bg-slate-100 text-slate-500"}`}>{o.level}</span>{o.label}
+        </button>)}
+      </div>
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={() => setStep(0)} className="cursor-pointer text-sm font-bold text-slate-500 hover:text-ink"><ChevronLeft size={15} className="mr-1 inline" />Back</button>
+        <button type="button" onClick={() => setStep(2)} className="ml-auto flex cursor-pointer items-center gap-2 rounded-full bg-[#0F8B8D] px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#0c7375]">Next<ChevronRight size={15} /></button>
+      </div>
+    </div>}
+
+    {step === 2 && <div className={`${cardClass} mt-6 space-y-4 p-6 sm:p-7`}>
+      <div>
+        <label className="text-sm font-bold text-ink">Rate your confidence by subject.</label>
+        <p className="mt-1 text-xs text-slate-500">Only subjects with real lesson content are shown—Studium will combine this with your actual quiz/practice performance as you go.</p>
+      </div>
+      {realSubjects.length === 0
+        ? <p className="text-sm text-slate-400">No subjects with real content are available yet.</p>
+        : <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
+          {realSubjects.map(s => <div key={s.subjectId} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 p-3">
+            <span className="text-sm font-bold text-ink">{s.subjectName}<span className="ml-1.5 text-[11px] font-medium text-slate-400">{s.sectionTitle}</span></span>
+            <div className="flex gap-1">
+              {confidenceOptions.map(o => <button key={o.level} type="button" title={o.label} onClick={() => setTopicDrafts(prev => ({ ...prev, [s.subjectId]: o.level }))} className={`grid h-7 w-7 cursor-pointer place-items-center rounded-full border-2 text-xs font-bold transition ${topicDrafts[s.subjectId] === o.level ? "border-[#0F8B8D] bg-[#0F8B8D] text-white" : "border-slate-200 text-slate-500 hover:border-[#0F8B8D]/40"}`}>{o.level}</button>)}
+            </div>
+          </div>)}
+        </div>}
+      <div className="flex items-center gap-3 pt-2">
+        <button type="button" onClick={() => setStep(1)} className="cursor-pointer text-sm font-bold text-slate-500 hover:text-ink"><ChevronLeft size={15} className="mr-1 inline" />Back</button>
+        <button type="button" onClick={finish} className="ml-auto flex cursor-pointer items-center gap-2 rounded-full bg-[#0F8B8D] px-6 py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0f8b8d] transition hover:-translate-y-0.5 hover:bg-[#0c7375]">Activate My Study Plan<ArrowRight size={15} /></button>
+      </div>
+    </div>}
   </section>;
 }
