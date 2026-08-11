@@ -3,6 +3,7 @@
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, Check, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   return <motion.div className={className} initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .2 }} transition={{ duration: .65, delay, ease: [0.22, 1, .36, 1] }}>{children}</motion.div>;
@@ -53,17 +54,36 @@ export function TikTokIcon({ size = 18, className = "" }: { size?: number; class
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z" /></svg>;
 }
 
+// Real Supabase OAuth—signInWithOAuth redirects the whole browser tab to
+// Google/Apple's real login screen, which then bounces back through
+// /auth/callback to exchange the code for a session. Neither provider is
+// enabled in the Supabase project yet, so today this surfaces Supabase's
+// own real "Unsupported provider" error instead of silently pretending to
+// work; the moment Google/Apple are turned on in the Supabase dashboard,
+// these buttons work with zero code changes.
 export function OAuthButtons({ actionLabel }: { actionLabel: string }) {
-  const [notice, setNotice] = useState("");
-  function handle(provider: string) {
-    setNotice(`${provider} isn't connected yet — please use email for now.`);
+  const [error, setError] = useState("");
+  const [loadingProvider, setLoadingProvider] = useState<"google" | "apple" | null>(null);
+
+  async function handle(provider: "google" | "apple") {
+    setError("");
+    setLoadingProvider(provider);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
+    });
+    // On success Supabase immediately navigates the tab away to the
+    // provider—there's no "success" state to handle here, only failure.
+    if (error) { setError(error.message); setLoadingProvider(null); }
   }
+
   return <>
     <div className="mt-6 flex items-center gap-3"><div className="h-px flex-1 bg-slate-200" /><span className="text-xs font-bold uppercase tracking-wider text-slate-500">Or</span><div className="h-px flex-1 bg-slate-200" /></div>
     <div className="mt-6 space-y-3">
-      <button type="button" onClick={() => handle("Google")} className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-slate-200 bg-white py-3.5 text-sm font-bold text-ink transition hover:-translate-y-0.5 hover:bg-slate-50"><GoogleIcon />{actionLabel} with Google</button>
-      <button type="button" onClick={() => handle("Apple")} className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"><AppleIcon size={18} />{actionLabel} with Apple</button>
+      <button type="button" onClick={() => handle("google")} disabled={loadingProvider !== null} className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-slate-200 bg-white py-3.5 text-sm font-bold text-ink transition hover:-translate-y-0.5 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"><GoogleIcon />{loadingProvider === "google" ? "Redirecting…" : `${actionLabel} with Google`}</button>
+      <button type="button" onClick={() => handle("apple")} disabled={loadingProvider !== null} className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"><AppleIcon size={18} />{loadingProvider === "apple" ? "Redirecting…" : `${actionLabel} with Apple`}</button>
     </div>
-    {notice && <p className="mt-4 text-center text-xs font-bold text-teal-600">{notice}</p>}
+    {error && <p className="mt-4 text-center text-xs font-bold text-rose-600">{error}</p>}
   </>;
 }

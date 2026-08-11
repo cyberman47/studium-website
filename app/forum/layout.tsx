@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Logo } from "@/components/navigation";
 import { UserMenu } from "@/components/dashboard-shell";
 import { getUser } from "@/lib/onboarding";
+import { createClient } from "@/lib/supabase/client";
 
 // A deliberately bare shell for the Forum—no sidebar, no search bar, no
 // streak/notifications, just the logo (back to the real dashboard) and
@@ -23,7 +24,8 @@ export default function ForumLayout({ children }: { children: React.ReactNode })
     setAvatar(user?.avatar ?? null);
   }, []);
 
-  function logOut() {
+  async function logOut() {
+    await createClient().auth.signOut();
     localStorage.removeItem("studium_user");
     localStorage.removeItem("studium_onboarding_answers");
     localStorage.removeItem("studium_onboarding_complete");

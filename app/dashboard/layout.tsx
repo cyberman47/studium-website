@@ -6,6 +6,7 @@ import { Logo } from "@/components/navigation";
 import { LearningPathSwitcher, NotificationsBell, StudyStreak, UserMenu } from "@/components/dashboard-shell";
 import { CommandSearch } from "@/components/command-search";
 import { getUser } from "@/lib/onboarding";
+import { createClient } from "@/lib/supabase/client";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -32,7 +33,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [router]);
 
-  function logOut() {
+  async function logOut() {
+    await createClient().auth.signOut();
     localStorage.removeItem("studium_user");
     localStorage.removeItem("studium_onboarding_answers");
     localStorage.removeItem("studium_onboarding_complete");

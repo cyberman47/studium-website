@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, Sparkles } from "lucide-react";
 import { LogoMark } from "@/components/navigation";
-import { completeOnboarding, emptyAnswers, getUser, goalOptions, isOnboardingComplete, OnboardingAnswers, roleOptions, sourceOptions, studyMethodOptions, studyTimeOptions } from "@/lib/onboarding";
+import { completeOnboarding, emptyAnswers, getUser, goalOptions, isOnboardingComplete, OnboardingAnswers, roleOptions, saveUser, sourceOptions, studyMethodOptions, studyTimeOptions } from "@/lib/onboarding";
 import { currentPathLabels, labelToPathId, setCurrentPathId } from "@/lib/currentPath";
+import { createClient } from "@/lib/supabase/client";
 
 type Question = {
   key: keyof Omit<OnboardingAnswers, "studyMethods">;
@@ -44,6 +45,23 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (isOnboardingComplete()) { router.replace("/dashboard"); return; }
+    // Closes the one real gap the localStorage bridge (see signup/login
+    // pages) can't cover: a student who just signed in via Google/Apple
+    // OAuth never passes through either form's handleSubmit, so nothing
+    // populated their local profile cache yet—only a real Supabase session
+    // exists at this point. Backfill it here from the real session's own
+    // metadata so the rest of the app (which still reads getUser()) has a
+    // name to show instead of "there".
+    if (!getUser()) {
+      createClient().auth.getUser().then(({ data }) => {
+        const authUser = data.user;
+        if (!authUser?.email) return;
+        const name = (authUser.user_metadata?.name as string | undefined)
+          ?? (authUser.user_metadata?.full_name as string | undefined)
+          ?? authUser.email.split("@")[0];
+        saveUser(name, authUser.email);
+      });
+    }
     setReady(true);
   }, [router]);
 
