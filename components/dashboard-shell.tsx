@@ -1,14 +1,48 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell, Check, ChevronDown, CreditCard, Flame, GraduationCap, HeartHandshake, LogOut, Map as MapIcon, ClipboardCheck,
-  FlaskConical, Pill, Settings, Smile, Sparkles, Trophy, User, X, Zap
+  FlaskConical, Pill, Settings, ShieldAlert, Smile, Snowflake, Sparkles, Trophy, User, X, Zap
 } from "lucide-react";
-import { getLongestStreak, getStreak, getTotalKP, getWeekLog, getWeeklyActivityByDay, WeekDay } from "@/lib/progress";
+import {
+  ensureStreakFreezesGranted, ensureStreakGapsFrozen, getLongestStreak, getStreakFreezeCount, getWeekLog,
+  PROGRESS_EVENT, WeekDay
+} from "@/lib/progress";
+import { ADAPTIVE_PACING_EVENT } from "@/lib/adaptivePacing";
+import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
 import { currentPathOptions, CurrentPathId, findCurrentPathDef, getCurrentPathId, setCurrentPathId } from "@/lib/currentPath";
 import { formatRelativeTime, getNotifications, getUnreadCount, markAllNotificationsRead, markNotificationRead, NotificationItem } from "@/lib/notifications";
+
+const SECURED_COLOR = "#0F8B8D"; // this app's existing brand teal (accent-500)—used instead of the spec's one-off #00A884 to stay on the real design system
+const BUILDING_COLOR = "#D97706"; // amber-600, matches the amber-50/100/600 tones this file already used for the old flame streak button
+
+// A brain, not a shield—same liquid-fill mechanic as before (a clipPath
+// rect whose height is driven by `percent`, reused for both the outline and
+// the colored fill layer), just swapped onto real brain geometry: the two
+// closed hemisphere loops from Lucide's own "Brain" icon (normally rendered
+// as multi-stroke line art) combined into one fillable silhouette instead,
+// since a liquid fill needs one solid enclosed shape, not separate stroked
+// lines. useId keeps the clipPath id collision-free between the header's
+// mini brain and the dropdown's large one, which render simultaneously.
+function BrainIcon({ percent, secured, size = 22 }: { percent: number; secured: boolean; size?: number }) {
+  const clipId = useId();
+  const fill = secured ? SECURED_COLOR : BUILDING_COLOR;
+  const brainPath = "M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z";
+  const fillHeight = (percent / 100) * 24;
+  return <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+    <defs>
+      <clipPath id={clipId}>
+        <rect x="0" y={24 - fillHeight} width="24" height={fillHeight} style={{ transition: "y 0.6s cubic-bezier(.22,1,.36,1), height 0.6s cubic-bezier(.22,1,.36,1)" }} />
+      </clipPath>
+    </defs>
+    <path d={brainPath} fill="none" stroke="#CBD5E1" strokeWidth="1.3" strokeLinejoin="round" />
+    <path d={brainPath} fill={fill} clipPath={`url(#${clipId})`} style={{ transition: "fill 0.4s ease" }} />
+    {secured && <path d="M7.7 12 L10.8 15.1 L16.6 8.6" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "opacity 0.3s ease 0.3s" }} />}
+  </svg>;
+}
 
 const menuItems = [
   { label: "Profile Settings", icon: User, href: "/dashboard/settings/profile" },
@@ -84,83 +118,160 @@ export function StreakSummary({ streak, totalKP, week }: { streak: number; total
   </>;
 }
 
-function formatDayLabel(dateKey: string): string {
-  const d = new Date(`${dateKey}T00:00:00`);
-  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-}
-
+// Study Shield: replaces the old flame streak pill. Every number here is
+// real (lib/studyShield.ts)—today's KP is a genuine sum of today's actually
+// logged activities, and crossing the 50-KP target genuinely marks today as
+// a streak day (same real storage the old 3-goal Study Plan already wrote
+// to), not a cosmetic-only animation.
 export function StudyStreak() {
   const [open, setOpen] = useState(false);
-  const [streak, setStreak] = useState(0);
+  // The dropdown opens compact (days + KP + secured status only) so it
+  // doesn't dump the full activity list/calendar on you every time—expanded
+  // is its own state, reset shut each time the dropdown itself closes, via
+  // the click-outside effect below.
+  const [expanded, setExpanded] = useState(false);
   const [longestStreak, setLongestStreak] = useState(0);
   const [week, setWeek] = useState<WeekDay[]>([]);
-  const [recent, setRecent] = useState<ReturnType<typeof getWeeklyActivityByDay>>([]);
+  const [progress, setProgress] = useState<ShieldProgress | null>(null);
+  const [freezeCount, setFreezeCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setStreak(getStreak());
+  function refresh() {
+    // Bridge any missed day with a real Streak Freeze, and grant freezes if
+    // this is the first time the streak has passed 2 days—both before
+    // reading today's progress, so a just-bridged gap is reflected
+    // immediately rather than on the next reload.
+    ensureStreakGapsFrozen();
+    ensureStreakFreezesGranted();
+    let next = getTodayShieldProgress();
+    ensureShieldSecured(next);
+    // Re-read after securing so `streakDays` reflects today counting toward
+    // the real streak immediately (getStreak() already includes today the
+    // moment it's added to storage)—the "14 → 15 DAYS" jump the moment you
+    // cross 50 KP is this, not a separate animation trick.
+    if (next.secured) next = getTodayShieldProgress();
+    setProgress(next);
     setLongestStreak(getLongestStreak());
     setWeek(getWeekLog());
-    setRecent(getWeeklyActivityByDay());
+    setFreezeCount(getStreakFreezeCount());
+  }
+
+  useEffect(() => {
+    refresh();
+    // The Shield lives in the persistent header, but the actions that
+    // change it happen on other pages entirely—without these listeners
+    // it'd only ever reflect whatever was true the moment it first
+    // mounted. Its target is adaptive once an exam date exists (see
+    // lib/adaptivePacing.ts), so it also needs to hear about exam-date/
+    // intensity changes, not just KP changes.
+    window.addEventListener(PROGRESS_EVENT, refresh);
+    window.addEventListener(ADAPTIVE_PACING_EVENT, refresh);
+    return () => {
+      window.removeEventListener(PROGRESS_EVENT, refresh);
+      window.removeEventListener(ADAPTIVE_PACING_EVENT, refresh);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!open) return;
     function onClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) { setOpen(false); setExpanded(false); }
     }
     document.addEventListener("mousedown", onClickOutside);
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [open]);
 
-  const activeRecent = recent.filter(d => d.minutes > 0 || d.flashcards > 0 || d.quizzes > 0).slice().reverse();
+  if (!progress) return <div className="h-7 w-32 shrink-0 animate-pulse rounded-full bg-slate-100" />;
+
+  const { activities, currentKP, targetKP, percent, secured, kpUntilSecured, streakDays } = progress;
 
   return <div ref={ref} className="relative">
-    <button type="button" onClick={() => setOpen(o => !o)} aria-label="Study streak" aria-expanded={open} className="flex cursor-pointer items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-extrabold text-amber-700 transition hover:bg-amber-100 focus-visible:ring-4 focus-visible:ring-amber-100">
-      <Flame size={16} className="text-amber-500" fill="currentColor" />{streak} Day Streak
+    <button
+      type="button"
+      onClick={() => setOpen(o => !o)}
+      aria-label="Study progress"
+      aria-expanded={open}
+      className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-extrabold transition focus-visible:ring-4 ${secured ? "border-teal-200 bg-teal-50 text-teal-700 hover:bg-teal-100 focus-visible:ring-teal-100" : "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 focus-visible:ring-amber-100"}`}
+    >
+      <BrainIcon percent={percent} secured={secured} size={13} />
+      {streakDays}d<span className="mx-0.5 text-black/15">·</span>{currentKP}/{targetKP} KP
     </button>
+
     <AnimatePresence>
       {open && <motion.div
         initial={{ opacity: 0, y: -6, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -6, scale: 0.98 }}
         transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute left-0 top-full z-30 mt-2 max-h-[calc(100vh-6rem)] w-80 origin-top-left overflow-y-auto rounded-2xl border border-slate-100 bg-white p-5 shadow-lift"
+        className="absolute left-0 top-full z-30 mt-2 max-h-[calc(100vh-6rem)] w-72 origin-top-left overflow-y-auto rounded-2xl border border-slate-100 bg-white p-4 shadow-lift"
       >
-        <div className="grid grid-cols-2 gap-2.5">
-          <div className="rounded-2xl bg-amber-50 p-3 text-center">
-            <Flame size={18} className="mx-auto text-amber-600" fill="currentColor" />
-            <p className="mt-1.5 text-xl font-extrabold text-ink">{streak}</p>
-            <p className="text-[11px] font-bold text-slate-500">Current streak</p>
+        {/* Compact by default—just the headline number and today's status,
+            so opening this doesn't dump the full activity list/calendar on
+            you every time. The chevron below reveals the rest. */}
+        <div className="flex flex-col items-center text-center">
+          <p className="text-2xl font-extrabold tracking-tight text-ink">{streakDays} DAYS</p>
+          <div className="mt-2">
+            <BrainIcon percent={percent} secured={secured} size={72} />
           </div>
-          <div className="rounded-2xl bg-teal-50 p-3 text-center">
-            <Trophy size={18} className="mx-auto text-teal-600" />
-            <p className="mt-1.5 text-xl font-extrabold text-ink">{longestStreak}</p>
-            <p className="text-[11px] font-bold text-slate-500">Longest streak</p>
-          </div>
+          <p className="mt-2 text-sm font-extrabold text-ink">{currentKP} / {targetKP} KP</p>
+          {secured
+            ? <p className="mt-1 flex items-center gap-1.5 text-xs font-extrabold text-teal-700"><Check size={13} strokeWidth={3} />STREAK SECURED FOR TODAY</p>
+            : <p className="mt-1 flex items-center gap-1.5 text-xs font-extrabold text-amber-700"><ShieldAlert size={13} />{kpUntilSecured} KP until your streak is secured</p>}
+          {freezeCount > 0 && <p className="mt-2 flex items-center gap-1.5 rounded-full bg-sky-50 px-3 py-1 text-[11px] font-extrabold text-sky-700"><Snowflake size={12} />{freezeCount} Streak Freeze{freezeCount === 1 ? "" : "s"} available</p>}
         </div>
 
-        <div className="mt-4">
-          <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Study calendar</p>
-          <div className="mt-2.5 flex justify-between gap-1">
-            {week.map(d => <span key={d.date} className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-extrabold transition ${d.active ? "bg-amber-400 text-white" : "bg-slate-100 text-slate-400"} ${d.isToday ? "ring-2 ring-teal-500 ring-offset-2" : ""}`}>{d.active ? <Check size={14} strokeWidth={3} /> : d.label}</span>)}
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => setExpanded(e => !e)}
+          aria-expanded={expanded}
+          className="mt-3 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-slate-100 py-1.5 text-[11px] font-bold text-slate-500 transition hover:border-teal-200 hover:text-teal-700"
+        >
+          {expanded ? "Show less" : "Show details"}
+          <ChevronDown size={13} className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+        </button>
 
-        <div className="mt-4">
-          <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Recent activity</p>
-          {activeRecent.length === 0
-            ? <p className="mt-1.5 text-xs text-slate-400">Nothing logged yet this week.</p>
-            : <ul className="mt-2 space-y-1.5">
-              {activeRecent.map(d => {
-                const parts: string[] = [];
-                if (d.minutes > 0) parts.push(`${d.minutes} min studied`);
-                if (d.flashcards > 0) parts.push(`${d.flashcards} flashcards`);
-                if (d.quizzes > 0) parts.push(`${d.quizzes} quiz${d.quizzes === 1 ? "" : "zes"}`);
-                return <li key={d.date} className="text-xs text-slate-600"><span className="font-extrabold text-ink">{formatDayLabel(d.date)}:</span> {parts.join(" · ")}</li>;
-              })}
-            </ul>}
-        </div>
+        <AnimatePresence initial={false}>
+          {expanded && <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="mt-3 rounded-2xl bg-[#f9fcfc] p-3 text-center">
+              <p className="text-lg font-extrabold text-ink">{longestStreak}</p>
+              <p className="flex items-center justify-center gap-1 text-[11px] font-bold text-slate-500"><Trophy size={11} />Longest streak</p>
+            </div>
+
+            <div className="mt-3">
+              <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Today's activities</p>
+              <div className="mt-2 space-y-1.5">
+                {activities.map(a => <div key={a.id} className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 transition ${a.done ? "border-transparent bg-teal-50" : "border-slate-100 bg-white"}`}>
+                  {a.done
+                    ? <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-teal-500 text-white"><Check size={11} strokeWidth={3} /></span>
+                    : <span className="h-5 w-5 shrink-0 rounded-full border-2 border-slate-200" />}
+                  <span className={`flex-1 text-xs font-bold ${a.done ? "text-slate-400 line-through" : "text-ink"}`}>{a.label}</span>
+                  <span className={`text-xs font-extrabold ${a.done ? "text-teal-600" : "text-slate-400"}`}>+{a.kp} KP</span>
+                </div>)}
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Study calendar</p>
+              <div className="mt-2.5 flex justify-between gap-1">
+                {week.map(d => <span key={d.date} title={d.frozen ? "Protected by a Streak Freeze" : undefined} className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-extrabold transition ${d.frozen ? "bg-sky-400 text-white" : d.active ? "bg-teal-500 text-white" : "bg-slate-100 text-slate-400"} ${d.isToday ? "ring-2 ring-teal-500 ring-offset-2" : ""}`}>{d.frozen ? <Snowflake size={12} /> : d.active ? <Check size={12} strokeWidth={3} /> : d.label}</span>)}
+              </div>
+            </div>
+
+            <div className={`mt-3 flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-extrabold ${secured ? "bg-teal-50 text-teal-700" : "bg-amber-50 text-amber-700"}`}>
+              <Zap size={14} fill="currentColor" />
+              {secured ? `Streak secured—come back tomorrow to keep it going.` : `Earn ${kpUntilSecured} more KP to continue your ${streakDays}-day streak.`}
+            </div>
+
+            <Link href="/dashboard/progress" onClick={() => { setOpen(false); setExpanded(false); }} className="mt-3 flex cursor-pointer items-center justify-center gap-1.5 text-xs font-bold text-slate-500 transition hover:text-teal-600">View full progress</Link>
+          </motion.div>}
+        </AnimatePresence>
       </motion.div>}
     </AnimatePresence>
   </div>;

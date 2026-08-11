@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, Noto_Sans } from "next/font/google";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import "./globals.css";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-display", display: "swap" });
@@ -11,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en" className={`${figtree.variable} ${notoSans.variable}`}><body>{children}</body></html>;
+  return <html lang="en" className={`${figtree.variable} ${notoSans.variable}`}><body>{children}<CookieConsentBanner /></body></html>;
 }

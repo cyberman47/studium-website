@@ -101,7 +101,7 @@ function ProgressBar({ percent }: { percent: number }) {
 
 function WelcomeScreen({ onStart }: { onStart: () => void }) {
   return <div className="rounded-3xl border border-slate-100 bg-white p-8 text-center shadow-soft sm:p-12">
-    <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#effbfa]"><LogoMark className="h-9 w-9" /></span>
+    <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#effbfa]"><LogoMark className="h-10 w-8" /></span>
     <h1 className="display mt-7 text-3xl leading-tight sm:text-4xl">👋 Welcome to Studium</h1>
     <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-slate-500 sm:text-base">Let's personalize your learning experience. This will only take a few moments.</p>
     <button type="button" onClick={onStart} className="mt-9 w-full cursor-pointer rounded-full bg-[#0F8B8D] py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0f8b8d] transition hover:-translate-y-0.5 hover:bg-[#0c7375] sm:w-auto sm:px-10">Get Started</button>

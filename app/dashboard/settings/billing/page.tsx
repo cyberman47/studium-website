@@ -13,7 +13,7 @@ export default function BillingPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Current plan</p>
-            <p className="mt-1 text-2xl font-extrabold text-ink">Starter <span className="text-sm font-bold text-slate-400">· Free</span></p>
+            <p className="mt-1 text-2xl font-extrabold text-ink">Free</p>
           </div>
           <Link href="/pricing" className="cursor-pointer rounded-full bg-accent-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Upgrade plan</Link>
         </div>

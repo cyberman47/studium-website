@@ -3,14 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookA, Compass, Library, Map, Search } from "lucide-react";
+import { BookA, Compass, FileText, Globe, Link2, Map, Search } from "lucide-react";
 import { getDefaultSuggestions, search, SearchResult } from "@/lib/search";
 
 const groupIcons: Record<SearchResult["group"], typeof Search> = {
   "Go to": Compass,
   Terminology: BookA,
   "MCAT Lessons": Map,
-  Library: Library
+  Community: Globe,
+  Articles: FileText,
+  Resources: Link2
 };
 
 export function CommandSearch() {
@@ -65,7 +67,6 @@ export function CommandSearch() {
     >
       <Search size={15} className="shrink-0" />
       <span className="flex-1 text-left">Search...</span>
-      <kbd className="shrink-0 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-bold text-slate-400">⌘K</kbd>
     </button>
     <button type="button" onClick={() => setOpen(true)} aria-label="Search" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-500 transition hover:bg-slate-50 sm:hidden"><Search size={18} /></button>
 

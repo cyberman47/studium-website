@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { LanguageBar, Logo } from "./navigation";
 
-export function LegalDocument({ title, lastUpdated, children }: { title: string; lastUpdated: string; children: React.ReactNode }) {
+export function LegalDocument({ title, lastUpdated, eyebrow = "Legal", children }: { title: string; lastUpdated: string; eyebrow?: string; children: React.ReactNode }) {
   return <main className="min-h-screen bg-[#fcfdfd]">
     <LanguageBar />
     <header className="border-b border-slate-100 bg-white/85 py-4 backdrop-blur-xl">
@@ -12,7 +12,7 @@ export function LegalDocument({ title, lastUpdated, children }: { title: string;
       <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
       <div className="container-page">
         <div className="mx-auto max-w-3xl">
-          <span className="eyebrow">Legal</span>
+          <span className="eyebrow">{eyebrow}</span>
           <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">{title}</h1>
           <p className="mt-3 text-sm font-bold text-slate-500">Last updated: {lastUpdated}</p>
           <div className="mt-10 space-y-8">{children}</div>

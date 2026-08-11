@@ -1,15 +1,36 @@
-import { Bot, Sparkles } from "lucide-react";
+"use client";
+
+// The standalone "Studium AI" nav destination—general Q&A, not tied to any
+// one lesson. Uses AiTutorWorkspace (components/ai-tutor-workspace.tsx), a
+// full-page chat-app layout distinct from AiTutorPanel's compact docked
+// sidebar (which stays as-is for the 3 in-lesson embed sites). Both share
+// the same real /api/tutor pipeline (lib/tutorChat.ts). Its own chat thread
+// is keyed under lessonId "general" so it doesn't mix with any lesson's
+// history.
+import { AiTutorWorkspace } from "@/components/ai-tutor-workspace";
+import { TutorContext } from "@/lib/tutorChat";
+import { getLevelInfo, getTotalKP } from "@/lib/progress";
 
 export default function AiTutorPage() {
-  return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
-    <span className="eyebrow"><Sparkles size={13} />AI Tutor</span>
-    <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Ask Studium anything.</h1>
-    <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Your AI study partner for clear explanations, hints, and a plan whenever you need one.</p>
-    <div className="mt-12 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-white py-20 text-center shadow-soft">
-      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 text-teal-700"><Bot size={26} /></span>
-      <p className="text-base font-extrabold text-ink">Your AI Tutor isn't connected yet.</p>
-      <p className="max-w-xs text-sm leading-relaxed text-slate-500">We're still building this section—check back soon.</p>
+  const level = getLevelInfo(getTotalKP());
+  const context: TutorContext = {
+    sectionName: "General",
+    subjectName: "Open Q&A",
+    lessonTitle: "your studies",
+    lessonId: "general",
+    currentStep: "Open chat — not tied to a specific lesson",
+    currentFlashcard: null,
+    currentPracticeQuestion: null,
+    recentMistakes: [],
+    studentLevel: `Level ${level.level} · ${level.name}`
+  };
+
+  // Fills the full remaining content area below the dashboard's top header
+  // (77px, measured) with a small breathing margin, rather than a narrow
+  // card floating in whitespace.
+  return <div className="flex flex-col py-4" style={{ height: "calc(100vh - 77px)" }}>
+    <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border border-slate-200 shadow-soft">
+      <AiTutorWorkspace context={context} />
     </div>
-  </section>;
+  </div>;
 }

@@ -7,6 +7,7 @@ import {
   BookOpen, Brain, ClipboardList, Copy, FileText, HelpCircle, Layers, Search,
   Sparkles, Trash2, Type, UploadCloud
 } from "lucide-react";
+import { CreateHub } from "@/components/create-hub";
 import { inputClass } from "@/components/ui";
 import {
   deleteDeck, deleteLesson, deleteQuiz, deleteSummary, duplicateDeck, duplicateLesson, duplicateQuiz, duplicateSummary,
@@ -14,12 +15,21 @@ import {
   SavedQuiz, SavedSummaryEntry
 } from "@/lib/create";
 import { getLearnedTerms } from "@/lib/terminology";
+import { setPendingSource } from "@/lib/aiGenerate";
 
 type Step = "idle" | "analyzing" | "analyzed";
 
 const acceptedTypes = ".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.txt";
 
-const generateOptions = [
+// Only these two are wired to real AI generation today (see lib/aiGenerate.ts
+// + app/api/generate/route.ts)—shown for the real-text path. The other
+// generate options still exist for the sample-document walkthrough below.
+const realGenerateOptions = [
+  { id: "flashcards", label: "Generate Flashcards", icon: Brain, href: "/dashboard/create/flashcards", color: "bg-indigo-100 text-indigo-600" },
+  { id: "quiz", label: "Create Quiz", icon: HelpCircle, href: "/dashboard/create/quiz", color: "bg-amber-100 text-amber-600" }
+];
+
+const sampleGenerateOptions = [
   { id: "flashcards", label: "Generate Flashcards", icon: Brain, href: "/dashboard/create/flashcards", color: "bg-indigo-100 text-indigo-600" },
   { id: "quiz", label: "Create Quiz", icon: HelpCircle, href: "/dashboard/create/quiz", color: "bg-amber-100 text-amber-600" },
   { id: "lesson", label: "Build Lesson", icon: BookOpen, href: "/dashboard/create/lesson", color: "bg-teal-100 text-teal-700" },
@@ -29,12 +39,24 @@ const generateOptions = [
 
 type CreationRow = { id: string; type: "Lesson" | "Flashcards" | "Quiz" | "Summary"; title: string; createdAt: string; meta: string };
 
+function estimateReadMinutes(wordCount: number): number {
+  return Math.max(1, Math.round(wordCount / 200));
+}
+
 export default function CreatePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<Step>("idle");
   const [dragOver, setDragOver] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [fileError, setFileError] = useState("");
+
+  // Real captured text—from a real .txt file's actual contents, or pasted
+  // notes. null means the sample-document walkthrough is running instead
+  // (e.g. any other accepted file type, which can't be parsed for real
+  // without new server-side parsing dependencies).
+  const [realText, setRealText] = useState<string | null>(null);
+  const [pasteOpen, setPasteOpen] = useState(false);
+  const [pasteDraft, setPasteDraft] = useState("");
 
   const [decks, setDecks] = useState<SavedDeck[]>([]);
   const [quizzes, setQuizzes] = useState<SavedQuiz[]>([]);
@@ -58,28 +80,51 @@ export default function CreatePage() {
     return ["pdf", "doc", "docx", "ppt", "pptx", "png", "jpg", "jpeg", "txt"].includes(ext ?? "");
   }
 
-  function startAnalysis(fileName: string) {
-    if (!isSupported(fileName)) { setFileError("That file type isn't supported. Try a PDF, Word, PowerPoint, image, or text file."); return; }
+  async function startAnalysis(input: File | string) {
+    const name = typeof input === "string" ? input : input.name;
+    if (!isSupported(name)) { setFileError("That file type isn't supported. Try a PDF, Word, PowerPoint, image, or text file."); return; }
     setFileError("");
-    setUploadedFileName(fileName);
+    setUploadedFileName(name);
+    setPasteOpen(false);
     setStep("analyzing");
-    setTimeout(() => {
-      registerUpload();
-      setStep("analyzed");
-    }, 1200);
+
+    // Only .txt files can be read for real without a server-side parser
+    // (pdf/doc/ppt/image parsing isn't wired up)—everything else genuinely
+    // falls back to the labeled sample-document walkthrough below.
+    if (typeof input !== "string" && name.toLowerCase().endsWith(".txt")) {
+      const text = await input.text();
+      setTimeout(() => { registerUpload(); setRealText(text); setStep("analyzed"); }, 700);
+      return;
+    }
+    setTimeout(() => { registerUpload(); setRealText(null); setStep("analyzed"); }, 1200);
+  }
+
+  function analyzePastedText() {
+    const trimmed = pasteDraft.trim();
+    if (!trimmed) { setFileError("Paste some text first."); return; }
+    setFileError("");
+    setUploadedFileName("Pasted notes");
+    setStep("analyzing");
+    setTimeout(() => { registerUpload(); setRealText(trimmed); setStep("analyzed"); }, 500);
   }
 
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) startAnalysis(file.name);
+    if (file) startAnalysis(file);
   }
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = "";
-    if (file) startAnalysis(file.name);
+    if (file) startAnalysis(file);
+  }
+
+  function goGenerate(href: string) {
+    if (realText !== null) setPendingSource({ kind: "text", text: realText, fileName: uploadedFileName ?? undefined });
+    // else: no pending source is set, so the destination page falls back
+    // to its own honest sample-content walkthrough (unchanged behavior).
   }
 
   const rows: CreationRow[] = [
@@ -97,13 +142,17 @@ export default function CreatePage() {
     refreshCreations();
   }
 
+  const wordCount = realText ? realText.trim().split(/\s+/).filter(Boolean).length : 0;
+
   return <section className="relative py-10 sm:py-14">
     <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
     <span className="eyebrow"><Sparkles size={13} />Create</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Create Your Own Learning Materials.</h1>
-    <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Upload your notes and let Studium transform them into personalized study resources.</p>
+    <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Paste your notes, upload a document, and let Studium transform them into real, AI-generated study resources.</p>
 
-    <div className="mt-10 max-w-3xl">
+    <CreateHub />
+
+    <div id="upload-files" className="mt-10 max-w-3xl scroll-mt-24">
       <div
         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
@@ -112,13 +161,23 @@ export default function CreatePage() {
       >
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 text-teal-700"><UploadCloud size={26} /></span>
         <h2 className="mt-4 text-lg font-extrabold tracking-tight">Upload Notes</h2>
-        <p className="mt-1.5 max-w-sm mx-auto text-sm leading-relaxed text-slate-500">Drag and drop a PDF, Word doc, PowerPoint, image, or text file—or click to browse.</p>
+        <p className="mt-1.5 max-w-sm mx-auto text-sm leading-relaxed text-slate-500">Drag and drop a .txt file for real AI generation, or a PDF/Word/PowerPoint/image for a sample walkthrough.</p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           <button type="button" onClick={() => fileInputRef.current?.click()} className="cursor-pointer rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Browse Files</button>
+          <button type="button" onClick={() => { setPasteOpen(o => !o); setFileError(""); }} className="cursor-pointer rounded-full border border-slate-200 px-6 py-3 text-sm font-bold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc]">Paste Text Instead</button>
           <button type="button" onClick={() => startAnalysis(sampleDocument.fileName)} className="cursor-pointer rounded-full border border-slate-200 px-6 py-3 text-sm font-bold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc]">Try a Sample Document</button>
         </div>
         <input ref={fileInputRef} type="file" accept={acceptedTypes} onChange={handleFileSelect} className="hidden" />
         {fileError && <p className="mt-3 text-xs font-bold text-rose-600">{fileError}</p>}
+
+        <AnimatePresence>
+          {pasteOpen && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+            <div className="mt-5 text-left">
+              <textarea value={pasteDraft} onChange={e => setPasteDraft(e.target.value)} rows={6} placeholder="Paste your notes here—this becomes the real source Studium's AI generates from." className={`${inputClass} resize-none`} />
+              <button type="button" onClick={analyzePastedText} className="mt-3 cursor-pointer rounded-full bg-accent-500 px-6 py-2.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Use This Text</button>
+            </div>
+          </motion.div>}
+        </AnimatePresence>
       </div>
 
       <AnimatePresence>
@@ -127,9 +186,22 @@ export default function CreatePage() {
           <div className="mx-auto mt-4 h-1.5 w-48 overflow-hidden rounded-full bg-slate-100"><motion.div className="h-full rounded-full bg-teal-500" initial={{ width: "0%" }} animate={{ width: "100%" }} transition={{ duration: 1.1, ease: "easeInOut" }} /></div>
         </motion.div>}
 
-        {step === "analyzed" && <motion.div key="analyzed" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+        {step === "analyzed" && realText !== null && <motion.div key="analyzed-real" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-6 rounded-3xl border border-teal-100 bg-white p-6 shadow-soft sm:p-7">
+          <p className="text-sm font-extrabold text-teal-700">✓ Real text captured from "{uploadedFileName}".</p>
+          <p className="mt-1 text-xs text-slate-400">{wordCount.toLocaleString()} words · ~{estimateReadMinutes(wordCount)} min read. This is your actual content—generation below is a real AI call grounded in it, not a sample.</p>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {realGenerateOptions.map(opt => <Link key={opt.id} href={opt.href} onClick={() => goGenerate(opt.href)} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-100 p-3.5 transition hover:border-teal-200 hover:bg-[#f9fcfc]">
+              <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${opt.color}`}><opt.icon size={18} /></span>
+              <span className="text-sm font-bold text-ink">{opt.label}</span>
+            </Link>)}
+          </div>
+          <p className="mt-4 text-[11px] text-slate-400">Lesson, Summary, and Terminology generation from your own text aren't wired up yet—only Flashcards and Quiz.</p>
+        </motion.div>}
+
+        {step === "analyzed" && realText === null && <motion.div key="analyzed-sample" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
           <p className="text-sm font-extrabold text-teal-700">✓ Your document has been analyzed.</p>
-          <p className="mt-1 text-xs text-slate-400">You uploaded "{uploadedFileName}". Deep AI analysis of arbitrary files isn't connected in this demo, so the results below use a sample document ({sampleDocument.fileName}) to show you what the finished experience looks like.</p>
+          <p className="mt-1 text-xs text-slate-400">You uploaded "{uploadedFileName}". Parsing arbitrary file types (PDF/Word/PowerPoint/image) for real isn't connected yet, so the results below use a sample document ({sampleDocument.fileName}) to show you what the finished experience looks like. Upload a .txt file or paste text instead for real generation.</p>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-2xl bg-[#f9fcfc] p-4 text-center"><p className="text-xl font-extrabold text-ink">{sampleDocument.pages}</p><p className="mt-0.5 text-[11px] font-bold text-slate-500">pages analyzed</p></div>
             <div className="rounded-2xl bg-[#f9fcfc] p-4 text-center"><p className="text-xl font-extrabold text-ink">{sampleDocument.keyConceptsFound}</p><p className="mt-0.5 text-[11px] font-bold text-slate-500">key concepts found</p></div>
@@ -138,7 +210,7 @@ export default function CreatePage() {
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {generateOptions.map(opt => <Link key={opt.id} href={opt.href} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-100 p-3.5 transition hover:border-teal-200 hover:bg-[#f9fcfc]">
+            {sampleGenerateOptions.map(opt => <Link key={opt.id} href={opt.href} onClick={() => goGenerate(opt.href)} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-100 p-3.5 transition hover:border-teal-200 hover:bg-[#f9fcfc]">
               <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${opt.color}`}><opt.icon size={18} /></span>
               <span className="text-sm font-bold text-ink">{opt.label}</span>
             </Link>)}

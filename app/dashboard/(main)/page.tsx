@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, BookOpen, ChevronRight, Flame, HelpCircle, Layers, Play, Stethoscope, Zap } from "lucide-react";
+import { ArrowUpRight, BookOpen, Calendar, ChevronRight, Flame, HelpCircle, Layers, Play, Stethoscope, Target, Zap } from "lucide-react";
 import { getUser } from "@/lib/onboarding";
-import { getLevelInfo, getStreak, getStudyPlanProgress, getTotalKP, LevelInfo, recordVisit, StudyPlanProgress } from "@/lib/progress";
+import { getLevelInfo, getStreak, getTotalKP, LevelInfo, recordVisit } from "@/lib/progress";
 import { CaseAttempt, ClinicalCase, getCaseOfTheDay, getTodayCaseAttempt } from "@/lib/clinicalCases";
 import { CURRENT_PATH_EVENT, CurrentPathId, findCurrentPathDef, getCurrentPathId, pathEmoji } from "@/lib/currentPath";
 import { findSubject, getLessonStatus } from "@/lib/mcatPath";
+import { getAllMcatPracticeQuestions, getUnusedMcatPracticeQuestions } from "@/lib/mcatConcepts";
+import { getAllLibraryCards, isCardDue } from "@/lib/flashcardLibrary";
 import { getTerminologyStats, TerminologyStats } from "@/lib/terminology";
-import { getTodaysStudyPlan, TodaysStudyPlan } from "@/lib/studyPlan";
-import { StudyPlanCard } from "@/components/study-plan-card";
+import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
+import { AdaptivePace, getAdaptivePace, getDaysRemaining, getExamDate, getIntensity } from "@/lib/adaptivePacing";
 
 const pathRecommendations: Record<CurrentPathId, { label: string; href: string }[]> = {
   "medical-school": [
@@ -73,8 +75,11 @@ export default function DashboardHomePage() {
   const [pathId, setPathId] = useState<CurrentPathId | null>(null);
   const [nextLesson, setNextLesson] = useState<NextLesson | null>(null);
   const [term, setTerm] = useState<TerminologyStats | null>(null);
-  const [planProgress, setPlanProgress] = useState<StudyPlanProgress | null>(null);
-  const [plan, setPlan] = useState<TodaysStudyPlan | null>(null);
+  const [shield, setShield] = useState<ShieldProgress | null>(null);
+  const [examDate, setExamDate] = useState<string | null>(null);
+  const [pace, setPace] = useState<AdaptivePace | null>(null);
+  const [dueCards, setDueCards] = useState(0);
+  const [unusedQuizzes, setUnusedQuizzes] = useState(0);
 
   function refresh() {
     const kp = getTotalKP();
@@ -86,8 +91,16 @@ export default function DashboardHomePage() {
     const currentPath = getCurrentPathId();
     setPathId(currentPath);
     setTerm(getTerminologyStats());
-    setPlanProgress(getStudyPlanProgress());
-    setPlan(getTodaysStudyPlan(currentPath));
+
+    let s = getTodayShieldProgress();
+    ensureShieldSecured(s);
+    if (s.secured) s = getTodayShieldProgress();
+    setShield(s);
+    const date = getExamDate();
+    setExamDate(date);
+    setPace(getAdaptivePace(date, getIntensity()));
+    setDueCards(getAllLibraryCards().filter(c => isCardDue(c.id)).length);
+    setUnusedQuizzes(getUnusedMcatPracticeQuestions(getAllMcatPracticeQuestions()).length);
 
     const biology = findSubject("bio-biochem", "biology");
     if (biology) {
@@ -154,7 +167,7 @@ export default function DashboardHomePage() {
         <div className={`${cardClass} p-5 lg:col-span-1`}>
           <span className="eyebrow">🏆 Progress</span>
           <div className="mt-4 flex items-center gap-4">
-            <MiniRing percent={plan?.percent ?? 0} size={58} stroke={6} />
+            <MiniRing percent={shield?.percent ?? 0} size={58} stroke={6} />
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Level {level?.level ?? 1}</p>
               <p className="truncate text-sm font-extrabold text-ink">{level?.name ?? "Beginner"}</p>
@@ -180,8 +193,26 @@ export default function DashboardHomePage() {
         </div>}
       </div>
 
-      {/* Today's Study Plan — compact */}
-      {plan && <StudyPlanCard plan={plan} onChange={refresh} />}
+      {/* Study Planner summary—real Adaptive Pacing Hub data, not a second
+          copy of its logic. Blank prompt until a real exam date is set. */}
+      {examDate === null && <div className={`${cardClass} p-6 text-center sm:p-8`}>
+        <span className="eyebrow justify-center text-[#0F8B8D]">📅 Study Planner</span>
+        <h3 className="display mt-3 text-xl">Set a target exam date.</h3>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-slate-500">Studium adapts your daily KP target automatically as the date gets closer.</p>
+        <Link href="/dashboard/study-plan" className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#0F8B8D] px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0f8b8d] transition hover:-translate-y-0.5 hover:bg-[#0c7375]"><Calendar size={15} />Set Exam Date</Link>
+      </div>}
+      {examDate !== null && pace && shield && <Link href="/dashboard/study-plan" className={`${cardClass} block cursor-pointer p-5 transition hover:-translate-y-0.5 hover:shadow-lift sm:p-6`}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="eyebrow text-[#0F8B8D]">📅 Study Planner</span>
+          <span className="flex items-center gap-1.5 text-xs font-extrabold text-[#0F8B8D]">View full plan<ArrowUpRight size={12} /></span>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+          <span className="flex items-center gap-1.5 font-bold text-ink"><Target size={14} className="text-[#0F8B8D]" />{getDaysRemaining(examDate)} days to exam</span>
+          <span className="flex items-center gap-1.5 font-bold text-ink">{shield.currentKP} / {shield.targetKP} KP today</span>
+          <span className={`rounded-full px-2.5 py-1 text-[11px] font-extrabold ${shield.secured ? "bg-teal-50 text-teal-700" : "bg-amber-50 text-amber-700"}`}>{shield.secured ? "Streak secured" : `${shield.kpUntilSecured} KP to go`}</span>
+        </div>
+        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100"><div className={`h-full rounded-full transition-[width] duration-500 ${shield.secured ? "bg-[#0F8B8D]" : "bg-amber-400"}`} style={{ width: `${shield.percent}%` }} /></div>
+      </Link>}
 
       {/* Secondary grid: AI Recommendations · Upcoming Reviews */}
       <div className="grid gap-4 lg:grid-cols-2">
@@ -214,12 +245,12 @@ export default function DashboardHomePage() {
             </Link>
             <div className="flex items-center gap-3.5 py-3">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-600"><Layers size={15} /></span>
-              <div className="min-w-0 flex-1"><p className="text-sm font-bold text-ink">Flashcards</p><p className="text-xs text-slate-500">{planProgress ? `${Math.max(0, planProgress.goals.flashcards - planProgress.flashcards)} cards due` : "—"}</p></div>
+              <div className="min-w-0 flex-1"><p className="text-sm font-bold text-ink">Flashcards</p><p className="text-xs text-slate-500">{dueCards} card{dueCards === 1 ? "" : "s"} due</p></div>
               <span className="shrink-0 text-[11px] font-bold text-slate-400">In today's plan</span>
             </div>
             <div className="flex items-center gap-3.5 py-3">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-600"><HelpCircle size={15} /></span>
-              <div className="min-w-0 flex-1"><p className="text-sm font-bold text-ink">Quizzes</p><p className="text-xs text-slate-500">{planProgress ? `${planProgress.goals.quizzes} quiz${planProgress.goals.quizzes === 1 ? "" : "zes"} ready` : "—"}</p></div>
+              <div className="min-w-0 flex-1"><p className="text-sm font-bold text-ink">Quizzes</p><p className="text-xs text-slate-500">{unusedQuizzes} unused question{unusedQuizzes === 1 ? "" : "s"}</p></div>
               <span className="shrink-0 text-[11px] font-bold text-slate-400">In today's plan</span>
             </div>
           </div>

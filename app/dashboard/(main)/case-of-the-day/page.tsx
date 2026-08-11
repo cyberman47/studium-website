@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Check, CheckCircle2, PartyPopper, Stethoscope, X } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, Flag, PartyPopper, Stethoscope, X } from "lucide-react";
 import { CaseAttempt, getCaseOfTheDay, getTodayCaseAttempt, submitCaseAnswer } from "@/lib/clinicalCases";
 import { claimClinicalCase, getLevelInfo } from "@/lib/progress";
+import { reportTypeLabels, ReportType, submitReport } from "@/lib/reports";
 import { InteractiveText } from "@/components/interactive-text";
 
 const difficultyClasses: Record<string, string> = {
@@ -20,6 +21,10 @@ export default function CaseOfTheDayPage() {
   const [attempt, setAttempt] = useState<CaseAttempt | null>(null);
   const [kpAwarded, setKpAwarded] = useState<number | null>(null);
   const [levelUpInfo, setLevelUpInfo] = useState<{ level: number; name: string } | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
+  const [reportType, setReportType] = useState<ReportType>("bug");
+  const [reportSent, setReportSent] = useState(false);
 
   useEffect(() => {
     const existing = getTodayCaseAttempt();
@@ -43,6 +48,15 @@ export default function CaseOfTheDayPage() {
     }
   }
 
+  function handleReportSubmit() {
+    const result = submitReport({ type: reportType, targetType: "case", targetId: todaysCase.id, targetLabel: todaysCase.title, message: reportMessage });
+    if (result.ok) {
+      setReportSent(true);
+      setReportMessage("");
+      setTimeout(() => { setReportOpen(false); setReportSent(false); }, 1500);
+    }
+  }
+
   const solved = !!attempt;
 
   return <section className="relative py-10 sm:py-14">
@@ -62,7 +76,7 @@ export default function CaseOfTheDayPage() {
       </div>
 
       <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
-        <h2 className="text-lg font-extrabold tracking-tight">{todaysCase.question}</h2>
+        <h2 className="text-lg font-extrabold tracking-tight"><InteractiveText text={todaysCase.question} /></h2>
         <div className="mt-4 space-y-2.5">
           {todaysCase.options.map((option, i) => {
             const isCorrect = i === todaysCase.correctIndex;
@@ -87,13 +101,42 @@ export default function CaseOfTheDayPage() {
 
         {attempt && <div className="mt-6 rounded-2xl bg-[#f9fcfc] p-5">
           <p className={`text-sm font-extrabold ${attempt.correct ? "text-teal-700" : "text-rose-600"}`}>{attempt.correct ? "Correct!" : "Not quite."}</p>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">{todaysCase.explanation}</p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600"><InteractiveText text={todaysCase.explanation} /></p>
           {kpAwarded !== null && <p className="mt-3 text-xs font-extrabold text-teal-600">+{kpAwarded} KP earned</p>}
         </div>}
       </div>
 
       {solved && <p className="px-1 text-xs leading-relaxed text-slate-400">Come back tomorrow for a new case.</p>}
+
+      <button type="button" onClick={() => setReportOpen(true)} className="flex cursor-pointer items-center gap-1.5 px-1 text-xs font-bold text-slate-400 transition hover:text-rose-500"><Flag size={12} />Something wrong with this case? Report it</button>
     </div>
+
+    <AnimatePresence>
+      {reportOpen && <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
+        onClick={() => setReportOpen(false)}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4 backdrop-blur-sm"
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 8 }}
+          onClick={e => e.stopPropagation()}
+          className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-lift"
+        >
+          <h3 className="text-base font-extrabold text-ink">Report an issue</h3>
+          <p className="mt-1 text-xs text-slate-500">On "{todaysCase.title}". Sent to the admin Reports inbox on this browser.</p>
+          {reportSent ? <p className="mt-4 rounded-xl bg-teal-50 px-3 py-2 text-sm font-bold text-teal-700">Thanks—your report was submitted.</p> : <>
+            <select value={reportType} onChange={e => setReportType(e.target.value as ReportType)} className="mt-4 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400">
+              {(Object.keys(reportTypeLabels) as ReportType[]).map(t => <option key={t} value={t}>{reportTypeLabels[t]}</option>)}
+            </select>
+            <textarea value={reportMessage} onChange={e => setReportMessage(e.target.value)} rows={3} placeholder="What's wrong?" className="mt-2 w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400" />
+            <div className="mt-4 flex gap-2">
+              <button type="button" onClick={() => setReportOpen(false)} className="flex-1 cursor-pointer rounded-full border border-slate-200 px-4 py-2 text-sm font-bold text-slate-500">Cancel</button>
+              <button type="button" onClick={handleReportSubmit} disabled={!reportMessage.trim()} className="flex-1 cursor-pointer rounded-full bg-accent-500 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">Submit</button>
+            </div>
+          </>}
+        </motion.div>
+      </motion.div>}
+    </AnimatePresence>
 
     <AnimatePresence>
       {levelUpInfo && <motion.div

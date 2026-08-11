@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence } from "framer-motion";
 import { CheckCircle2, Layers, Sparkles } from "lucide-react";
 import { Reveal } from "@/components/ui";
+import { ExpandedTermPanel } from "@/components/interactive-text";
 import { findTermCategory, getTermsByCategory, isTermLearned, isTermMastered } from "@/lib/terminology";
 
 export default function TerminologyCategoryPage({ params }: { params: { category: string } }) {
@@ -11,6 +13,10 @@ export default function TerminologyCategoryPage({ params }: { params: { category
   const termList = category ? getTermsByCategory(category.id) : [];
   const [learned, setLearned] = useState<Set<string>>(new Set());
   const [mastered, setMastered] = useState<Set<string>>(new Set());
+  // Clicking a term used to navigate to a whole new page—now it opens the
+  // same on-page summary popup used everywhere else a term gets clicked
+  // (see components/interactive-text.tsx), so browsing stays on this page.
+  const [openTermId, setOpenTermId] = useState<string | null>(null);
 
   useEffect(() => {
     setLearned(new Set(termList.filter(t => isTermLearned(t.id)).map(t => t.id)));
@@ -39,15 +45,19 @@ export default function TerminologyCategoryPage({ params }: { params: { category
       </div>
       : <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {termList.map((term, i) => <Reveal key={term.id} delay={i * 0.03}>
-          <Link href={`/dashboard/terminology/${category.id}/${term.id}`} className="flex h-full flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+          <button type="button" onClick={() => setOpenTermId(term.id)} className="flex h-full w-full cursor-pointer flex-col rounded-3xl border border-slate-100 bg-white p-5 text-left shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-base font-extrabold tracking-tight text-ink">{term.name}</h2>
               {mastered.has(term.id) ? <span className="flex items-center gap-1 rounded-full bg-teal-50 px-2 py-1 text-[10px] font-extrabold text-teal-700"><CheckCircle2 size={11} />Mastered</span>
                 : learned.has(term.id) && <span className="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-extrabold text-amber-700">Learning</span>}
             </div>
             <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-500">{term.definition}</p>
-          </Link>
+          </button>
         </Reveal>)}
       </div>}
+
+    <AnimatePresence>
+      {openTermId && <ExpandedTermPanel initialTermId={openTermId} onClose={() => setOpenTermId(null)} />}
+    </AnimatePresence>
   </section>;
 }

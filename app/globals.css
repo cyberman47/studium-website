@@ -14,7 +14,12 @@
   .container-page { @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8; }
   .dashboard-shell { @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8; }
   .eyebrow { @apply inline-flex items-center gap-2 rounded-full border border-teal-100 bg-white/80 px-3 py-1.5 text-xs font-extrabold tracking-[.13em] text-teal-700 uppercase shadow-sm; }
-  .display { @apply font-display font-extrabold tracking-[-.03em] text-ink; }
+  /* No hardcoded color here on purpose: the page body already defaults to
+     text-ink everywhere, so light-background usages look identical either
+     way—but a hardcoded color here would win over an ancestor's text-white
+     on dark cards (CSS inheritance always loses to an explicit rule on the
+     element itself), silently rendering dark-on-dark invisible text. */
+  .display { @apply font-display font-extrabold tracking-[-.03em]; }
   .dot-grid { background-image: radial-gradient(#bfd8d6 1px, transparent 1px); background-size: 18px 18px; }
 }
 
@@ -25,7 +30,17 @@
 @keyframes float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
 @keyframes pulse-ring { 0% { transform: scale(.85); opacity: .5 } 75%,100% { transform: scale(1.35); opacity: 0 } }
 @keyframes shimmer { 0% { background-position: -400px 0 } 100% { background-position: 400px 0 } }
+/* components/flashcard.tsx's entrance slide: a real @keyframes animation
+   fires automatically whenever the element is inserted into the DOM, with
+   no React effect/JS involved—unlike a Framer Motion initial->animate
+   handshake or a React-state-driven CSS transition, both of which turned
+   out to silently never fire when this component mounts as part of a
+   brand-new subtree (e.g. a just-opened fullscreen overlay) under this
+   dev environment's React 18 Strict Mode. Direction is passed via a CSS
+   custom property so one keyframe serves both slide-from-left/right. */
+@keyframes flashcard-enter { from { opacity: 0; transform: translateX(var(--flashcard-enter-x, 24px)); } to { opacity: 1; transform: translateX(0); } }
 .float { animation: float 5s ease-in-out infinite; }
 .float-slow { animation: float 7s ease-in-out 1s infinite; }
 .pulse-ring { animation: pulse-ring 2.5s ease-out infinite; }
 .skeleton { background-image: linear-gradient(90deg, #eef2f4 25%, #e1e8eb 37%, #eef2f4 63%); background-size: 400px 100%; animation: shimmer 1.4s ease-in-out infinite; }
+.flashcard-enter { animation: flashcard-enter 200ms ease-out both; }

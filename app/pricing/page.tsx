@@ -7,23 +7,36 @@ import { ArrowLeft, Check, ChevronDown, Minus, ShieldCheck, Sparkles } from "luc
 import { LanguageBar, Logo } from "@/components/navigation";
 import { Reveal } from "@/components/ui";
 
-const plans: { name: string; price: string; text: string; items: string[]; popular?: boolean }[] = [
-  { name: "Starter", price: "0", text: "A better way to begin.", items: ["AI study help", "3 subjects", "Essential flashcards"] },
-  { name: "Plus", price: "12", text: "For focused learners.", items: ["Unlimited subjects", "Personal learning plans", "Advanced analytics", "Practice exams"], popular: true },
-  { name: "Pro", price: "24", text: "For big academic goals.", items: ["Everything in Plus", "Priority AI support", "Deep-dive insights", "Early access features"] }
+type Billing = "monthly" | "yearly";
+
+const plans: { name: string; monthly: number; yearly: number | null; text: string; items: string[]; popular?: boolean }[] = [
+  { name: "Free", monthly: 0, yearly: null, text: "A better way to begin.", items: ["20 AI Tutor messages/mo", "1 AI quiz + 3 flashcard decks/mo", "Basic study planner"] },
+  { name: "Pro", monthly: 12.99, yearly: 99.99, text: "For focused learners.", items: ["500 AI Tutor messages/mo", "Voice AI Tutor", "Personalized study planner", "Smart Review & Weakness Detection"], popular: true },
+  { name: "Max", monthly: 24.99, yearly: 199.99, text: "For big academic goals.", items: ["2,000 AI Tutor messages/mo", "Advanced AI models", "Adaptive AI learning paths", "Early access to new AI features"] }
 ];
 
-const comparison = [
-  ["AI study help", true, true, true],
-  ["Subjects", "3", "Unlimited", "Unlimited"],
-  ["Flashcards", "Essential", "Essential", "Essential"],
-  ["Personal learning plans", false, true, true],
-  ["Advanced analytics", false, true, true],
-  ["Practice exams", false, true, true],
-  ["Priority AI support", false, false, true],
-  ["Deep-dive insights", false, false, true],
-  ["Early access features", false, false, true]
-] as const;
+// Every row from the plan comparison, faithfully carried over—text values
+// (message caps, "Limited"/"Advanced" tiers) render as-is, true/false render
+// as a check or dash. Monthly/Yearly price live in the plan cards above,
+// not duplicated here.
+const comparison: [string, boolean | string, boolean | string, boolean | string][] = [
+  ["AI Tutor", "20 messages/mo", "500 messages/mo", "2,000 messages/mo"],
+  ["Voice AI Tutor", false, true, true],
+  ["AI Quiz creation", "1/mo", "30/mo", "100/mo"],
+  ["AI Flashcard decks", "3/mo", "30/mo", "100/mo"],
+  ["AI Study Planner", "Basic", "Personalized", "Advanced + adaptive"],
+  ["Document → study materials", "1/mo", "20/mo", "100/mo"],
+  ["AI explanations", "Limited", true, "Advanced"],
+  ["AI Learning Paths", "Limited", true, "Adaptive AI paths"],
+  ["Smart Review", false, true, "Adaptive"],
+  ["Weakness Detection", false, true, "Advanced AI analysis"],
+  ["Daily Case", "Limited", true, "Unlimited"],
+  ["Terminology", true, true, true],
+  ["Progress Tracking", "Basic", "Advanced", "Advanced + AI insights"],
+  ["Text-to-Speech", "Limited", true, "Unlimited"],
+  ["Advanced AI models", false, false, true],
+  ["Early access to new AI features", false, false, true]
+];
 
 const pricingFaqs = [
   ["Can I cancel anytime?", "Yes. Cancel whenever you like from your account settings—no calls, no hoops. You'll keep access until the end of your billing period."],
@@ -38,8 +51,13 @@ function Cell({ value }: { value: boolean | string }) {
   return <span className="text-xs font-bold text-slate-600">{value}</span>;
 }
 
+function formatPrice(n: number): string {
+  return n % 1 === 0 ? `${n}` : n.toFixed(2);
+}
+
 export default function PricingPage() {
   const [open, setOpen] = useState(0);
+  const [billing, setBilling] = useState<Billing>("monthly");
 
   return <main className="min-h-screen overflow-hidden bg-[#fcfdfd]">
     <LanguageBar />
@@ -56,17 +74,34 @@ export default function PricingPage() {
           <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-500 sm:text-lg">Start free. Upgrade when your ambition needs more room.</p>
         </Reveal>
 
-        <div className="mx-auto mt-14 grid max-w-5xl gap-4 md:grid-cols-3">
-          {plans.map((plan, i) => <Reveal key={plan.name} delay={i * .08}>
-            <motion.div whileHover={{ y: -7 }} className={`relative h-full rounded-3xl border p-6 ${plan.popular ? "border-teal-500 bg-ink text-white shadow-lift" : "border-slate-100 bg-white shadow-soft"}`}>
-              {plan.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">Most popular</span>}
-              <h3 className="text-lg font-extrabold">{plan.name}</h3>
-              <p className={`mt-2 h-10 text-xs ${plan.popular ? "text-slate-300" : "text-slate-500"}`}>{plan.text}</p>
-              <div className="mt-5 flex items-baseline"><span className={`display text-4xl ${plan.popular ? "!text-white" : ""}`}>€{plan.price}</span><span className={`ml-1 text-xs ${plan.popular ? "text-slate-300" : "text-slate-500"}`}>/ month</span></div>
-              <Link href="/signup" className={`mt-6 block cursor-pointer rounded-full py-3 text-center text-sm font-extrabold transition ${plan.popular ? "bg-accent-500 text-white hover:bg-accent-600" : "bg-teal-50 text-teal-700 hover:bg-teal-100"}`}>{plan.price === "0" ? "Get started" : "Start free trial"}</Link>
-              <ul className="mt-7 space-y-3">{plan.items.map(x => <li key={x} className={`flex gap-2 text-xs font-medium ${plan.popular ? "text-slate-200" : "text-slate-600"}`}><ShieldCheck size={15} className="shrink-0 text-teal-500" />{x}</li>)}</ul>
-            </motion.div>
-          </Reveal>)}
+        <Reveal delay={.05} className="mt-8 flex justify-center">
+          <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-soft">
+            <button type="button" onClick={() => setBilling("monthly")} className={`cursor-pointer rounded-full px-4 py-2 text-xs font-extrabold transition ${billing === "monthly" ? "bg-ink text-white" : "text-slate-500 hover:text-ink"}`}>Monthly</button>
+            <button type="button" onClick={() => setBilling("yearly")} className={`flex cursor-pointer items-center gap-1.5 rounded-full px-4 py-2 text-xs font-extrabold transition ${billing === "yearly" ? "bg-ink text-white" : "text-slate-500 hover:text-ink"}`}>Yearly<span className="rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-extrabold text-teal-700">Save up to 36%</span></button>
+          </div>
+        </Reveal>
+
+        <div className="mx-auto mt-10 grid max-w-5xl gap-4 md:grid-cols-3">
+          {plans.map((plan, i) => {
+            const isFree = plan.monthly === 0;
+            const price = billing === "yearly" && plan.yearly !== null ? plan.yearly : plan.monthly;
+            const suffix = isFree ? "forever" : billing === "yearly" && plan.yearly !== null ? "/ year" : "/ month";
+            const savingsPct = billing === "yearly" && plan.yearly !== null ? Math.round((1 - plan.yearly / (plan.monthly * 12)) * 100) : null;
+            return <Reveal key={plan.name} delay={i * .08}>
+              <motion.div whileHover={{ y: -7 }} className={`relative h-full rounded-3xl border p-6 ${plan.popular ? "border-teal-500 bg-ink text-white shadow-lift" : "border-slate-100 bg-white shadow-soft"}`}>
+                {plan.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">Most popular</span>}
+                <h3 className="text-lg font-extrabold">{plan.name}</h3>
+                <p className={`mt-2 h-10 text-xs ${plan.popular ? "text-slate-300" : "text-slate-500"}`}>{plan.text}</p>
+                <div className="mt-5 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
+                  <span className={`display text-4xl ${plan.popular ? "!text-white" : ""}`}>${formatPrice(price)}</span>
+                  <span className={`text-xs ${plan.popular ? "text-slate-300" : "text-slate-500"}`}>{suffix}</span>
+                  {savingsPct !== null && <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${plan.popular ? "bg-white/15 text-white" : "bg-teal-50 text-teal-700"}`}>Save {savingsPct}%</span>}
+                </div>
+                <Link href="/signup" className={`mt-6 block cursor-pointer rounded-full py-3 text-center text-sm font-extrabold transition ${plan.popular ? "bg-accent-500 text-white hover:bg-accent-600" : "bg-teal-50 text-teal-700 hover:bg-teal-100"}`}>{isFree ? "Get started" : "Start free trial"}</Link>
+                <ul className="mt-7 space-y-3">{plan.items.map(x => <li key={x} className={`flex gap-2 text-xs font-medium ${plan.popular ? "text-slate-200" : "text-slate-600"}`}><ShieldCheck size={15} className="shrink-0 text-teal-500" />{x}</li>)}</ul>
+              </motion.div>
+            </Reveal>;
+          })}
         </div>
       </div>
     </section>
@@ -75,7 +110,7 @@ export default function PricingPage() {
       <div className="container-page">
         <Reveal className="max-w-xl"><span className="eyebrow">Compare plans</span><h2 className="display mt-5 text-4xl sm:text-5xl">Every item, side by side.</h2></Reveal>
         <Reveal delay={.08} className="mt-12 overflow-x-auto">
-          <table className="w-full min-w-[560px] border-separate border-spacing-0 overflow-hidden rounded-3xl border border-slate-100 shadow-soft">
+          <table className="w-full min-w-[640px] border-separate border-spacing-0 overflow-hidden rounded-3xl border border-slate-100 shadow-soft">
             <thead>
               <tr className="bg-[#f9fcfc]">
                 <th className="px-5 py-4 text-left text-xs font-extrabold uppercase tracking-wider text-slate-500">Feature</th>

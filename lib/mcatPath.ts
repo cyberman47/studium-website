@@ -36,13 +36,65 @@ export const mcatSections: SectionDef[] = [
           { id: "ecology", title: "Ecology" }
         ]
       },
-      { id: "biochemistry", name: "Biochemistry", lessons: [] },
-      { id: "genetics", name: "Genetics", lessons: [] },
-      { id: "cell-biology", name: "Cell Biology", lessons: [] },
-      { id: "human-physiology", name: "Human Physiology", lessons: [] },
-      { id: "molecular-biology", name: "Molecular Biology", lessons: [] },
-      { id: "immunology", name: "Immunology", lessons: [] },
-      { id: "microbiology", name: "Microbiology", lessons: [] }
+      // Navigation shell only, below—real subject/lesson names, no lesson
+      // bodies written yet (same "coming soon" convention as Nursing/
+      // Anatomy/Pharmacology/USMLE). Deliberately kept separate from the
+      // "biology" subject above rather than merged into it, since that one
+      // already has real written content and merging risks orphaning it.
+      {
+        id: "cell-biology",
+        name: "Cell Biology",
+        lessons: [
+          { id: "cell-structure-organelles", title: "Cell Structure & Organelles" },
+          { id: "cell-membranes-transport", title: "Cell Membranes & Transport" },
+          { id: "cell-communication-signaling", title: "Cell Communication & Signaling" },
+          { id: "cell-cycle-mitosis-meiosis", title: "Cell Cycle, Mitosis & Meiosis" }
+        ]
+      },
+      {
+        id: "genetics-molecular-biology",
+        name: "Genetics & Molecular Biology",
+        lessons: [
+          { id: "mendelian-genetics-inheritance", title: "Mendelian Genetics & Inheritance" },
+          { id: "dna-replication-repair", title: "DNA Replication & Repair" },
+          { id: "transcription-rna", title: "Transcription & RNA" },
+          { id: "translation-protein-synthesis", title: "Translation & Protein Synthesis" },
+          { id: "gene-regulation-mutations", title: "Gene Regulation & Mutations" }
+        ]
+      },
+      {
+        id: "biochemistry",
+        name: "Biochemistry",
+        lessons: [
+          { id: "amino-acids-protein-structure", title: "Amino Acids & Protein Structure" },
+          { id: "enzymes-enzyme-kinetics", title: "Enzymes & Enzyme Kinetics" },
+          { id: "carbohydrates-lipids", title: "Carbohydrates & Lipids" },
+          { id: "nucleic-acids", title: "Nucleic Acids" },
+          { id: "bioenergetics-atp", title: "Bioenergetics & ATP" },
+          { id: "glycolysis-citric-acid-cycle", title: "Glycolysis & Citric Acid Cycle" },
+          { id: "oxidative-phosphorylation", title: "Oxidative Phosphorylation" },
+          { id: "metabolism-regulation", title: "Metabolism & Metabolic Regulation" }
+        ]
+      },
+      {
+        id: "organ-systems",
+        name: "Organ Systems",
+        lessons: [
+          { id: "nervous-endocrine-systems", title: "Nervous & Endocrine Systems" },
+          { id: "cardiovascular-respiratory-systems", title: "Cardiovascular & Respiratory Systems" },
+          { id: "renal-fluid-balance", title: "Renal & Fluid Balance" },
+          { id: "digestive-system-nutrition", title: "Digestive System & Nutrition" },
+          { id: "immune-system", title: "Immune System" },
+          { id: "reproductive-system-development", title: "Reproductive System & Development" }
+        ]
+      },
+      {
+        id: "evolution-ecology",
+        name: "Evolution & Ecology",
+        lessons: [
+          { id: "evolution-genetics-ecology", title: "Evolution, Genetics & Ecology" }
+        ]
+      }
     ]
   },
   {
@@ -50,10 +102,49 @@ export const mcatSections: SectionDef[] = [
     title: "Chemical & Physical Foundations of Biological Systems",
     shortTitle: "Chemical & Physical Foundations",
     subjects: [
-      { id: "general-chemistry", name: "General Chemistry", lessons: [] },
-      { id: "organic-chemistry", name: "Organic Chemistry", lessons: [] },
-      { id: "physics", name: "Physics", lessons: [] },
-      { id: "biochemistry-cp", name: "Biochemistry", lessons: [] }
+      {
+        id: "general-chemistry",
+        name: "General Chemistry",
+        lessons: [
+          { id: "atomic-structure-periodic-trends", title: "Atomic Structure & Periodic Trends" },
+          { id: "chemical-bonding-molecular-structure", title: "Chemical Bonding & Molecular Structure" },
+          { id: "stoichiometry-chemical-reactions", title: "Stoichiometry & Chemical Reactions" },
+          { id: "solutions-concentrations", title: "Solutions & Concentrations" },
+          { id: "gases-liquids-solids", title: "Gases, Liquids & Solids" },
+          { id: "thermochemistry-thermodynamics", title: "Thermochemistry & Thermodynamics" },
+          { id: "chemical-equilibrium", title: "Chemical Equilibrium" },
+          { id: "acids-bases-buffers", title: "Acids, Bases & Buffers" },
+          { id: "redox-electrochemistry", title: "Redox & Electrochemistry" },
+          { id: "chemical-kinetics", title: "Chemical Kinetics" }
+        ]
+      },
+      {
+        id: "organic-chemistry",
+        name: "Organic Chemistry",
+        lessons: [
+          { id: "organic-structure-functional-groups", title: "Organic Structure & Functional Groups" },
+          { id: "isomers-stereochemistry", title: "Isomers & Stereochemistry" },
+          { id: "organic-reactions", title: "Organic Reactions" },
+          { id: "carbonyls-carboxylic-acids-derivatives", title: "Carbonyls, Carboxylic Acids & Derivatives" },
+          { id: "amines-amides-biological-molecules", title: "Amines, Amides & Biological Molecules" },
+          { id: "organic-chemistry-spectroscopy", title: "Organic Chemistry & Spectroscopy" }
+        ]
+      },
+      {
+        id: "physics",
+        name: "Physics",
+        lessons: [
+          { id: "units-math-graphs", title: "Units, Math & Graphs" },
+          { id: "kinematics-newtonian-mechanics", title: "Kinematics & Newtonian Mechanics" },
+          { id: "work-energy-momentum", title: "Work, Energy & Momentum" },
+          { id: "fluids-pressure", title: "Fluids & Pressure" },
+          { id: "physics-thermodynamics", title: "Thermodynamics" },
+          { id: "electrostatics", title: "Electrostatics" },
+          { id: "circuits-electricity", title: "Circuits & Electricity" },
+          { id: "magnetism-electromagnetic-phenomena", title: "Magnetism & Electromagnetic Phenomena" },
+          { id: "waves-sound-light-optics", title: "Waves, Sound, Light & Optics" }
+        ]
+      }
     ]
   },
   {
@@ -61,9 +152,50 @@ export const mcatSections: SectionDef[] = [
     title: "Psychological, Social & Biological Foundations of Behavior",
     shortTitle: "Psychological, Social & Biological Foundations",
     subjects: [
-      { id: "psychology", name: "Psychology", lessons: [] },
-      { id: "sociology", name: "Sociology", lessons: [] },
-      { id: "biological-bases", name: "Biological Bases of Behavior", lessons: [] }
+      {
+        id: "psychology",
+        name: "Psychology",
+        lessons: [
+          { id: "research-methods-statistics", title: "Research Methods & Statistics" },
+          { id: "sensation-perception", title: "Sensation & Perception" },
+          { id: "learning-conditioning", title: "Learning & Conditioning" },
+          { id: "memory-cognition", title: "Memory & Cognition" },
+          { id: "language-intelligence-problem-solving", title: "Language, Intelligence & Problem Solving" },
+          { id: "emotion-motivation", title: "Emotion & Motivation" },
+          { id: "consciousness-sleep", title: "Consciousness & Sleep" },
+          { id: "personality", title: "Personality" },
+          { id: "psychological-development", title: "Psychological Development" },
+          { id: "psychological-disorders-mental-health", title: "Psychological Disorders & Mental Health" }
+        ]
+      },
+      {
+        id: "social-psychology",
+        name: "Social Psychology",
+        lessons: [
+          { id: "social-interaction-groups", title: "Social Interaction & Groups" },
+          { id: "attitudes-beliefs-behavior", title: "Attitudes, Beliefs & Behavior" },
+          { id: "social-influence-conformity", title: "Social Influence & Conformity" },
+          { id: "identity-culture-socialization", title: "Identity, Culture & Socialization" }
+        ]
+      },
+      {
+        id: "sociology",
+        name: "Sociology",
+        lessons: [
+          { id: "social-structure-institutions", title: "Social Structure & Institutions" },
+          { id: "social-stratification-inequality", title: "Social Stratification & Inequality" },
+          { id: "race-ethnicity-gender", title: "Race, Ethnicity & Gender" },
+          { id: "population-demographics", title: "Population & Demographics" },
+          { id: "health-healthcare-social-determinants", title: "Health, Healthcare & Social Determinants" }
+        ]
+      },
+      {
+        id: "biological-bases",
+        name: "Biological Foundations",
+        lessons: [
+          { id: "brain-behavior-hormones-genetics", title: "Brain, Behavior, Hormones & Genetics" }
+        ]
+      }
     ]
   },
   {
@@ -71,9 +203,24 @@ export const mcatSections: SectionDef[] = [
     title: "Critical Analysis & Reasoning Skills",
     shortTitle: "CARS",
     subjects: [
-      { id: "humanities-passages", name: "Humanities Passages", lessons: [] },
-      { id: "social-science-passages", name: "Social Science Passages", lessons: [] },
-      { id: "natural-science-passages", name: "Natural Science Passages", lessons: [] }
+      {
+        id: "cars-skills",
+        name: "CARS Skills",
+        lessons: [
+          { id: "introduction-to-cars", title: "Introduction to CARS" },
+          { id: "understanding-passage-structure", title: "Understanding Passage Structure" },
+          { id: "finding-the-main-idea", title: "Finding the Main Idea" },
+          { id: "authors-purpose-tone", title: "Author's Purpose & Tone" },
+          { id: "making-inferences", title: "Making Inferences" },
+          { id: "understanding-arguments-evidence", title: "Understanding Arguments & Evidence" },
+          { id: "applying-passage-information", title: "Applying Passage Information" },
+          { id: "eliminating-wrong-answers", title: "Eliminating Wrong Answers" },
+          { id: "handling-difficult-passages", title: "Handling Difficult Passages" },
+          { id: "reading-speed-timing", title: "Reading Speed & Timing" },
+          { id: "humanities-social-science-passages", title: "Humanities & Social Science Passages" },
+          { id: "full-cars-practice", title: "Full CARS Practice" }
+        ]
+      }
     ]
   }
 ];
@@ -1156,6 +1303,23 @@ export const lessonContentMap: Record<string, LessonContent> = Object.fromEntrie
 
 export function getLessonContent(lessonId: string): LessonContent | undefined {
   return lessonContentMap[lessonId];
+}
+
+// Real lesson content with its section/subject display names resolved—for
+// any Library/search view that needs to show "MCAT · Biology" alongside a
+// lesson without every caller re-deriving it from sectionId/subjectId by
+// hand. Only lessons with real LessonContent are included (the other ~90%
+// of mcatSections' lesson summaries are title-only stubs with no body to
+// browse yet—see the "empty = content not written yet" comment on
+// SubjectDef above).
+export type BrowsableLesson = { content: LessonContent; sectionTitle: string; subjectName: string };
+
+export function getAllRealLessons(): BrowsableLesson[] {
+  return lessonContentList.map(content => ({
+    content,
+    sectionTitle: findSection(content.sectionId)?.shortTitle ?? content.sectionId,
+    subjectName: findSubject(content.sectionId, content.subjectId)?.name ?? content.subjectId
+  }));
 }
 
 // ---- Progress tracking ----

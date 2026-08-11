@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BookOpen, ChevronRight, Sparkles } from "lucide-react";
+import { BookOpen, ChevronRight, ListChecks, Sparkles } from "lucide-react";
 import { Reveal } from "@/components/ui";
+import { McatSubnav } from "@/components/mcat-subnav";
 import { findSection, getSubjectProgress, SubjectProgress } from "@/lib/mcatPath";
 
 const tileColors = [
@@ -31,10 +32,18 @@ export default function MCATSectionPage({ params }: { params: { section: string 
 
   return <section className="relative py-10 sm:py-14">
     <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
-    <Link href="/dashboard/learning-paths/mcat" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600">← Back to MCAT path</Link>
-    <span className="eyebrow"><Sparkles size={13} />MCAT</span>
-    <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">{section.shortTitle}.</h1>
-    <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-500">{section.title}</p>
+    <McatSubnav />
+
+    <div className="mt-8">
+      <span className="eyebrow"><Sparkles size={13} />MCAT</span>
+      <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="display text-4xl leading-tight sm:text-5xl">{section.shortTitle}.</h1>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-500">{section.title}</p>
+        </div>
+        <Link href={`/dashboard/learning-paths/mcat/${section.id}/practice`} className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-5 py-2.5 text-xs font-bold text-white shadow-[0_10px_20px_-10px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600"><ListChecks size={14} />Practice this section</Link>
+      </div>
+    </div>
 
     <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {section.subjects.map((subject, i) => {

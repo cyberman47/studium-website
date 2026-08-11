@@ -134,7 +134,7 @@ export default function AccountPage() {
         </div>
         <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
           <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Crown size={13} />Current tier</div>
-          <p className="mt-3 text-xl font-extrabold text-ink">Starter <span className="text-sm font-bold text-slate-400">· Free</span></p>
+          <p className="mt-3 text-xl font-extrabold text-ink">Free</p>
           <Link href="/dashboard/settings/billing" className="mt-1.5 inline-block cursor-pointer text-xs font-extrabold text-teal-600 hover:text-teal-700">Change plan →</Link>
         </div>
         <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">

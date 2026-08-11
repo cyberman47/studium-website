@@ -1,3 +1,5 @@
+import { pushNotification } from "./notifications";
+
 const ACTIVE_DAYS_KEY = "studium_active_days";
 const STREAK_DAYS_KEY = "studium_streak_days";
 const KP_KEY = "studium_kp";
@@ -7,9 +9,24 @@ const DAILY_ACTIVITY_KEY = "studium_daily_activity";
 const DAILY_REWARDS_KEY = "studium_daily_rewards";
 const MILESTONE_KEY = "studium_milestone_rewards";
 const ACHIEVEMENTS_KEY = "studium_achievements";
-const STUDY_PLAN_KEY = "studium_study_plan";
+const STREAK_FREEZE_COUNT_KEY = "studium_streak_freeze_count";
+const STREAK_FREEZE_GRANTED_KEY = "studium_streak_freeze_granted";
+const STREAK_FROZEN_DAYS_KEY = "studium_streak_frozen_days";
 
 const KP_PER_DAY = 10;
+
+// Real broadcast for "KP, today's activity, or streak state changed"—same
+// pattern already used by flashcardLibrary.ts/flashcardDecks.ts/terminology.ts.
+// Needed because the Study Shield lives in the persistent top header
+// (mounted once across every dashboard page) while the actions that change
+// its numbers happen on other pages entirely (Home's Study Plan card, a
+// lesson's completion, a term review, ...)—without this, the header would
+// only ever reflect the state from when it first mounted.
+export const PROGRESS_EVENT = "studium:progressChange";
+
+function notifyProgressChange() {
+  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(PROGRESS_EVENT));
+}
 
 function toDateKey(d: Date): string {
   return d.toISOString().slice(0, 10); // YYYY-MM-DD, UTC-based but consistent for same-session use
@@ -39,13 +56,22 @@ function getStreakDays(): string[] {
   return raw ? JSON.parse(raw) : [];
 }
 
+// A day counts toward the streak if it was genuinely secured OR bridged by
+// a Streak Freeze (see "Streak Freezes" below)—every streak calculation in
+// this file goes through this one check so a frozen day counts everywhere
+// consistently (the header pill, the weekly calendar, milestone checks).
+function isStreakDayCounted(key: string, days: Set<string>, frozen: Set<string>): boolean {
+  return days.has(key) || frozen.has(key);
+}
+
 export function getStreak(): number {
   const days = new Set(getStreakDays());
+  const frozen = new Set(getFrozenDays());
   let streak = 0;
   const cursor = new Date();
   // if today isn't logged yet, start counting from yesterday
-  if (!days.has(toDateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
-  while (days.has(toDateKey(cursor))) {
+  if (!isStreakDayCounted(toDateKey(cursor), days, frozen)) cursor.setDate(cursor.getDate() - 1);
+  while (isStreakDayCounted(toDateKey(cursor), days, frozen)) {
     streak++;
     cursor.setDate(cursor.getDate() - 1);
   }
@@ -63,10 +89,11 @@ function updateLongestStreak() {
   if (current > getLongestStreak()) localStorage.setItem(LONGEST_STREAK_KEY, String(current));
 }
 
-export type WeekDay = { label: string; date: string; active: boolean; isToday: boolean };
+export type WeekDay = { label: string; date: string; active: boolean; frozen: boolean; isToday: boolean };
 
 export function getWeekLog(): WeekDay[] {
   const days = new Set(getStreakDays());
+  const frozen = new Set(getFrozenDays());
   const today = new Date();
   const monday = mondayOf(today);
 
@@ -75,8 +102,91 @@ export function getWeekLog(): WeekDay[] {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
     const key = toDateKey(d);
-    return { label, date: key, active: days.has(key), isToday: key === toDateKey(today) };
+    return { label, date: key, active: days.has(key) || frozen.has(key), frozen: frozen.has(key) && !days.has(key), isToday: key === toDateKey(today) };
   });
+}
+
+// ---- Streak Freezes ----
+// A real streak-protection mechanic, not decorative: once a student has
+// actually built a streak longer than 2 days, they're granted 2 freeze
+// tokens—once, not re-granted every visit (STREAK_FREEZE_GRANTED_KEY tracks
+// that). From then on, if a day gets missed, the next time the app opens
+// (ensureStreakGapsFrozen, called alongside ensureShieldSecured) the gap is
+// silently bridged using one freeze per missed day, "no matter what
+// happens" that day—no conditions on why it was missed. A frozen day is
+// tracked separately from a real secured day (STREAK_FROZEN_DAYS_KEY vs
+// STREAK_DAYS_KEY) so the weekly calendar can still show the honest
+// difference between "actually studied" and "protected by a freeze."
+
+function getFrozenDays(): string[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(STREAK_FROZEN_DAYS_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+
+function addFrozenDay(date: string) {
+  if (typeof window === "undefined") return;
+  const days = new Set(getFrozenDays());
+  days.add(date);
+  localStorage.setItem(STREAK_FROZEN_DAYS_KEY, JSON.stringify(Array.from(days)));
+}
+
+export function isDayFrozen(date: string): boolean {
+  return getFrozenDays().includes(date);
+}
+
+export function getStreakFreezeCount(): number {
+  if (typeof window === "undefined") return 0;
+  return Number(localStorage.getItem(STREAK_FREEZE_COUNT_KEY) || "0");
+}
+
+function setStreakFreezeCount(n: number) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(STREAK_FREEZE_COUNT_KEY, String(Math.max(0, n)));
+}
+
+// Safe to call every time (mirrors ensureShieldSecured's idempotent
+// pattern)—grants 2 freezes exactly once, the first time a student's real
+// streak exceeds 2 days, and never again after that.
+export function ensureStreakFreezesGranted(): void {
+  if (typeof window === "undefined") return;
+  if (localStorage.getItem(STREAK_FREEZE_GRANTED_KEY)) return;
+  if (getStreak() > 2) {
+    setStreakFreezeCount(2);
+    localStorage.setItem(STREAK_FREEZE_GRANTED_KEY, "true");
+    notifyProgressChange();
+    pushNotification({ id: "streak-freeze-granted", title: "2 Streak Freezes unlocked ❄️", body: "You've kept a streak going for more than 2 days—if you ever miss a day now, a freeze will protect it automatically." });
+  }
+}
+
+// Also safe to call every time. Walks backward from yesterday and spends
+// one freeze per consecutive missed day until either a real (or already
+// frozen) day is reached—gap closed—or freezes run out. A brand-new user
+// can never accidentally get days frozen: freezes only exist at all once
+// ensureStreakFreezesGranted has actually run, which itself requires a real
+// 3+ day streak to have happened first.
+export function ensureStreakGapsFrozen(): void {
+  if (typeof window === "undefined") return;
+  const freezeCount = getStreakFreezeCount();
+  if (freezeCount <= 0) return;
+  const days = new Set(getStreakDays());
+  const frozen = new Set(getFrozenDays());
+  const cursor = new Date();
+  cursor.setDate(cursor.getDate() - 1); // start at yesterday—today isn't "missed" yet
+  const toFreeze: string[] = [];
+  let remaining = freezeCount;
+  while (remaining > 0) {
+    const key = toDateKey(cursor);
+    if (isStreakDayCounted(key, days, frozen)) break; // no gap here—already covered
+    toFreeze.push(key);
+    remaining--;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  if (toFreeze.length === 0) return;
+  for (const day of toFreeze) addFrozenDay(day);
+  setStreakFreezeCount(freezeCount - toFreeze.length);
+  for (const day of toFreeze) pushNotification({ id: `streak-freeze-used-${day}`, title: "Your streak was saved by a Freeze ❄️", body: `You missed ${day}, but a Streak Freeze covered it automatically—your streak kept going.` });
+  notifyProgressChange();
 }
 
 // ---- Knowledge Points ----
@@ -95,7 +205,21 @@ function addKP(amount: number): number {
   if (typeof window === "undefined") return 0;
   const total = getTotalKP() + amount;
   localStorage.setItem(KP_KEY, String(total));
+  // Real per-day KP counter—every source of KP funnels through this one
+  // function, so this is a genuine "KP earned today" total (distinct from,
+  // and a superset of, the Study Shield's own 6-activity calculation),
+  // used by the Daily KP Goal below.
+  bumpDailyActivity({ kp: amount });
   return total;
+}
+
+// Real admin override for QA/preview: directly sets this browser's lifetime
+// KP so an admin can see exactly what a given level looks like live, rather
+// than a fabricated "preview" screenshot. Genuinely writes the same key
+// getTotalKP()/getLevelInfo() read.
+export function setTotalKPOverride(amount: number) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(KP_KEY, String(Math.max(0, Math.floor(amount))));
 }
 
 // ---- Lifetime stats ----
@@ -165,6 +289,12 @@ export function recordMaterialUploaded() {
   saveStats({ ...s, materialsUploaded: s.materialsUploaded + 1 });
 }
 
+export function recordNoteCreated() {
+  const s = getStats();
+  saveStats({ ...s, notesCreated: s.notesCreated + 1 });
+  bumpDailyActivity({ notes: 1 });
+}
+
 export function getTotalHours(): number {
   return Math.round((getStats().studyMinutes / 60) * 10) / 10;
 }
@@ -177,13 +307,16 @@ export function getAverageQuizScore(): number | null {
 
 // ---- Daily activity (for weekly progress) ----
 
-type DailyActivity = { minutes: number; flashcards: number; notes: number; aiChats: number; quizzes: number };
-const emptyActivity: DailyActivity = { minutes: 0, flashcards: 0, notes: 0, aiChats: 0, quizzes: 0 };
+type DailyActivity = { minutes: number; flashcards: number; notes: number; aiChats: number; quizzes: number; lessons: number; kp: number };
+const emptyActivity: DailyActivity = { minutes: 0, flashcards: 0, notes: 0, aiChats: 0, quizzes: 0, lessons: 0, kp: 0 };
 
 function getDailyActivityMap(): Record<string, DailyActivity> {
   if (typeof window === "undefined") return {};
   const raw = localStorage.getItem(DAILY_ACTIVITY_KEY);
-  return raw ? JSON.parse(raw) : {};
+  const parsed = raw ? JSON.parse(raw) : {};
+  // Old entries (saved before `lessons` existed) just get 0 via emptyActivity's spread—no migration needed.
+  for (const key of Object.keys(parsed)) parsed[key] = { ...emptyActivity, ...parsed[key] };
+  return parsed;
 }
 
 function bumpDailyActivity(delta: Partial<DailyActivity>) {
@@ -196,9 +329,19 @@ function bumpDailyActivity(delta: Partial<DailyActivity>) {
     flashcards: current.flashcards + (delta.flashcards ?? 0),
     notes: current.notes + (delta.notes ?? 0),
     aiChats: current.aiChats + (delta.aiChats ?? 0),
-    quizzes: current.quizzes + (delta.quizzes ?? 0)
+    quizzes: current.quizzes + (delta.quizzes ?? 0),
+    lessons: current.lessons + (delta.lessons ?? 0),
+    kp: current.kp + (delta.kp ?? 0)
   };
   localStorage.setItem(DAILY_ACTIVITY_KEY, JSON.stringify(map));
+  notifyProgressChange();
+}
+
+// Real read-only access to today's tracked activity—used by the Study
+// Shield (lib/studyShield.ts) to compute today's real KP without duplicating
+// this file's daily-activity storage.
+export function getTodayActivity(): DailyActivity {
+  return getDailyActivityMap()[toDateKey(new Date())] ?? emptyActivity;
 }
 
 export function getWeeklyActivity(): DailyActivity {
@@ -215,6 +358,8 @@ export function getWeeklyActivity(): DailyActivity {
     totals.notes += entry.notes;
     totals.aiChats += entry.aiChats;
     totals.quizzes += entry.quizzes;
+    totals.lessons += entry.lessons;
+    totals.kp += entry.kp;
   }
   return totals;
 }
@@ -235,91 +380,51 @@ export function getWeeklyActivityByDay(): DailyActivityPoint[] {
   });
 }
 
-// ---- Study Plan ----
-// Your streak is only kept alive by completing all three of today's Study Plan goals—
-// simply visiting the app no longer counts (see recordVisit / checkStudyPlanCompletion).
+// ---- Streak ----
+// Your streak is kept alive by the real Study Shield / Adaptive Pacing
+// system (lib/studyShield.ts, lib/adaptivePacing.ts)—earning enough real
+// KP today, not simply opening the app. This file just owns the actual
+// streak-day storage those systems write to.
 
-export type StudyPlanGoals = { minutes: number; flashcards: number; quizzes: number };
-
-const defaultStudyPlan: StudyPlanGoals = { minutes: 30, flashcards: 50, quizzes: 1 };
-
-export function getStudyPlan(): StudyPlanGoals {
-  if (typeof window === "undefined") return defaultStudyPlan;
-  const raw = localStorage.getItem(STUDY_PLAN_KEY);
-  return raw ? { ...defaultStudyPlan, ...JSON.parse(raw) } : defaultStudyPlan;
-}
-
-export function saveStudyPlan(goals: StudyPlanGoals) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STUDY_PLAN_KEY, JSON.stringify(goals));
-}
-
-export type StudyPlanProgress = {
-  goals: StudyPlanGoals;
-  minutes: number;
-  flashcards: number;
-  quizzes: number;
-  minutesComplete: boolean;
-  flashcardsComplete: boolean;
-  quizzesComplete: boolean;
-  complete: boolean;
-};
-
-export function getStudyPlanProgress(): StudyPlanProgress {
-  const goals = getStudyPlan();
-  const today = getDailyActivityMap()[toDateKey(new Date())] ?? emptyActivity;
-  const minutesComplete = today.minutes >= goals.minutes;
-  const flashcardsComplete = today.flashcards >= goals.flashcards;
-  const quizzesComplete = today.quizzes >= goals.quizzes;
-  return {
-    goals,
-    minutes: today.minutes,
-    flashcards: today.flashcards,
-    quizzes: today.quizzes,
-    minutesComplete,
-    flashcardsComplete,
-    quizzesComplete,
-    complete: minutesComplete && flashcardsComplete && quizzesComplete
-  };
-}
-
-// Called after any activity is logged. If today's plan is now fully met, marks today
-// as a streak day (once) and auto-claims the "Reach Daily Study Goal" reward.
-function checkStudyPlanCompletion(): ClaimResult | null {
-  const progress = getStudyPlanProgress();
-  if (!progress.complete) return null;
+// The actual mechanism that keeps a streak alive: marks today as a real
+// streak day (once—idempotent) and updates the longest-streak/milestone
+// records. Extracted so more than one real "did enough today" check can
+// trigger it—the Study Plan's 3-goal completion below, and the Study
+// Shield's 50-KP completion (lib/studyShield.ts, which calls this directly
+// since it can't import this file's own private checkStudyPlanCompletion
+// without a circular import through lib/terminology.ts).
+export function markStreakDaySecured(): void {
   const today = toDateKey(new Date());
   const streakDays = new Set(getStreakDays());
-  if (!streakDays.has(today)) {
-    streakDays.add(today);
-    if (typeof window !== "undefined") localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify(Array.from(streakDays)));
-    updateLongestStreak();
-    checkStreakMilestones();
-  }
-  return claimDailyGoal();
+  if (streakDays.has(today)) return;
+  streakDays.add(today);
+  if (typeof window !== "undefined") localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify(Array.from(streakDays)));
+  updateLongestStreak();
+  checkStreakMilestones();
+  notifyProgressChange();
 }
 
-export function logStudyMinutes(minutes: number): ClaimResult | null {
-  if (typeof window === "undefined") return null;
+// These three just record real stats/activity now—streak-securing is
+// handled centrally by the Study Shield (rendered in the persistent header
+// on every dashboard page), which reads this same real activity data.
+export function logStudyMinutes(minutes: number): void {
+  if (typeof window === "undefined") return;
   saveStats({ ...getStats(), studyMinutes: getStats().studyMinutes + minutes });
   bumpDailyActivity({ minutes });
-  return checkStudyPlanCompletion();
 }
 
-export function logFlashcards(count: number): ClaimResult | null {
-  if (typeof window === "undefined") return null;
+export function logFlashcards(count: number): void {
+  if (typeof window === "undefined") return;
   saveStats({ ...getStats(), flashcardsCompleted: getStats().flashcardsCompleted + count });
   bumpDailyActivity({ flashcards: count });
-  return checkStudyPlanCompletion();
 }
 
-export function logQuiz(): ClaimResult | null {
-  if (typeof window === "undefined") return null;
+export function logQuiz(): void {
+  if (typeof window === "undefined") return;
   const score = Math.floor(75 + Math.random() * 26); // 75-100
   const stats = getStats();
   saveStats({ ...stats, aiQuizzesCompleted: stats.aiQuizzesCompleted + 1, quizScores: [...stats.quizScores, score].slice(-50) });
   bumpDailyActivity({ quizzes: 1 });
-  return checkStudyPlanCompletion();
 }
 
 // ---- Levels ----
@@ -382,7 +487,6 @@ export const rewardDefs: RewardDef[] = [
   { id: "studySession", title: "Complete a Study Session", kp: 25, kind: "daily", description: "Finish one focused study session." },
   { id: "flashcards100", title: "Complete 100 Flashcards", kp: 40, kind: "daily", description: "Review 100 flashcards in a day." },
   { id: "aiQuiz", title: "Complete an AI Quiz", kp: 35, kind: "daily", description: "Finish a quiz from your AI tutor." },
-  { id: "dailyGoal", title: "Reach Daily Study Goal", kp: 50, kind: "daily", description: "Complete all three of today's Study Plan goals. This is what keeps your streak alive." },
   { id: "clinicalCase", title: "Solve the Clinical Case of the Day", kp: 30, kind: "daily", description: "Work through today's clinical vignette." },
   { id: "termsReviewed", title: "Hit Your Daily Terminology Goal", kp: 20, kind: "daily", description: "Learn or review your daily terminology goal." },
   { id: "streak7", title: "Maintain a 7-Day Streak", kp: 100, kind: "milestone", description: "Awarded automatically once your streak reaches 7 days." },
@@ -528,6 +632,7 @@ export function claimTerminologyGoal(): ClaimResult {
 export function awardLessonKP(kp: number): ClaimResult {
   const beforeTotal = getTotalKP();
   const beforeLevel = getLevelInfo(beforeTotal).level;
+  bumpDailyActivity({ lessons: 1 });
   const totalKP = addKP(kp);
   const toLevel = getLevelInfo(totalKP).level;
   const achievements = getAchievements();
@@ -585,6 +690,15 @@ export function getAchievements(): Achievement[] {
   });
   if (typeof window !== "undefined") localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(next));
   return result;
+}
+
+// Real admin override: genuinely grants/revokes an achievement for this
+// browser by writing the same ACHIEVEMENTS_KEY getAchievements() reads—
+// useful for QA-ing the unlock UI without grinding out the real requirement.
+export function setAchievementOverride(id: string, unlocked: boolean) {
+  if (typeof window === "undefined") return;
+  const stored = getStoredAchievements();
+  localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify({ ...stored, [id]: unlocked }));
 }
 
 // ---- Visits ----

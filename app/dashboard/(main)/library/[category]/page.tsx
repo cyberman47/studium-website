@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, CheckCircle2, Sparkles, Stethoscope } from "lucide-react";
-import { CaseAttempt, ClinicalCase, clinicalCases, getCaseOfTheDay, getTodayCaseAttempt } from "@/lib/clinicalCases";
+import { CaseAttempt, ClinicalCase, getAllCases, getCaseOfTheDay, getTodayCaseAttempt } from "@/lib/clinicalCases";
 import { findLibraryCategory } from "@/lib/libraryCategories";
 
 const difficultyClasses: Record<string, string> = {
@@ -29,8 +30,25 @@ export default function LibraryCategoryPage({ params }: { params: { category: st
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">{category.name}.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">{category.description}</p>
 
-    {category.id === "clinical-cases" ? <ClinicalCasesView /> : <EmptyState category={category} />}
+    {category.id === "clinical-cases" ? <ClinicalCasesView />
+      : category.id === "flashcards" ? <FlashcardsRedirect />
+      : <EmptyState category={category} />}
   </section>;
+}
+
+// The real Flashcard Library already lives at /dashboard/flashcards (browse,
+// search, filter, decks)—rather than building a second UI here, this
+// category card hands off to it directly.
+function FlashcardsRedirect() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/dashboard/flashcards");
+  }, [router]);
+  return <div className="mt-12 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-white py-20 text-center shadow-soft">
+    <span className="grid h-14 w-14 place-items-center rounded-2xl bg-indigo-100 text-indigo-600"><Sparkles size={26} /></span>
+    <p className="text-base font-extrabold text-ink">Taking you to your Flashcard Library…</p>
+    <Link href="/dashboard/flashcards" className="mt-1 cursor-pointer text-sm font-bold text-teal-600 hover:text-teal-700">Click here if you're not redirected</Link>
+  </div>;
 }
 
 function EmptyState({ category }: { category: NonNullable<ReturnType<typeof findLibraryCategory>> }) {
@@ -44,10 +62,12 @@ function EmptyState({ category }: { category: NonNullable<ReturnType<typeof find
 function ClinicalCasesView() {
   const [todaysCase, setTodaysCase] = useState<ClinicalCase | null>(null);
   const [attempt, setAttempt] = useState<CaseAttempt | null>(null);
+  const [allCases, setAllCases] = useState<ClinicalCase[]>([]);
 
   useEffect(() => {
     setTodaysCase(getCaseOfTheDay());
     setAttempt(getTodayCaseAttempt());
+    setAllCases(getAllCases());
   }, []);
 
   return <div className="mt-10 max-w-3xl space-y-8">
@@ -69,7 +89,7 @@ function ClinicalCasesView() {
       <h2 className="text-lg font-extrabold tracking-tight">All Cases</h2>
       <p className="mt-1 text-sm text-slate-500">Browse the full case library. Only today's case can be solved for credit—new cases rotate in daily.</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        {clinicalCases.map(c => <div key={c.id} className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
+        {allCases.map(c => <div key={c.id} className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-extrabold text-slate-600">{c.category}</span>
             <span className={`rounded-full px-2.5 py-1 text-[11px] font-extrabold ${difficultyClasses[c.difficulty]}`}>{c.difficulty}</span>
