@@ -153,7 +153,7 @@ export default function MCATSectionPracticePage({ params }: { params: { section:
   }
 
   function selectAllVisible() {
-    setSelectedCardIds(prev => new Set([...prev, ...visibleCards.map(c => c.id)]));
+    setSelectedCardIds(prev => new Set([...Array.from(prev), ...visibleCards.map(c => c.id)]));
   }
 
   function clearCardSelection() {

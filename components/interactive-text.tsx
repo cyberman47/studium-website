@@ -15,7 +15,7 @@ import { detectTerms } from "@/lib/termDetection";
 import { getConditionsForTerm } from "@/lib/termConditions";
 import {
   awardTermClickKP, ConfidenceLevel, getTerm, getTermConfidence, getTermMasteryState, getTermNote, isTermFavorited,
-  MasteryState, recordTermView, saveTermNote, setTermConfidence, Term, TERM_PROGRESS_EVENT, toggleTermFavorite
+  learnTerm, MasteryState, recordTermView, saveTermNote, setTermConfidence, Term, TERM_PROGRESS_EVENT, toggleTermFavorite
 } from "@/lib/terminology";
 
 // Same three real states everywhere a familiarity control appears—labels and
@@ -124,12 +124,19 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
   }
 
   // Opening the popup is the "press" moment: awards 1 KP (once ever per
-  // term, so re-opening the same word can't be farmed), loads any note
-  // already saved for it, and loads the student's prior rating (if any) so
-  // the correct circle shows filled instead of always starting blank.
+  // term, so re-opening the same word can't be farmed), auto-adds the term
+  // to the student's terminology library (learnTerm—idempotent, so this is
+  // a no-op on a term that's already in it), loads any note already saved
+  // for it, and loads the student's prior rating (if any) so the correct
+  // circle shows filled instead of always starting blank. Adding it here
+  // rather than only on a confidence pick is what makes the yellow "unknown"
+  // highlight clear the moment a word is pressed, before the student has
+  // rated it at all—getTermMasteryState now treats "in the library" and
+  // "rated" as separate things.
   function togglePopup() {
     if (!pinned) {
       handleResult(awardTermClickKP(term.id));
+      handleResult(learnTerm(term.id));
       recordTermView(term.id);
       setNoteText(getTermNote(term.id));
       setNoteOpen(false);

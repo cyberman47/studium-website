@@ -17,3 +17,6 @@ outputs/*.zip
 # local tooling
 .claude/
 tsconfig.tsbuildinfo
+
+.vercel
+.env*

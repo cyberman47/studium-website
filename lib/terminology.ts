@@ -1435,17 +1435,19 @@ export function getTermConfidence(termId: string): ConfidenceLevel | null {
 
 // ---- Personalized highlighting (Interactive Medical Terms) ----
 // Drives which of the three highlight states a term shows in lesson/case
-// text. Unknown = never learned, or explicitly rated "I don't know this".
-// Learning = "I've seen it before". Mastered = "I know this well"—these
+// text. Unknown (yellow) = not yet in your terminology library at all—
+// clicking it is what adds it (see HighlightedTerm's togglePopup, which
+// calls learnTerm on open) and immediately clears this state, regardless of
+// what the student rates it afterward. Learning = in your library but not
+// yet rated "I know this well" (covers "I don't know this", "I'm learning
+// this", and simply not rated yet). Mastered = "I know this well"—these
 // terms stop being highlighted entirely and blend into normal reading text.
 
 export type MasteryState = "unknown" | "learning" | "mastered";
 
 export function getTermMasteryState(termId: string): MasteryState {
-  const confidence = getTermConfidence(termId);
-  if (confidence === "know-well") return "mastered";
-  if (confidence === "somewhat") return "learning";
-  return "unknown";
+  if (!getTermProgress(termId)) return "unknown";
+  return getTermConfidence(termId) === "know-well" ? "mastered" : "learning";
 }
 
 // Forces a term to be due today, regardless of its current box—used by the
