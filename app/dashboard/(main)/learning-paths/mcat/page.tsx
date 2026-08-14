@@ -16,7 +16,7 @@ import { getMcatGoals, McatGoals, setMcatGoals } from "@/lib/mcatGoals";
 import { getDaysRemaining, getExamConfig, STUDY_PLANNER_EVENT } from "@/lib/studyPlanner";
 import { logAttempt } from "@/lib/practiceHistory";
 import {
-  CARD_PROGRESS_EVENT, getAllLibraryCards, getCardProgress, isCardDue, LibraryCard, restoreLibraryCard, reviewLibraryCard
+  CARD_PROGRESS_EVENT, getAllLibraryCards, getCardSnapshot, isCardDue, LibraryCard, restoreLibraryCard, reviewLibraryCard
 } from "@/lib/flashcardLibrary";
 import { PERSONAL_FLASHCARDS_EVENT } from "@/lib/personalFlashcards";
 import { TERM_PROGRESS_EVENT } from "@/lib/terminology";
@@ -31,10 +31,10 @@ const sectionIcons: Record<string, typeof Dna> = {
 };
 
 const sectionColors: Record<string, string> = {
-  "bio-biochem": "bg-teal-100 text-teal-700",
-  "chem-phys": "bg-violet-100 text-violet-600",
-  "psych-social": "bg-pink-100 text-pink-600",
-  cars: "bg-amber-100 text-amber-600"
+  "bio-biochem": "bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-teal-700",
+  "chem-phys": "bg-violet-100 dark:bg-violet-500/20 dark:text-violet-300 text-violet-600",
+  "psych-social": "bg-pink-100 dark:bg-pink-500/20 dark:text-pink-300 text-pink-600",
+  cars: "bg-amber-100 dark:bg-amber-500/20 dark:text-amber-300 text-amber-600"
 };
 
 function shuffle<T>(arr: T[]): T[] {
@@ -75,7 +75,7 @@ function CircularProgress({ percent, size = 48, stroke = 4.5 }: { percent: numbe
       <circle cx={cx} cy={cy} r={radius} strokeWidth={stroke} className="fill-none stroke-slate-100" />
       <circle cx={cx} cy={cy} r={radius} strokeWidth={stroke} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="fill-none stroke-teal-500 transition-[stroke-dashoffset] duration-500" />
     </g>
-    <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" className="fill-ink font-extrabold" style={{ fontSize: size * 0.26 }}>{clamped}%</text>
+    <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" className="fill-heading font-extrabold" style={{ fontSize: size * 0.26 }}>{clamped}%</text>
   </svg>;
 }
 
@@ -98,7 +98,7 @@ export default function MCATPathPage() {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [qotdOpen, setQotdOpen] = useState(false);
   const [diagnosticOpen, setDiagnosticOpen] = useState(false);
-  const cardSnapshots = useRef(new Map<string, ReturnType<typeof getCardProgress>>()).current;
+  const cardSnapshots = useRef(new Map<string, ReturnType<typeof getCardSnapshot>>()).current;
 
   // Every value below is real but localStorage/content-derived—populated
   // post-mount only, never computed inline during render, so the server
@@ -143,7 +143,7 @@ export default function MCATPathPage() {
   }
 
   function handleRate(card: FocusCard, rating: FocusRating) {
-    cardSnapshots.set(card.id, getCardProgress(card.id));
+    cardSnapshots.set(card.id, getCardSnapshot(card.id));
     reviewLibraryCard(card.id, rating);
   }
 
@@ -194,17 +194,17 @@ export default function MCATPathPage() {
 
   const canResume = continueRec && continueRec.recommendation.action !== "caught-up";
 
-  return <section className="mx-auto max-w-7xl bg-slate-50 px-4 py-10 sm:px-6 sm:py-14">
+  return <section className="mx-auto max-w-7xl bg-slate-50 dark:bg-white/5 px-4 py-10 sm:px-6 sm:py-14">
     <Link href="/dashboard/learning-paths" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Learning Paths</Link>
     <span className="eyebrow"><Sparkles size={13} />MCAT Preparation</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">MCAT Preparation Command Center.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Learn and Practice by exam section. Review by personal need.</p>
 
     {showStartHereNudge && <Reveal delay={0}>
-      <Link href="/dashboard/learning-paths/mcat/start-here" className="mt-6 flex items-center gap-4 rounded-3xl border border-teal-200 bg-teal-50/70 p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white text-teal-700 shadow-soft"><Compass size={19} /></span>
+      <Link href="/dashboard/learning-paths/mcat/start-here" className="mt-6 flex items-center gap-4 rounded-3xl border border-teal-200 bg-teal-50/70 dark:bg-teal-500/15 p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white dark:bg-[#0d1917] text-teal-700 shadow-soft"><Compass size={19} /></span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-extrabold text-ink">New here? Start with a 2-minute orientation.</p>
+          <p className="text-sm font-extrabold text-heading">New here? Start with a 2-minute orientation.</p>
           <p className="mt-0.5 text-xs text-slate-500">What the MCAT is, and how Studium's Learn / Practice / Review split works.</p>
         </div>
         <ChevronRight size={18} className="shrink-0 text-teal-600" />
@@ -213,30 +213,30 @@ export default function MCATPathPage() {
 
     {/* Target bar */}
     <Reveal delay={0.03}>
-      <div className="mt-6 flex flex-wrap items-center gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-7">
+      <div className="mt-6 flex flex-wrap items-center gap-6 rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <div className="min-w-[130px]">
           <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-400"><Calendar size={12} />Test Date</p>
           {/* Read-only here—the real editable source is the Study Planner's
               exam setup (lib/studyPlanner.ts), so this widget and the
               Planner's own countdown can never disagree. */}
           <Link href="/dashboard/study-plan" className="mt-1 block cursor-pointer text-left">
-            <span className="text-lg font-extrabold text-ink hover:text-teal-700">{examDate ? formatDate(examDate) : "Set date"}</span>
+            <span className="text-lg font-extrabold text-heading hover:text-teal-700">{examDate ? formatDate(examDate) : "Set date"}</span>
             {daysLeft !== null && <span className="ml-2 text-xs font-bold text-teal-600">{daysLeft >= 0 ? `${daysLeft}d left` : "date passed"}</span>}
           </Link>
         </div>
 
-        <div className="hidden h-10 w-px bg-slate-100 sm:block" />
+        <div className="hidden h-10 w-px bg-slate-100 dark:bg-white/10 sm:block" />
 
         <div className="min-w-[110px]">
           <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-400"><Target size={12} />Target Score</p>
           {editingScore
-            ? <input autoFocus type="number" min={472} max={528} value={scoreDraft} onChange={e => setScoreDraft(e.target.value)} onBlur={commitScore} onKeyDown={e => e.key === "Enter" && commitScore()} className="mt-1.5 w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm font-bold text-ink outline-none focus:border-teal-400" />
+            ? <input autoFocus type="number" min={472} max={528} value={scoreDraft} onChange={e => setScoreDraft(e.target.value)} onBlur={commitScore} onKeyDown={e => e.key === "Enter" && commitScore()} className="mt-1.5 w-20 rounded-lg border border-slate-200 dark:border-white/10 px-2 py-1 text-sm font-bold text-heading outline-none focus:border-teal-400" />
             : <button type="button" onClick={() => { setScoreDraft(goals.targetScore?.toString() ?? ""); setEditingScore(true); }} className="mt-1 block cursor-pointer text-left">
-              <span className="text-lg font-extrabold text-ink hover:text-teal-700">{goals.targetScore ?? "Set target"}</span>
+              <span className="text-lg font-extrabold text-heading hover:text-teal-700">{goals.targetScore ?? "Set target"}</span>
             </button>}
         </div>
 
-        <div className="hidden h-10 w-px bg-slate-100 sm:block" />
+        <div className="hidden h-10 w-px bg-slate-100 dark:bg-white/10 sm:block" />
 
         <div className="flex items-center gap-3">
           <CircularProgress percent={readiness.readinessPercent} size={52} />
@@ -262,17 +262,17 @@ export default function MCATPathPage() {
     {/* Quick Practice drawer */}
     <div className="mt-10 grid gap-5 sm:grid-cols-2">
       <Reveal delay={0.1}>
-        <div className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+        <div className="flex h-full flex-col rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft">
           <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><RotateCcw size={13} />Spaced Repetition</div>
-          <p className="mt-3 text-3xl font-extrabold text-ink">{dueCards.length}<span className="ml-1.5 text-sm font-bold text-slate-400">card{dueCards.length === 1 ? "" : "s"} due today</span></p>
+          <p className="mt-3 text-3xl font-extrabold text-heading">{dueCards.length}<span className="ml-1.5 text-sm font-bold text-slate-400">card{dueCards.length === 1 ? "" : "s"} due today</span></p>
           <button type="button" onClick={() => setReviewOpen(true)} disabled={dueCards.length === 0} className="mt-4 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-5 py-2.5 text-xs font-bold text-white shadow-[0_10px_20px_-10px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-40">Start Review</button>
         </div>
       </Reveal>
       <Reveal delay={0.14}>
-        <div className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+        <div className="flex h-full flex-col rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft">
           <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Sparkles size={13} />Question of the Day</div>
           {questionOfDay ? <>
-            <p className="mt-3 flex-1 text-sm font-bold leading-snug text-ink">{questionOfDay.question.question}</p>
+            <p className="mt-3 flex-1 text-sm font-bold leading-snug text-heading">{questionOfDay.question.question}</p>
             <button type="button" onClick={() => setQotdOpen(true)} className="mt-4 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-5 py-2.5 text-xs font-bold text-white shadow-[0_10px_20px_-10px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Try it</button>
           </> : <p className="mt-3 text-xs text-slate-500">No practice questions have been authored yet.</p>}
         </div>
@@ -288,12 +288,12 @@ function PillarCard({ section, progress, index }: { section: SectionDef; progres
   const Icon = sectionIcons[section.id];
   const hasContent = (progress?.total ?? 0) > 0;
   return <Reveal delay={index * 0.05}>
-    <Link href={`/dashboard/learning-paths/mcat/${section.id}`} className="group flex h-full cursor-pointer flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lift sm:p-7">
+    <Link href={`/dashboard/learning-paths/mcat/${section.id}`} className="group flex h-full cursor-pointer flex-col rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lift sm:p-7">
       <div className="flex items-start justify-between gap-3">
         <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${sectionColors[section.id]}`}><Icon size={22} /></span>
         <CircularProgress percent={progress?.percent ?? 0} />
       </div>
-      <h3 className="mt-5 flex items-center gap-1.5 text-lg font-extrabold leading-snug tracking-tight text-ink">
+      <h3 className="mt-5 flex items-center gap-1.5 text-lg font-extrabold leading-snug tracking-tight text-heading">
         {section.shortTitle}
         <ChevronRight size={18} className="shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-teal-500" />
       </h3>

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { DeckPicker } from "@/components/deck-picker";
 import { addCardsToDeck } from "@/lib/flashcardDecks";
+import { showKnowledgeToast } from "@/lib/kpToast";
 import { ClaimResult, getLevelInfo } from "@/lib/progress";
 import { detectTerms } from "@/lib/termDetection";
 import { getConditionsForTerm } from "@/lib/termConditions";
@@ -21,9 +22,9 @@ import {
 // Same three real states everywhere a familiarity control appears—labels and
 // colors match the Terminology homepage exactly, no separate vocabulary.
 const familiarityLevels: { level: ConfidenceLevel; label: string; dot: string; active: string }[] = [
-  { level: "dont-know", label: "Unfamiliar", dot: "bg-rose-500", active: "border-rose-300 bg-rose-50 text-rose-700" },
-  { level: "somewhat", label: "Learning", dot: "bg-amber-500", active: "border-amber-300 bg-amber-50 text-amber-700" },
-  { level: "know-well", label: "Know", dot: "bg-teal-500", active: "border-teal-300 bg-teal-50 text-teal-700" }
+  { level: "dont-know", label: "Unfamiliar", dot: "bg-rose-500", active: "border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300" },
+  { level: "somewhat", label: "Learning", dot: "bg-amber-500", active: "border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300" },
+  { level: "know-well", label: "Know", dot: "bg-teal-500", active: "border-teal-300 bg-teal-50 text-teal-700 dark:border-teal-500/30 dark:bg-teal-500/10 dark:text-teal-300" }
 ];
 
 // Speaks a term aloud using the browser's built-in Web Speech API—genuinely
@@ -51,12 +52,12 @@ export function InteractiveText({ text }: { text: string }) {
 }
 
 const knowledgeLevels: { level: ConfidenceLevel; symbol: string | null; title: string; border: string; filled: string }[] = [
-  { level: "dont-know", symbol: "1", title: "I don't know this", border: "border-amber-300 text-amber-700 hover:bg-amber-50", filled: "bg-amber-500 text-white" },
-  { level: "somewhat", symbol: "2", title: "I'm learning this", border: "border-sky-300 text-sky-700 hover:bg-sky-50", filled: "bg-sky-500 text-white" },
+  { level: "dont-know", symbol: "1", title: "I don't know this", border: "border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-500/40 dark:text-amber-300 dark:hover:bg-amber-500/10", filled: "bg-amber-500 text-white" },
+  { level: "somewhat", symbol: "2", title: "I'm learning this", border: "border-sky-300 text-sky-700 hover:bg-sky-50 dark:border-sky-500/40 dark:text-sky-300 dark:hover:bg-sky-500/10", filled: "bg-sky-500 text-white" },
   // Mastered uses the app's own accent teal rather than a level-specific
   // color, since it's the "complete" state rather than one more rung on
   // the same ladder—symbol is null here; the ✓ icon is rendered specially.
-  { level: "know-well", symbol: null, title: "I know this well", border: "border-teal-300 text-teal-700 hover:bg-teal-50", filled: "bg-teal-500 text-white" }
+  { level: "know-well", symbol: null, title: "I know this well", border: "border-teal-300 text-teal-700 hover:bg-teal-50 dark:border-teal-500/40 dark:text-teal-300 dark:hover:bg-teal-500/10", filled: "bg-teal-500 text-white" }
 ];
 
 // Mastery state depends on localStorage, which isn't available during SSR.
@@ -68,7 +69,6 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
   const [pinned, setPinned] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [mastery, setMastery] = useState<MasteryState>("unknown");
-  const [floatingKP, setFloatingKP] = useState<number | null>(null);
   const [levelUpInfo, setLevelUpInfo] = useState<{ level: number; name: string } | null>(null);
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
@@ -95,8 +95,7 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
 
   function handleResult(result: ClaimResult | null) {
     if (result?.awarded) {
-      setFloatingKP(result.kpAwarded);
-      setTimeout(() => setFloatingKP(null), 1400);
+      showKnowledgeToast(result.kpAwarded);
       if (result.leveledUp) {
         const info = getLevelInfo(result.totalKP);
         setLevelUpInfo({ level: info.level, name: info.name });
@@ -159,10 +158,10 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
   // pronounced, no changing your mind and re-rating it. A faint hover cue
   // keeps it discoverable without adding visual clutter while reading.
   const triggerClass = mastery === "unknown"
-    ? "cursor-pointer rounded px-0.5 font-semibold bg-amber-200/70 text-ink transition-all duration-200 ease-out hover:bg-amber-300/80 hover:shadow-[0_0_0_3px_rgba(217,119,6,0.18)]"
+    ? "cursor-pointer rounded px-0.5 font-semibold bg-amber-200/70 text-heading transition-all duration-200 ease-out hover:bg-amber-300/80 hover:shadow-[0_0_0_3px_rgba(217,119,6,0.18)] dark:bg-amber-500/25 dark:text-amber-100 dark:hover:bg-amber-500/35 dark:hover:shadow-[0_0_0_3px_rgba(217,119,6,0.25)]"
     : mastery === "learning"
-      ? "cursor-pointer border-b border-sky-400/60 font-normal text-ink transition-all duration-200 ease-out hover:border-sky-500 hover:bg-sky-50"
-      : "cursor-pointer rounded px-0.5 font-normal text-ink transition-all duration-200 ease-out hover:bg-slate-100";
+      ? "cursor-pointer border-b border-sky-400/60 font-normal text-heading transition-all duration-200 ease-out hover:border-sky-500 hover:bg-sky-50 dark:text-white dark:hover:bg-sky-500/10"
+      : "cursor-pointer rounded px-0.5 font-normal text-heading transition-all duration-200 ease-out hover:bg-slate-100 dark:text-white dark:hover:bg-white/10";
 
   const visible = hovered || pinned;
 
@@ -171,7 +170,7 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
         surfaces with their own click handlers on an ancestor (a flashcard
         that flips on click, a quiz option that grades on click)—without it,
         opening a term's popup would also fire whatever the parent does. */}
-    <button type="button" onClick={e => { e.stopPropagation(); togglePopup(); }} className={triggerClass}>
+    <button type="button" data-tour-term={term.id} onClick={e => { e.stopPropagation(); togglePopup(); }} className={triggerClass}>
       {matchedText}
     </button>
     {/* Rendered as <span>s throughout (never <div>/<p>) since this popover can be
@@ -184,25 +183,25 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
         animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
         exit={{ opacity: 0, y: 4, scale: 0.97, x: "-50%" }}
         transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-auto absolute bottom-full left-1/2 z-40 mb-3 w-72 cursor-auto rounded-2xl border border-[#EEF2F7] bg-white px-5 pb-4 pt-5 text-left shadow-[0_12px_32px_rgba(15,23,42,0.12)]"
+        className="pointer-events-auto absolute bottom-full left-1/2 z-40 mb-3 w-72 cursor-auto rounded-2xl border border-[#EEF2F7] bg-white px-5 pb-4 pt-5 text-left shadow-[0_12px_32px_rgba(15,23,42,0.12)] dark:border-white/10 dark:bg-[#0d1917] dark:shadow-[0_12px_32px_rgba(0,0,0,0.4)]"
       >
         {/* Header: name + pronunciation, perfectly baseline-aligned */}
         <span className="flex items-center justify-between gap-3">
-          <span className="block truncate text-[15px] font-bold tracking-tight text-ink">{term.name}</span>
+          <span className="block truncate text-[15px] font-bold tracking-tight text-heading dark:text-white">{term.name}</span>
           <button
             type="button" title="Pronounce" aria-label="Pronounce" onClick={() => speakTerm(term.name)}
-            className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition-all duration-150 hover:bg-slate-100 hover:text-[#0F8B8D] active:scale-95"
+            className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition-all duration-150 hover:bg-slate-100 hover:text-[#0F8B8D] active:scale-95 dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-teal-300"
           ><Volume2 size={14} /></button>
         </span>
 
         {/* Definition, with a small muted label for hierarchy */}
-        <span className="mt-3 block text-[10px] font-bold uppercase tracking-wider text-slate-400">Definition</span>
-        <span className={`mt-1.5 block text-[13px] leading-[1.6] text-slate-600 ${pinned ? "" : "line-clamp-3"}`}>{term.definition}</span>
+        <span className="mt-3 block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Definition</span>
+        <span className={`mt-1.5 block text-[13px] leading-[1.6] text-slate-600 dark:text-slate-300 ${pinned ? "" : "line-clamp-3"}`}>{term.definition}</span>
 
         {pinned && <>
-          <span className="mt-4 block border-t border-[#EEF2F7]" />
+          <span className="mt-4 block border-t border-[#EEF2F7] dark:border-white/10" />
 
-          <span className="mt-3.5 block text-[10px] font-bold uppercase tracking-wider text-slate-400">Understanding</span>
+          <span className="mt-3.5 block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Understanding</span>
           <span className="mt-2 flex items-center justify-between gap-2">
             <span className="flex items-center gap-2">
               {knowledgeLevels.map(lvl => {
@@ -228,25 +227,25 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
                 title={noteText ? "Edit your note" : "Add a note"}
                 aria-label="Notes"
                 onClick={() => setNoteOpen(o => !o)}
-                className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-1.5 text-[11px] font-bold transition-all duration-150 active:scale-95 ${noteOpen || noteText ? "bg-[#effbfa] text-[#0F8B8D]" : "text-slate-400 hover:bg-slate-100 hover:text-[#0F8B8D]"}`}
+                className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-1.5 text-[11px] font-bold transition-all duration-150 active:scale-95 ${noteOpen || noteText ? "bg-[#effbfa] text-[#0F8B8D] dark:bg-teal-500/15 dark:text-teal-300" : "text-slate-400 hover:bg-slate-100 hover:text-[#0F8B8D] dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-teal-300"}`}
               ><PenLine size={12} />Edit</button>
               <button
                 type="button"
                 title="Expand for more detail"
                 aria-label="Expand"
                 onClick={() => { setExpanded(true); setPinned(false); }}
-                className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-1.5 text-[11px] font-bold text-slate-400 transition-all duration-150 hover:bg-slate-100 hover:text-[#0F8B8D] active:scale-95"
+                className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-1.5 text-[11px] font-bold text-slate-400 transition-all duration-150 hover:bg-slate-100 hover:text-[#0F8B8D] active:scale-95 dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-teal-300"
               >Expand<ArrowRight size={12} /></button>
             </span>
           </span>
 
-          {noteOpen && <span className="mt-3.5 block border-t border-[#EEF2F7] pt-3.5">
+          {noteOpen && <span className="mt-3.5 block border-t border-[#EEF2F7] pt-3.5 dark:border-white/10">
             <textarea
               value={noteText}
               onChange={e => setNoteText(e.target.value)}
               rows={2}
               placeholder={`Note about ${term.name}...`}
-              className="w-full resize-none rounded-lg border border-slate-200 p-2 text-[13px] leading-relaxed text-ink outline-none transition-colors duration-150 placeholder:text-slate-400 focus:border-[#0F8B8D]/40"
+              className="w-full resize-none rounded-lg border border-slate-200 p-2 text-[13px] leading-relaxed text-heading outline-none transition-colors duration-150 placeholder:text-slate-400 focus:border-[#0F8B8D]/40 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500"
             />
             <button type="button" onClick={handleSaveNote} className="mt-2 flex cursor-pointer items-center gap-1 rounded-full bg-accent-500 px-3 py-1.5 text-[11px] font-extrabold text-white transition-all duration-150 hover:bg-accent-600 active:scale-95">
               {noteSaved ? <Check size={11} /> : null}{noteSaved ? "Saved" : "Save Note"}
@@ -254,15 +253,8 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
           </span>}
         </>}
 
-        <span className="absolute left-1/2 top-full h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-[#EEF2F7] bg-white" />
+        <span className="absolute left-1/2 top-full h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-[#EEF2F7] bg-white dark:border-white/10 dark:bg-[#0d1917]" />
       </motion.span>}
-    </AnimatePresence>
-
-    <AnimatePresence>
-      {floatingKP !== null && <motion.span
-        initial={{ opacity: 1, y: 0 }} animate={{ opacity: 0, y: -20 }} exit={{ opacity: 0 }} transition={{ duration: 1.2 }}
-        className="pointer-events-none absolute -right-2 -top-2 z-40 text-[11px] font-extrabold text-teal-600"
-      >+{floatingKP} KP</motion.span>}
     </AnimatePresence>
 
     <AnimatePresence>
@@ -273,17 +265,17 @@ function HighlightedTerm({ term, matchedText }: { term: Term; matchedText: strin
       {levelUpInfo && <motion.span
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
         onClick={() => setLevelUpInfo(null)}
-        className="fixed inset-0 z-[70] flex items-center justify-center bg-ink/50 p-4 backdrop-blur-sm"
+        className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       >
         <motion.span
           initial={{ opacity: 0, scale: 0.7, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.7, y: 20 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           onClick={e => e.stopPropagation()}
-          className="block w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-lift"
+          className="block w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-lift dark:bg-[#0d1917] dark:shadow-none dark:ring-1 dark:ring-white/10"
         >
-          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-teal-100 text-teal-600"><PartyPopper size={30} /></span>
-          <span className="display mt-5 block text-2xl">🎉 Level Up!</span>
-          <span className="mt-2 block text-sm leading-relaxed text-slate-500">Congratulations! You've reached <span className="font-extrabold text-ink">Level {levelUpInfo.level} · {levelUpInfo.name}</span>.</span>
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-300"><PartyPopper size={30} /></span>
+          <span className="display mt-5 block text-2xl text-heading dark:text-white">🎉 Level Up!</span>
+          <span className="mt-2 block text-sm leading-relaxed text-slate-500 dark:text-slate-400">Congratulations! You've reached <span className="font-extrabold text-heading dark:text-white">Level {levelUpInfo.level} · {levelUpInfo.name}</span>.</span>
           <button type="button" onClick={() => setLevelUpInfo(null)} className="mt-6 w-full cursor-pointer rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Awesome!</button>
         </motion.span>
       </motion.span>}
@@ -345,49 +337,49 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
   return <motion.span
     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
     onClick={onClose}
-    className="fixed inset-0 z-[65] flex items-center justify-center bg-ink/40 p-4 backdrop-blur-[2px]"
+    className="fixed inset-0 z-[65] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"
   >
     <motion.span
       initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 10 }}
       transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
       onClick={e => e.stopPropagation()}
-      className="block max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-black/[0.06] bg-white p-6 text-left shadow-lift sm:p-7"
+      className="block max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-black/[0.06] bg-white p-6 text-left shadow-lift dark:border-white/10 dark:bg-[#0d1917] dark:shadow-none sm:p-7"
     >
       <span className="flex items-start justify-between gap-3">
         <span className="min-w-0">
           <span className="eyebrow text-[#0F8B8D]">Medical Term</span>
-          <span className="display mt-2 block text-2xl leading-tight">{term.name}</span>
+          <span className="display mt-2 block text-2xl leading-tight text-heading dark:text-white">{term.name}</span>
         </span>
-        <button type="button" onClick={onClose} aria-label="Close" className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-50 hover:text-ink"><X size={16} /></button>
+        <button type="button" onClick={onClose} aria-label="Close" className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-50 hover:text-heading dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-white"><X size={16} /></button>
       </span>
 
-      <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500">Definition</span>
-      <span className="mt-2 block text-sm leading-relaxed text-ink">{term.definition}</span>
+      <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Definition</span>
+      <span className="mt-2 block text-sm leading-relaxed text-heading dark:text-white">{term.definition}</span>
 
-      <span className="mt-4 block rounded-2xl bg-[#f9fcfc] p-4">
-        <span className="flex items-center gap-1.5 text-xs font-extrabold text-teal-700"><Wand2 size={13} />Simple Explanation</span>
-        <span className="mt-1.5 block text-sm leading-relaxed text-slate-600">{term.aiExplanation}</span>
+      <span className="mt-4 block rounded-2xl bg-[#f9fcfc] p-4 dark:bg-white/5">
+        <span className="flex items-center gap-1.5 text-xs font-extrabold text-teal-700 dark:text-teal-300"><Wand2 size={13} />Simple Explanation</span>
+        <span className="mt-1.5 block text-sm leading-relaxed text-slate-600 dark:text-slate-300">{term.aiExplanation}</span>
       </span>
 
-      <span className="mt-5 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Stethoscope size={13} />Why This Matters Clinically</span>
-      <span className="mt-2 block text-sm leading-relaxed text-slate-600">{term.clinicalRelevance}</span>
+      <span className="mt-5 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400"><Stethoscope size={13} />Why This Matters Clinically</span>
+      <span className="mt-2 block text-sm leading-relaxed text-slate-600 dark:text-slate-300">{term.clinicalRelevance}</span>
 
-      <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500">Common Conditions</span>
+      <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Common Conditions</span>
       {conditions.length > 0
         ? <span className="mt-2.5 flex flex-wrap gap-2">
-          {conditions.map(c => <span key={c.id} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-ink">{c.title} <span className="font-medium text-slate-400">· {c.category}</span></span>)}
+          {conditions.map(c => <span key={c.id} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-heading dark:border-white/10 dark:bg-white/5 dark:text-white">{c.title} <span className="font-medium text-slate-400 dark:text-slate-500">· {c.category}</span></span>)}
         </span>
-        : <span className="mt-1.5 block text-xs text-slate-400">Not yet featured in a Clinical Case.</span>}
+        : <span className="mt-1.5 block text-xs text-slate-400 dark:text-slate-500">Not yet featured in a Clinical Case.</span>}
 
       {relatedTerms.length > 0 && <>
-        <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500">Related concepts</span>
+        <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Related concepts</span>
         <span className="mt-2.5 flex flex-wrap gap-2">
-          {relatedTerms.map(rt => <button key={rt.id} type="button" onClick={() => setCurrentId(rt.id)} className="cursor-pointer rounded-full bg-teal-50 px-3 py-1.5 text-xs font-extrabold text-teal-700 transition hover:bg-teal-100">{rt.name}</button>)}
+          {relatedTerms.map(rt => <button key={rt.id} type="button" onClick={() => setCurrentId(rt.id)} className="cursor-pointer rounded-full bg-teal-50 px-3 py-1.5 text-xs font-extrabold text-teal-700 transition hover:bg-teal-100 dark:bg-teal-500/15 dark:text-teal-300 dark:hover:bg-teal-500/25">{rt.name}</button>)}
         </span>
       </>}
 
-      <span className="mt-5 block border-t border-[#EEF2F7] pt-5">
-        <span className="block text-xs font-extrabold uppercase tracking-wide text-slate-500">Your familiarity</span>
+      <span className="mt-5 block border-t border-[#EEF2F7] pt-5 dark:border-white/10">
+        <span className="block text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Your familiarity</span>
         <span className="mt-2.5 flex gap-2">
           {familiarityLevels.map(lvl => {
             const active = confidence === lvl.level;
@@ -396,20 +388,20 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
               type="button"
               onClick={() => handleFamiliarity(lvl.level)}
               aria-pressed={active}
-              className={`flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-2 py-2.5 text-xs font-extrabold transition ${active ? lvl.active : "border-slate-200 text-slate-500 hover:bg-slate-50"}`}
+              className={`flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-2 py-2.5 text-xs font-extrabold transition ${active ? lvl.active : "border-slate-200 text-slate-500 hover:bg-slate-50 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5"}`}
             ><span className={`h-2 w-2 shrink-0 rounded-full ${lvl.dot}`} />{lvl.label}</button>;
           })}
         </span>
       </span>
 
-      <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500">Actions</span>
+      <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Actions</span>
       <span className="mt-2.5 grid grid-cols-2 gap-2">
-        <button type="button" onClick={toggleFavorite} aria-pressed={favorited} className={`flex cursor-pointer items-center gap-1.5 rounded-xl border px-3 py-2.5 text-left text-xs font-bold transition ${favorited ? "border-amber-200 bg-amber-50 text-amber-700" : "border-slate-200 text-slate-600 hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-ink"}`}>
+        <button type="button" onClick={toggleFavorite} aria-pressed={favorited} className={`flex cursor-pointer items-center gap-1.5 rounded-xl border px-3 py-2.5 text-left text-xs font-bold transition ${favorited ? "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/25 dark:bg-amber-500/10 dark:text-amber-300" : "border-slate-200 text-slate-600 hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"}`}>
           <Bookmark size={14} className="shrink-0" fill={favorited ? "currentColor" : "none"} />{favorited ? "Saved" : "Save term"}
         </button>
-        <button type="button" onClick={() => setDeckPickerOpen(true)} className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-ink"><Layers size={14} className="shrink-0 text-teal-600" />Create flashcard</button>
-        <button type="button" onClick={() => router.push(`/dashboard/terminology/quiz-me/${term.id}`)} className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-ink"><HelpCircle size={14} className="shrink-0 text-teal-600" />Quiz me on this</button>
-        <Link href="/dashboard/ai-tutor" className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-ink"><Bot size={14} className="shrink-0 text-teal-600" />Ask Studium AI</Link>
+        <button type="button" onClick={() => setDeckPickerOpen(true)} className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"><Layers size={14} className="shrink-0 text-teal-600 dark:text-teal-300" />Create flashcard</button>
+        <button type="button" onClick={() => router.push(`/dashboard/terminology/quiz-me/${term.id}`)} className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"><HelpCircle size={14} className="shrink-0 text-teal-600 dark:text-teal-300" />Quiz me on this</button>
+        <Link href="/dashboard/ai-tutor" className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"><Bot size={14} className="shrink-0 text-teal-600 dark:text-teal-300" />Ask Studium AI</Link>
       </span>
 
       {deckPickerOpen && typeof document !== "undefined" && createPortal(
@@ -421,9 +413,9 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
         <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/30 p-4 sm:items-center" onClick={() => setDeckPickerOpen(false)}>
           <div className="w-full max-w-sm" onClick={e => e.stopPropagation()}>
             {addedToDeck
-              ? <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5 text-center">
-                <p className="text-sm font-extrabold text-teal-700">Added to deck ✓</p>
-                <button type="button" onClick={() => setDeckPickerOpen(false)} className="mt-3 cursor-pointer text-xs font-bold text-teal-700 underline">Close</button>
+              ? <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5 text-center dark:border-teal-500/25 dark:bg-teal-500/10">
+                <p className="text-sm font-extrabold text-teal-700 dark:text-teal-300">Added to deck ✓</p>
+                <button type="button" onClick={() => setDeckPickerOpen(false)} className="mt-3 cursor-pointer text-xs font-bold text-teal-700 underline dark:text-teal-300">Close</button>
               </div>
               : <DeckPicker
                 confirmLabel="Add card"
@@ -437,12 +429,12 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
 
       <span className="mt-2 block">
         {!noteOpen
-          ? <button type="button" onClick={() => setNoteOpen(true)} className="flex w-full cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-ink"><PenLine size={14} className="shrink-0 text-teal-600" />{noteText ? "Edit Note" : "Create Notes"}</button>
-          : <span className="block rounded-xl border border-slate-200 p-3">
-            <textarea value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} placeholder={`Jot a quick note about ${term.name}...`} className="w-full resize-none text-xs leading-relaxed text-ink outline-none placeholder:text-slate-400" />
+          ? <button type="button" onClick={() => setNoteOpen(true)} className="flex w-full cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"><PenLine size={14} className="shrink-0 text-teal-600 dark:text-teal-300" />{noteText ? "Edit Note" : "Create Notes"}</button>
+          : <span className="block rounded-xl border border-slate-200 p-3 dark:border-white/10">
+            <textarea value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} placeholder={`Jot a quick note about ${term.name}...`} className="w-full resize-none text-xs leading-relaxed text-heading outline-none placeholder:text-slate-400 dark:bg-transparent dark:text-white dark:placeholder:text-slate-500" />
             <span className="mt-2 flex items-center gap-2">
               <button type="button" onClick={handleSaveNote} className="flex cursor-pointer items-center gap-1 rounded-full bg-accent-500 px-3.5 py-1.5 text-[11px] font-extrabold text-white transition hover:bg-accent-600">{noteSaved ? <Check size={12} /> : null}{noteSaved ? "Saved" : "Save Note"}</button>
-              <button type="button" onClick={() => setNoteOpen(false)} className="cursor-pointer text-[11px] font-bold text-slate-400 hover:text-slate-600">Close</button>
+              <button type="button" onClick={() => setNoteOpen(false)} className="cursor-pointer text-[11px] font-bold text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">Close</button>
             </span>
           </span>}
       </span>

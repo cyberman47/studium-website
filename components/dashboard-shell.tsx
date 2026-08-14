@@ -2,10 +2,11 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Bell, Check, ChevronDown, CreditCard, Flame, GraduationCap, HeartHandshake, LogOut, Map as MapIcon, ClipboardCheck,
-  FlaskConical, Pill, Settings, ShieldAlert, Smile, Snowflake, Sparkles, Trophy, User, X, Zap
+  Bell, Check, ChevronDown, Compass, CreditCard, Flame, GraduationCap, HeartHandshake, LogOut, Map as MapIcon, ClipboardCheck,
+  FlaskConical, MessagesSquare, Pill, Settings, ShieldAlert, Smile, Snowflake, Sparkles, Trophy, User, X, Zap
 } from "lucide-react";
 import {
   ensureStreakFreezesGranted, ensureStreakGapsFrozen, getLongestStreak, getStreakFreezeCount, getWeekLog,
@@ -15,6 +16,8 @@ import { STUDY_PLANNER_EVENT } from "@/lib/studyPlanner";
 import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
 import { currentPathOptions, CurrentPathId, findCurrentPathDef, getCurrentPathId, setCurrentPathId } from "@/lib/currentPath";
 import { formatRelativeTime, getNotifications, getUnreadCount, markAllNotificationsRead, markNotificationRead, NotificationItem } from "@/lib/notifications";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { replayDashboardTour } from "@/lib/productTour";
 
 const SECURED_COLOR = "#0F8B8D"; // this app's existing brand teal (accent-500)—used instead of the spec's one-off #00A884 to stay on the real design system
 const BUILDING_COLOR = "#D97706"; // amber-600, matches the amber-50/100/600 tones this file already used for the old flame streak button
@@ -48,13 +51,27 @@ const menuItems = [
   { label: "Profile Settings", icon: User, href: "/dashboard/settings/profile" },
   { label: "Account Settings", icon: Settings, href: "/dashboard/settings/account" },
   { label: "Notifications", icon: Bell, href: "/dashboard/settings/notifications" },
-  { label: "Subscription", icon: CreditCard, href: "/dashboard/settings/billing" }
+  { label: "Subscription", icon: CreditCard, href: "/dashboard/settings/billing" },
+  // Forum is its own real discussion feature, distinct from the Community
+  // Library (lib/communityLessons.ts, now a real sidebar item)—moved back
+  // here, directly above Logout, per request.
+  { label: "Forum", icon: MessagesSquare, href: "/forum" }
 ] as const;
 
 export function UserMenu({ name, avatar, onLogOut }: { name: string; avatar?: string | null; onLogOut: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const initial = (name || "?").trim().charAt(0).toUpperCase();
+  const router = useRouter();
+
+  // Un-marks the dashboard tour and sends the student there—its own
+  // SectionTour (app/dashboard/(main)/page.tsx) auto-plays on mount for
+  // anyone who hasn't seen it, so this is indistinguishable from a genuine
+  // first visit.
+  function replayTour() {
+    replayDashboardTour();
+    router.push("/dashboard");
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -68,11 +85,11 @@ export function UserMenu({ name, avatar, onLogOut }: { name: string; avatar?: st
   function close() { setOpen(false); }
 
   return <div ref={ref} className="relative">
-    <button type="button" onClick={() => setOpen(o => !o)} aria-label="Account menu" aria-expanded={open} className="flex cursor-pointer items-center gap-2 rounded-full py-1 pl-1 pr-2.5 transition hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-teal-100">
+    <button type="button" onClick={() => setOpen(o => !o)} aria-label="Account menu" aria-expanded={open} className="flex cursor-pointer items-center gap-2 rounded-full py-1 pl-1 pr-2.5 transition hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-teal-100 dark:hover:bg-white/5">
       {avatar
         ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={avatar} alt="" className="h-9 w-9 rounded-full object-cover" />
-        : <span className="grid h-9 w-9 place-items-center rounded-full bg-teal-100 text-sm font-extrabold text-teal-700">{initial}</span>}
-      <span className="text-sm font-bold text-ink">{name}</span>
+        : <span className="grid h-9 w-9 place-items-center rounded-full bg-teal-100 text-sm font-extrabold text-teal-700 dark:bg-teal-500/20 dark:text-teal-300">{initial}</span>}
+      <span className="text-sm font-bold text-heading dark:text-white">{name}</span>
       <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
     </button>
     <AnimatePresence>
@@ -81,14 +98,19 @@ export function UserMenu({ name, avatar, onLogOut }: { name: string; avatar?: st
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -6, scale: 0.98 }}
         transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute right-0 top-full z-30 mt-2 max-h-[calc(100vh-6rem)] w-64 origin-top-right overflow-y-auto rounded-2xl border border-slate-100 bg-white shadow-lift"
+        className="absolute right-0 top-full z-30 mt-2 max-h-[calc(100vh-6rem)] w-64 origin-top-right overflow-y-auto rounded-2xl border border-slate-100 bg-white shadow-lift dark:border-white/10 dark:bg-[#0d1917]"
       >
-        <div className="p-1.5">
-          {menuItems.map(item => <a key={item.label} href={item.href} onClick={close} className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50 hover:text-ink"><item.icon size={15} className="shrink-0 text-slate-400" />{item.label}</a>)}
-          <button type="button" onClick={() => { close(); onLogOut(); }} className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-sm font-bold text-rose-600 transition hover:bg-rose-50"><LogOut size={15} />Logout</button>
+        <div className="border-b border-slate-100 p-3 dark:border-white/10">
+          <p className="px-0.5 text-[10px] font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Appearance</p>
+          <div className="mt-2"><ThemeToggle /></div>
         </div>
-        <div className="border-t border-slate-100 p-3">
-          <p className="text-[10px] font-extrabold uppercase tracking-wide text-slate-500">Get the mobile app</p>
+        <div className="p-1.5">
+          {menuItems.map(item => <a key={item.label} href={item.href} onClick={close} className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50 hover:text-heading dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"><item.icon size={15} className="shrink-0 text-slate-400" />{item.label}</a>)}
+          <button type="button" onClick={() => { close(); replayTour(); }} className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-sm font-bold text-slate-600 transition hover:bg-slate-50 hover:text-heading dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"><Compass size={15} className="shrink-0 text-slate-400" />Product Tour</button>
+          <button type="button" onClick={() => { close(); onLogOut(); }} className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-sm font-bold text-rose-600 transition hover:bg-rose-50 dark:hover:bg-rose-500/10"><LogOut size={15} />Logout</button>
+        </div>
+        <div className="border-t border-slate-100 p-3 dark:border-white/10">
+          <p className="text-[10px] font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Get the mobile app</p>
           <div className="mt-2.5 flex flex-col items-start gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <a href="#" className="cursor-pointer transition hover:opacity-80"><img src="/images/badges/google-play-badge.png" alt="Get it on Google Play" className="h-10 w-auto" /></a>
@@ -105,7 +127,7 @@ export function StreakSummary({ streak, totalKP, week }: { streak: number; total
   return <>
     <div className="flex items-center gap-3">
       <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-100 text-amber-600"><Flame size={22} fill="currentColor" /></span>
-      <div><p className="text-2xl font-extrabold leading-tight text-ink">{streak} day{streak === 1 ? "" : "s"}</p><p className="text-xs font-bold text-slate-500">Current streak</p></div>
+      <div><p className="text-2xl font-extrabold leading-tight text-heading">{streak} day{streak === 1 ? "" : "s"}</p><p className="text-xs font-bold text-slate-500">Current streak</p></div>
     </div>
     <div className="mt-4 flex items-center gap-2 rounded-xl bg-[#f9fcfc] px-3 py-2.5 text-xs font-extrabold text-teal-700"><Zap size={14} fill="currentColor" />{totalKP} Knowledge Points earned</div>
     <div className="mt-5">
@@ -192,7 +214,7 @@ export function StudyStreak() {
       onClick={() => setOpen(o => !o)}
       aria-label="Study progress"
       aria-expanded={open}
-      className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-extrabold transition focus-visible:ring-4 ${secured ? "border-teal-200 bg-teal-50 text-teal-700 hover:bg-teal-100 focus-visible:ring-teal-100" : "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 focus-visible:ring-amber-100"}`}
+      className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-extrabold transition focus-visible:ring-4 ${secured ? "border-teal-200 bg-teal-50 text-teal-700 hover:bg-teal-100 focus-visible:ring-teal-100 dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-teal-300 dark:hover:bg-teal-500/15" : "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 focus-visible:ring-amber-100 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/15"}`}
     >
       <BrainIcon percent={percent} secured={secured} size={13} />
       {streakDays}d<span className="mx-0.5 text-black/15">·</span>{currentKP}/{targetKP} KP
@@ -210,11 +232,11 @@ export function StudyStreak() {
             so opening this doesn't dump the full activity list/calendar on
             you every time. The chevron below reveals the rest. */}
         <div className="flex flex-col items-center text-center">
-          <p className="text-2xl font-extrabold tracking-tight text-ink">{streakDays} DAYS</p>
+          <p className="text-2xl font-extrabold tracking-tight text-heading">{streakDays} DAYS</p>
           <div className="mt-2">
             <BrainIcon percent={percent} secured={secured} size={72} />
           </div>
-          <p className="mt-2 text-sm font-extrabold text-ink">{currentKP} / {targetKP} KP</p>
+          <p className="mt-2 text-sm font-extrabold text-heading">{currentKP} / {targetKP} KP</p>
           {secured
             ? <p className="mt-1 flex items-center gap-1.5 text-xs font-extrabold text-teal-700"><Check size={13} strokeWidth={3} />STREAK SECURED FOR TODAY</p>
             : <p className="mt-1 flex items-center gap-1.5 text-xs font-extrabold text-amber-700"><ShieldAlert size={13} />{kpUntilSecured} KP until your streak is secured</p>}
@@ -240,7 +262,7 @@ export function StudyStreak() {
             className="overflow-hidden"
           >
             <div className="mt-3 rounded-2xl bg-[#f9fcfc] p-3 text-center">
-              <p className="text-lg font-extrabold text-ink">{longestStreak}</p>
+              <p className="text-lg font-extrabold text-heading">{longestStreak}</p>
               <p className="flex items-center justify-center gap-1 text-[11px] font-bold text-slate-500"><Trophy size={11} />Longest streak</p>
             </div>
 
@@ -251,7 +273,7 @@ export function StudyStreak() {
                   {a.done
                     ? <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-teal-500 text-white"><Check size={11} strokeWidth={3} /></span>
                     : <span className="h-5 w-5 shrink-0 rounded-full border-2 border-slate-200" />}
-                  <span className={`flex-1 text-xs font-bold ${a.done ? "text-slate-400 line-through" : "text-ink"}`}>{a.label}</span>
+                  <span className={`flex-1 text-xs font-bold ${a.done ? "text-slate-400 line-through" : "text-heading"}`}>{a.label}</span>
                   <span className={`text-xs font-extrabold ${a.done ? "text-teal-600" : "text-slate-400"}`}>+{a.kp} KP</span>
                 </div>)}
               </div>
@@ -313,7 +335,7 @@ export function LearningPathSwitcher() {
   const CurrentIcon = pathId ? pathIcons[pathId] : MapIcon;
 
   return <div ref={ref} className="relative">
-    <button type="button" onClick={() => setOpen(o => !o)} aria-label="Current learning path" aria-expanded={open} className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-extrabold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc] focus-visible:ring-4 focus-visible:ring-teal-100">
+    <button type="button" onClick={() => setOpen(o => !o)} aria-label="Current learning path" aria-expanded={open} className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-extrabold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] focus-visible:ring-4 focus-visible:ring-teal-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:border-teal-500/30 dark:hover:bg-white/10">
       <CurrentIcon size={15} className="text-teal-600" />
       <span className="max-w-[9rem] truncate">{current ? current.label : "Choose your path"}</span>
       <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
@@ -332,7 +354,7 @@ export function LearningPathSwitcher() {
         <div className="space-y-0.5 pb-1">
           {currentPathOptions.filter(p => p.id !== pathId).map(p => {
             const Icon = pathIcons[p.id];
-            return <button key={p.id} type="button" onClick={() => choose(p.id)} className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-bold text-slate-600 transition hover:bg-slate-50 hover:text-ink"><Icon size={15} className="shrink-0 text-slate-400" />{p.label}</button>;
+            return <button key={p.id} type="button" onClick={() => choose(p.id)} className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-bold text-slate-600 transition hover:bg-slate-50 hover:text-heading"><Icon size={15} className="shrink-0 text-slate-400" />{p.label}</button>;
           })}
         </div>
       </motion.div>}
@@ -344,6 +366,10 @@ export function NotificationsBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  // Which single notification is expanded, inbox-style—collapsed rows show
+  // only the subject line (title), and opening one to read the body is
+  // what marks it read, same real read/unread state as before.
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   function refresh() {
@@ -362,15 +388,16 @@ export function NotificationsBell() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [open]);
 
-  function openNotification(item: NotificationItem) {
+  function toggleNotification(item: NotificationItem) {
     if (!item.read) {
       markNotificationRead(item.id);
       refresh();
     }
+    setExpandedId(id => id === item.id ? null : item.id);
   }
 
   return <div ref={ref} className="relative">
-    <button type="button" onClick={() => setOpen(o => !o)} aria-label="Notifications" aria-expanded={open} className="relative grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-500 transition hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-teal-100">
+    <button type="button" onClick={() => setOpen(o => !o)} aria-label="Notifications" aria-expanded={open} className="relative grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-500 transition hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-teal-100 dark:text-slate-400 dark:hover:bg-white/5">
       <Bell size={18} />
       {unreadCount > 0 && <span className="absolute right-1 top-1 grid h-4 min-w-[16px] place-items-center rounded-full bg-rose-500 px-1 text-[9px] font-extrabold text-white">{unreadCount > 9 ? "9+" : unreadCount}</span>}
     </button>
@@ -380,17 +407,17 @@ export function NotificationsBell() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.97 }}
         transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed bottom-5 right-5 z-50 flex max-h-[32rem] w-[calc(100vw-2.5rem)] max-w-md origin-bottom-right flex-col overflow-hidden rounded-3xl border border-black/[0.06] bg-white shadow-lift"
+        className="fixed bottom-5 right-5 z-50 flex max-h-[32rem] w-[calc(100vw-2.5rem)] max-w-[22rem] origin-bottom-right flex-col overflow-hidden rounded-3xl border border-black/[0.06] bg-white shadow-lift"
       >
         <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-teal-100 text-teal-700"><Bell size={18} /></span>
             <div>
-              <p className="text-base font-extrabold text-ink">Notifications</p>
+              <p className="text-base font-extrabold text-heading">Notifications</p>
               <p className="text-xs text-slate-500">{unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}</p>
             </div>
           </div>
-          <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-50 hover:text-ink"><X size={16} /></button>
+          <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-50 hover:text-heading"><X size={16} /></button>
         </div>
 
         {unreadCount > 0 && <div className="flex justify-end border-b border-slate-100 px-5 py-2.5">
@@ -403,22 +430,39 @@ export function NotificationsBell() {
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-slate-50 text-slate-300"><Bell size={22} /></span>
               <p className="text-sm font-bold text-slate-400">Nothing here yet</p>
             </div>
-            : notifications.map(item => <button
-              key={item.id}
-              type="button"
-              onClick={() => openNotification(item)}
-              className={`flex w-full cursor-pointer items-start gap-3.5 rounded-2xl px-3.5 py-3.5 text-left transition hover:bg-[#f9fcfc] ${item.read ? "" : "bg-[#effbfa]"}`}
-            >
-              <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-teal-100 text-teal-700">
-                <Sparkles size={19} />
-                {!item.read && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-teal-500" />}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className={`text-sm ${item.read ? "font-bold text-slate-500" : "font-extrabold text-ink"}`}>{item.title}</p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-500">{item.body}</p>
-                <p className="mt-1.5 text-xs font-bold text-slate-400">{formatRelativeTime(item.createdAt)}</p>
-              </div>
-            </button>)}
+            : notifications.map(item => {
+              const isExpanded = expandedId === item.id;
+              return <div key={item.id} className={`overflow-hidden rounded-2xl transition-colors ${item.read ? "" : "bg-[#effbfa]"}`}>
+                {/* Inbox row: only the subject line shows until pressed, like
+                    an email—the body reveals inline underneath on click,
+                    which is also the real moment it gets marked read. */}
+                <button
+                  type="button"
+                  onClick={() => toggleNotification(item)}
+                  aria-expanded={isExpanded}
+                  className="flex w-full cursor-pointer items-center gap-3.5 px-3.5 py-3.5 text-left transition hover:bg-[#f9fcfc]"
+                >
+                  <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-teal-100 text-teal-700">
+                    <Sparkles size={19} />
+                    {!item.read && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-teal-500" />}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className={`block truncate text-sm ${item.read ? "font-bold text-slate-500" : "font-extrabold text-heading"}`}>{item.title}</span>
+                    <span className="mt-0.5 block text-xs font-bold text-slate-400">{formatRelativeTime(item.createdAt)}</span>
+                  </span>
+                  <ChevronDown size={16} className={`shrink-0 text-slate-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence initial={false}>
+                  {isExpanded && <motion.div
+                    initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <p className="px-3.5 pb-3.5 pl-[3.75rem] text-sm leading-relaxed text-slate-500">{item.body}</p>
+                  </motion.div>}
+                </AnimatePresence>
+              </div>;
+            })}
         </div>
       </motion.div>}
     </AnimatePresence>

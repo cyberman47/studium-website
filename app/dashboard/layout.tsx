@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Logo } from "@/components/navigation";
 import { LearningPathSwitcher, NotificationsBell, StudyStreak, UserMenu } from "@/components/dashboard-shell";
 import { CommandSearch } from "@/components/command-search";
+import { KnowledgeToastHost } from "@/components/knowledge-toast";
 import { getUser } from "@/lib/onboarding";
 import { createClient } from "@/lib/supabase/client";
 
@@ -41,10 +42,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push("/");
   }
 
-  return <div className="min-h-screen bg-[#fcfdfd]">
-    <header className="border-b border-slate-200 bg-slate-50 py-4">
+  // The product tour is no longer a single global cross-page walkthrough
+  // mounted here—each section now owns a small self-contained
+  // components/product-tour/SectionTour instance on its own page (see
+  // app/dashboard/(main)/page.tsx, .../learning-paths/page.tsx, etc.), so
+  // nothing needs to be mounted at this shared layout level at all.
+  return <div className="min-h-screen bg-[#fcfdfd] dark:bg-[#070d0c]">
+    <header className="border-b border-slate-200 bg-slate-50 py-4 dark:border-transparent dark:bg-transparent">
       <div className="dashboard-shell flex items-center justify-between gap-4"><Logo href="/dashboard" /><div className="flex flex-1 justify-center"><CommandSearch /></div><div className="flex items-center gap-3"><LearningPathSwitcher /><StudyStreak /><NotificationsBell /><UserMenu name={name} avatar={avatar} onLogOut={logOut} /></div></div>
     </header>
     {children}
+    <KnowledgeToastHost />
   </div>;
 }

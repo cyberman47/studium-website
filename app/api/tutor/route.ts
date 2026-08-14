@@ -10,7 +10,7 @@ import { NextRequest } from "next/server";
 
 export const runtime = "nodejs";
 
-type TutorMode = "tutor" | "socratic" | "simplify";
+type TutorMode = "tutor" | "deepdive" | "simplify";
 
 type TutorContext = {
   sectionName: string;
@@ -36,14 +36,24 @@ const MAX_MISTAKES = 20;
 // connected, I'd..." line—now it's genuinely the model's instruction.
 const modeInstructions: Record<TutorMode, string> = {
   tutor: "Explain concepts clearly and directly, like a patient one-on-one tutor.",
-  socratic: "Guide the student toward the answer with questions instead of stating it outright—true Socratic method.",
-  simplify: "Break the explanation down into the simplest, most beginner-friendly terms possible."
+  deepdive: "Give a comprehensive, structured, end-to-end breakdown: explain the underlying mechanism, walk through the logic step-by-step, and connect it to related concepts the student should already know.",
+  simplify: "Break the explanation down into the simplest, most beginner-friendly terms possible—lean on a plain-language analogy."
 };
 
-const modeLabels: Record<TutorMode, string> = { tutor: "Tutor", socratic: "Socratic", simplify: "Simplify" };
+// Deep Dive is the one mode where real length is the point, not a flaw—every
+// other mode stays deliberately short since this renders in a small chat
+// panel. Kept separate from modeInstructions (which shapes *what* to say)
+// so this only shapes *how much*.
+const modeLengthGuidance: Record<TutorMode, string> = {
+  tutor: "Keep replies focused and concise—this renders in a small chat panel, not an essay.",
+  deepdive: "Thoroughness is the point here: structure the reply into short labeled sections or numbered steps so a long answer still stays easy to follow. Don't pad it with repetition just to seem thorough.",
+  simplify: "Keep it short—one clear analogy plus a one-line takeaway is usually enough."
+};
+
+const modeLabels: Record<TutorMode, string> = { tutor: "Tutor", deepdive: "Deep Dive", simplify: "Simplify" };
 
 function isTutorMode(v: unknown): v is TutorMode {
-  return v === "tutor" || v === "socratic" || v === "simplify";
+  return v === "tutor" || v === "deepdive" || v === "simplify";
 }
 
 function jsonError(message: string, status: number) {
@@ -103,7 +113,7 @@ function buildSystemPrompt(mode: TutorMode, context: TutorContext): string {
   }
   lines.push(
     "",
-    `Mode: ${modeLabels[mode]}. Keep replies focused and concise—this renders in a small chat panel, not an essay. Plain text only (no markdown headers or tables); short paragraphs or a simple dashed list are fine.`
+    `Mode: ${modeLabels[mode]}. ${modeLengthGuidance[mode]} Plain text only (no markdown headers or tables); short paragraphs or a simple dashed list are fine.`
   );
   return lines.join("\n");
 }

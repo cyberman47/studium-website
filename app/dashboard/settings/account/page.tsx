@@ -4,10 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, Calendar, Camera, Clock3, Crown, Lock, LogOut, RotateCcw, Sparkles, Trash2, X } from "lucide-react";
+import { AlertTriangle, Calendar, Camera, ChevronRight, Clock3, Compass, Crown, Gift, Lock, LogOut, RotateCcw, Sparkles, Trash2, X } from "lucide-react";
 import { Field, inputClass } from "@/components/ui";
 import { getUser, updateUser } from "@/lib/onboarding";
 import { getTotalHours } from "@/lib/progress";
+import { getCurrentPlan } from "@/lib/billing";
+import { Plan } from "@/lib/plans";
+import { replayDashboardTour } from "@/lib/productTour";
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
@@ -23,6 +26,7 @@ export default function AccountPage() {
   const [joinedAt, setJoinedAt] = useState("");
   const [totalHours, setTotalHours] = useState(0);
   const [savedIdentity, setSavedIdentity] = useState(false);
+  const [plan, setPlan] = useState<Plan | null>(null);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -41,6 +45,7 @@ export default function AccountPage() {
     setAvatar(user?.avatar ?? null);
     setJoinedAt(user?.joinedAt || "");
     setTotalHours(getTotalHours());
+    setPlan(getCurrentPlan());
   }, []);
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -89,6 +94,15 @@ export default function AccountPage() {
     router.push("/onboarding");
   }
 
+  // Un-marks the dashboard tour and sends the student there—its own
+  // SectionTour (app/dashboard/(main)/page.tsx) auto-plays on mount for
+  // anyone who hasn't seen it, so this is indistinguishable from a genuine
+  // first visit.
+  function replayTour() {
+    replayDashboardTour();
+    router.push("/dashboard");
+  }
+
   function logOut() {
     localStorage.removeItem("studium_user");
     localStorage.removeItem("studium_onboarding_answers");
@@ -121,42 +135,42 @@ export default function AccountPage() {
   const joinedLabel = joinedAt ? new Date(joinedAt).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "—";
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <span className="eyebrow"><Sparkles size={13} />Settings</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Account.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Your sign-in details and account actions.</p>
 
     <div className="mt-10 max-w-2xl space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
+        <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft">
           <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Calendar size={13} />Member since</div>
-          <p className="mt-3 text-xl font-extrabold text-ink">{joinedLabel}</p>
+          <p className="mt-3 text-xl font-extrabold text-heading">{joinedLabel}</p>
         </div>
-        <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
+        <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft">
           <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Crown size={13} />Current tier</div>
-          <p className="mt-3 text-xl font-extrabold text-ink">Free</p>
+          <p className="mt-3 text-xl font-extrabold text-heading">{plan?.name ?? "Free"}</p>
           <Link href="/dashboard/settings/billing" className="mt-1.5 inline-block cursor-pointer text-xs font-extrabold text-teal-600 hover:text-teal-700">Change plan →</Link>
         </div>
-        <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
+        <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft">
           <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Clock3 size={13} />Total hours</div>
-          <p className="mt-3 text-xl font-extrabold text-ink">{totalHours}<span className="text-sm font-bold text-slate-400"> hrs</span></p>
+          <p className="mt-3 text-xl font-extrabold text-heading">{totalHours}<span className="text-sm font-bold text-slate-400"> hrs</span></p>
         </div>
       </div>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="text-lg font-extrabold tracking-tight">Profile &amp; login</h2>
         <div className="mt-5 flex items-center gap-5">
           <div className="relative shrink-0">
             {avatar
               ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={avatar} alt="" className="h-20 w-20 rounded-full object-cover" />
-              : <span className="grid h-20 w-20 place-items-center rounded-full bg-teal-100 text-2xl font-extrabold text-teal-700">{initial}</span>}
+              : <span className="grid h-20 w-20 place-items-center rounded-full bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-2xl font-extrabold text-teal-700">{initial}</span>}
             <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Change profile picture" className="absolute -bottom-1 -right-1 grid h-8 w-8 cursor-pointer place-items-center rounded-full border-2 border-white bg-ink text-white shadow transition hover:bg-slate-700">
               <Camera size={14} />
             </button>
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold text-ink">{name || "Your name"}</p>
+            <p className="truncate text-sm font-extrabold text-heading">{name || "Your name"}</p>
             <p className="mt-0.5 text-xs text-slate-500">To change your name, head to <Link href="/dashboard/settings/profile" className="cursor-pointer font-bold text-teal-600 hover:text-teal-700">Profile</Link>.</p>
             {avatar && <button type="button" onClick={removeAvatar} className="mt-1.5 cursor-pointer text-xs font-bold text-rose-600 hover:text-rose-700">Remove photo</button>}
             {avatarError && <p className="mt-1.5 text-xs font-bold text-rose-600">{avatarError}</p>}
@@ -173,7 +187,7 @@ export default function AccountPage() {
         </form>
       </div>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="flex items-center gap-2 text-lg font-extrabold tracking-tight"><Lock size={17} className="text-teal-600" />Change password</h2>
         <form onSubmit={handlePasswordSubmit} className="mt-5 space-y-4">
           <Field label="Current password"><input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••" className={inputClass} /></Field>
@@ -182,30 +196,41 @@ export default function AccountPage() {
             <Field label="Confirm new password"><input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repeat new password" className={inputClass} /></Field>
           </div>
           <div className="flex items-center gap-4">
-            <button type="submit" className="cursor-pointer rounded-full border border-slate-200 px-6 py-2.5 text-sm font-bold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc]">Update password</button>
+            <button type="submit" className="cursor-pointer rounded-full border border-slate-200 dark:border-white/10 px-6 py-2.5 text-sm font-bold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5">Update password</button>
           </div>
           {passwordNotice && <p className="text-xs font-bold text-slate-500">{passwordNotice}</p>}
         </form>
       </div>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="text-lg font-extrabold tracking-tight">Account actions</h2>
         <div className="mt-4 space-y-3">
-          <button type="button" onClick={resetOnboarding} className="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-left transition hover:border-teal-200 hover:bg-[#f9fcfc]">
-            <span><span className="block text-sm font-bold text-ink">Retake onboarding</span><span className="block text-xs text-slate-500">Redo the welcome questions to update your study profile.</span></span>
+          <Link href="/dashboard/settings/invite" className="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-teal-200 dark:border-teal-500/25 bg-teal-50/50 dark:bg-teal-500/[0.06] px-4 py-3 text-left transition hover:border-teal-300 hover:bg-teal-50">
+            <span className="flex items-center gap-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-teal-700"><Gift size={16} /></span>
+              <span><span className="block text-sm font-bold text-heading">Refer &amp; Earn</span><span className="block text-xs text-slate-500">Invite friends to Studium and earn free Pro time.</span></span>
+            </span>
+            <ChevronRight size={16} className="shrink-0 text-teal-500" />
+          </Link>
+          <button type="button" onClick={replayTour} className="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-slate-200 dark:border-white/10 px-4 py-3 text-left transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5">
+            <span><span className="block text-sm font-bold text-heading">Take the Tour Again</span><span className="block text-xs text-slate-500">Replay the guided walkthrough of Studium's interface.</span></span>
+            <Compass size={16} className="shrink-0 text-slate-400" />
+          </button>
+          <button type="button" onClick={resetOnboarding} className="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-slate-200 dark:border-white/10 px-4 py-3 text-left transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5">
+            <span><span className="block text-sm font-bold text-heading">Retake onboarding</span><span className="block text-xs text-slate-500">Redo the welcome questions to update your study profile.</span></span>
             <RotateCcw size={16} className="shrink-0 text-slate-400" />
           </button>
-          <button type="button" onClick={logOut} className="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-left transition hover:border-rose-200 hover:bg-rose-50">
+          <button type="button" onClick={logOut} className="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-slate-200 dark:border-white/10 px-4 py-3 text-left transition hover:border-rose-200 hover:bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300">
             <span className="text-sm font-bold text-rose-600">Log out</span>
             <LogOut size={16} className="shrink-0 text-rose-400" />
           </button>
         </div>
       </div>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="text-lg font-extrabold tracking-tight">Delete account</h2>
         <p className="mt-2 text-sm leading-relaxed text-slate-500">If at any time you are not satisfied with Studium, please let us know and we will do our best to resolve the situation. You may email us at <a href="mailto:hello@studium.app" className="cursor-pointer font-bold text-teal-600 hover:text-teal-700">hello@studium.app</a>. Please only delete your account if you are sure that you no longer wish to use Studium.</p>
-        <button type="button" onClick={openDeleteFlow} className="mt-5 flex cursor-pointer items-center gap-2 rounded-full border border-rose-200 px-5 py-2.5 text-sm font-bold text-rose-600 transition hover:bg-rose-50">
+        <button type="button" onClick={openDeleteFlow} className="mt-5 flex cursor-pointer items-center gap-2 rounded-full border border-rose-200 px-5 py-2.5 text-sm font-bold text-rose-600 transition hover:bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300">
           <Trash2 size={15} />Delete your account
         </button>
       </div>
@@ -218,7 +243,7 @@ export default function AccountPage() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
         onClick={closeDeleteFlow}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
       >
         <motion.div
           initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -226,31 +251,31 @@ export default function AccountPage() {
           exit={{ opacity: 0, y: 12, scale: 0.98 }}
           transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
           onClick={e => e.stopPropagation()}
-          className="w-full max-w-md rounded-3xl bg-white p-6 shadow-lift sm:p-7"
+          className="w-full max-w-md rounded-3xl bg-white dark:bg-[#0d1917] p-6 shadow-lift sm:p-7"
         >
           {deleteStep === "reason" ? <>
             <div className="flex items-start justify-between gap-4">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-rose-50 text-rose-600"><Trash2 size={20} /></span>
-              <button type="button" onClick={closeDeleteFlow} aria-label="Close" className="cursor-pointer rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-ink"><X size={18} /></button>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300 text-rose-600"><Trash2 size={20} /></span>
+              <button type="button" onClick={closeDeleteFlow} aria-label="Close" className="cursor-pointer rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><X size={18} /></button>
             </div>
             <h2 className="display mt-4 text-2xl">Before you go</h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-500">Why are you deleting your account? If there's anything we can help with, let us know—we'll do our best to fix it.</p>
             <textarea value={deleteReason} onChange={e => setDeleteReason(e.target.value)} rows={3} placeholder="Tell us what happened…" className={`${inputClass} mt-4 resize-none`} />
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <button type="button" onClick={closeDeleteFlow} className="cursor-pointer rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-ink transition hover:bg-slate-50">Never mind, keep my account</button>
+              <button type="button" onClick={closeDeleteFlow} className="cursor-pointer rounded-full border border-slate-200 dark:border-white/10 px-5 py-2.5 text-sm font-bold text-heading transition hover:bg-slate-50 dark:bg-white/5">Never mind, keep my account</button>
               <button type="button" onClick={() => setDeleteStep("confirm")} className="cursor-pointer rounded-full bg-rose-600 px-5 py-2.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-rose-700">Continue</button>
             </div>
           </> : <>
             <div className="flex items-start justify-between gap-4">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-rose-50 text-rose-600"><AlertTriangle size={20} /></span>
-              <button type="button" onClick={closeDeleteFlow} aria-label="Close" className="cursor-pointer rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-ink"><X size={18} /></button>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300 text-rose-600"><AlertTriangle size={20} /></span>
+              <button type="button" onClick={closeDeleteFlow} aria-label="Close" className="cursor-pointer rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><X size={18} /></button>
             </div>
             <h2 className="display mt-4 text-2xl">Delete your account</h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-500">This permanently erases your profile, streak, and settings from this browser. This can't be undone.</p>
             <p className="mt-4 text-xs font-extrabold text-slate-600">Type DELETE to confirm</p>
             <input value={deleteConfirmText} onChange={e => setDeleteConfirmText(e.target.value)} placeholder="DELETE" className={`${inputClass} mt-1.5`} />
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <button type="button" onClick={() => setDeleteStep("reason")} className="cursor-pointer rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-ink transition hover:bg-slate-50">Back</button>
+              <button type="button" onClick={() => setDeleteStep("reason")} className="cursor-pointer rounded-full border border-slate-200 dark:border-white/10 px-5 py-2.5 text-sm font-bold text-heading transition hover:bg-slate-50 dark:bg-white/5">Back</button>
               <button type="button" disabled={deleteConfirmText !== "DELETE"} onClick={confirmDelete} className="cursor-pointer rounded-full bg-rose-600 px-5 py-2.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">Delete my account</button>
             </div>
           </>}

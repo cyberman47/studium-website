@@ -1096,6 +1096,100 @@ export const terms: Term[] = [
     aiExplanation: "A noncompetitive inhibitor doesn't fight for the active site—it binds somewhere else and changes the enzyme's shape, so adding more substrate can't rescue the reaction.",
     exampleSentence: "Unlike competitive inhibition, noncompetitive inhibition lowers Vmax while leaving Km unchanged.",
     clinicalRelevance: "Distinguishing competitive from noncompetitive inhibition by their effect on Km and Vmax is a classic, testable pharmacology and biochemistry concept."
+  },
+  // Scientific-method / experimental-design vocabulary—added for the
+  // Scientific Method lesson's interactive terminology (see
+  // app/dashboard/learning-paths/mcat/[section]/[subject]/[lesson]/page.tsx,
+  // the scientific-method branch), but genuinely shared data: any lesson or
+  // clinical case body containing these words gets the same real
+  // InteractiveText popover, not a lesson-specific duplicate.
+  {
+    id: "hypothesis",
+    categoryId: "biology",
+    name: "Hypothesis",
+    definition: "A testable, falsifiable statement predicting the relationship between variables.",
+    wordBreakdown: [],
+    relatedTermIds: ["prediction", "independent-variable"],
+    aiExplanation: "A hypothesis is your best, testable guess at how two things are related—stated so an experiment could actually prove it wrong if it's false.",
+    exampleSentence: "Her hypothesis was that increased exercise reduces blood pressure.",
+    clinicalRelevance: "MCAT science-reasoning passages routinely ask you to pick the hypothesis out of a wall of experimental description—distinguishing it from the prediction or the conclusion."
+  },
+  {
+    id: "prediction",
+    categoryId: "biology",
+    name: "Prediction",
+    definition: "A specific, testable outcome expected if the hypothesis is true.",
+    wordBreakdown: [],
+    relatedTermIds: ["hypothesis"],
+    aiExplanation: "If the hypothesis is the general claim, the prediction is the specific 'if this, then that' outcome an experiment can actually check.",
+    exampleSentence: "If exercise really reduces blood pressure, the prediction is that the exercising group's readings will be lower after eight weeks.",
+    clinicalRelevance: "MCAT questions often test whether you can tell a hypothesis (the general claim) apart from a prediction (the specific measurable outcome it implies)."
+  },
+  {
+    id: "independent-variable",
+    categoryId: "biology",
+    name: "Independent Variable",
+    definition: "The variable a researcher deliberately manipulates.",
+    wordBreakdown: [],
+    relatedTermIds: ["dependent-variable", "confounding-variable", "control-group"],
+    aiExplanation: "The independent variable is whatever the experimenter changes on purpose—the thing being tested.",
+    exampleSentence: "In the fertilizer study, the type of fertilizer was the independent variable.",
+    clinicalRelevance: "Identifying the independent variable—the one thing the researcher is choosing to change—is the single most common MCAT experimental-design question."
+  },
+  {
+    id: "dependent-variable",
+    categoryId: "biology",
+    name: "Dependent Variable",
+    definition: "The variable that is measured to see how it responds to the independent variable.",
+    wordBreakdown: [],
+    relatedTermIds: ["independent-variable"],
+    aiExplanation: "The dependent variable is the outcome you measure—it 'depends on' whatever the independent variable does.",
+    exampleSentence: "Plant height was the dependent variable, measured after each fertilizer treatment.",
+    clinicalRelevance: "Confusing the independent and dependent variable is one of the most common MCAT experimental-design traps—remember: independent is changed, dependent is measured."
+  },
+  {
+    id: "confounding-variable",
+    categoryId: "biology",
+    name: "Confounding Variable",
+    definition: "An uncontrolled factor that could affect the outcome and obscure the true relationship being tested.",
+    wordBreakdown: [],
+    relatedTermIds: ["independent-variable", "control-group", "correlation"],
+    aiExplanation: "A confounding variable is an uninvited guest in the experiment—something the researcher didn't account for that could be the real reason for the result.",
+    exampleSentence: "Warm weather is a confounding variable behind the correlation between ice cream sales and drowning rates.",
+    clinicalRelevance: "MCAT passages love to bury a plausible confounding variable in the setup—spotting it is often the difference between the trap answer and the correct one."
+  },
+  {
+    id: "control-group",
+    categoryId: "biology",
+    name: "Control Group",
+    definition: "A group that does not receive the experimental treatment, used as a baseline for comparison.",
+    wordBreakdown: [],
+    relatedTermIds: ["independent-variable", "confounding-variable"],
+    aiExplanation: "The control group is the 'nothing changed' comparison point that lets you tell whether the treatment actually did anything.",
+    exampleSentence: "Participants in the control group followed their normal routine with no exercise intervention.",
+    clinicalRelevance: "Without a real control group, an MCAT passage's experiment can't rule out that the result would have happened anyway—a frequent basis for 'flaw in this study' questions."
+  },
+  {
+    id: "correlation",
+    categoryId: "biology",
+    name: "Correlation",
+    definition: "A statistical relationship where two variables tend to change together.",
+    wordBreakdown: [],
+    relatedTermIds: ["causation", "confounding-variable"],
+    aiExplanation: "Correlation just means two things move together in the data—it says nothing on its own about why.",
+    exampleSentence: "Ice cream sales and drowning incidents are correlated: both rise in summer.",
+    clinicalRelevance: "The MCAT tests correlation constantly because it's so easy to misread as proof of causation—training yourself to pause on 'these two things moved together' is high-yield."
+  },
+  {
+    id: "causation",
+    categoryId: "biology",
+    name: "Causation",
+    definition: "A relationship where a change in one variable directly produces a change in another.",
+    wordBreakdown: [],
+    relatedTermIds: ["correlation", "confounding-variable"],
+    aiExplanation: "Causation means one thing actually makes the other happen—not just that they tend to show up together.",
+    exampleSentence: "A well-controlled experiment showing the fertilizer group grew taller supports causation, not just correlation.",
+    clinicalRelevance: "Only a properly controlled experiment—not an observed correlation—can support a causal claim, a distinction the MCAT tests directly and often."
   }
 ];
 

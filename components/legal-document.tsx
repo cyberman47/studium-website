@@ -3,13 +3,13 @@ import { ArrowLeft } from "lucide-react";
 import { LanguageBar, Logo } from "./navigation";
 
 export function LegalDocument({ title, lastUpdated, eyebrow = "Legal", children }: { title: string; lastUpdated: string; eyebrow?: string; children: React.ReactNode }) {
-  return <main className="min-h-screen bg-[#fcfdfd]">
+  return <main className="min-h-screen bg-[#fcfdfd] dark:bg-[#070d0c]">
     <LanguageBar />
-    <header className="border-b border-slate-100 bg-white/85 py-4 backdrop-blur-xl">
+    <header className="border-b border-slate-100 dark:border-white/10 bg-white/85 dark:bg-[#0d1917]/85 py-4 backdrop-blur-xl">
       <div className="container-page flex items-center justify-between"><Logo /><Link href="/" className="inline-flex cursor-pointer items-center gap-2 text-sm font-extrabold text-slate-600 transition hover:text-teal-600"><ArrowLeft size={16} />Back to home</Link></div>
     </header>
     <section className="relative py-16 sm:py-20">
-      <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+      <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
       <div className="container-page">
         <div className="mx-auto max-w-3xl">
           <span className="eyebrow">{eyebrow}</span>
@@ -24,7 +24,7 @@ export function LegalDocument({ title, lastUpdated, eyebrow = "Legal", children 
 
 export function LegalSection({ heading, children }: { heading: string; children: React.ReactNode }) {
   return <div>
-    <h2 className="text-xl font-extrabold tracking-tight text-ink">{heading}</h2>
+    <h2 className="text-xl font-extrabold tracking-tight text-heading">{heading}</h2>
     <div className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">{children}</div>
   </div>;
 }

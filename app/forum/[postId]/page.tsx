@@ -85,7 +85,7 @@ export default function ForumPostPage({ params }: { params: { postId: string } }
       </div>
 
       <div className="mt-6">
-        <h2 className="flex items-center gap-1.5 text-base font-extrabold text-ink"><MessagesSquare size={16} className="text-slate-400" />{comments.length} Comment{comments.length === 1 ? "" : "s"}</h2>
+        <h2 className="flex items-center gap-1.5 text-base font-extrabold text-heading"><MessagesSquare size={16} className="text-slate-400" />{comments.length} Comment{comments.length === 1 ? "" : "s"}</h2>
 
         <div className="mt-4 rounded-3xl border border-slate-100 bg-white p-4 shadow-soft">
           <textarea value={commentBody} onChange={e => setCommentBody(e.target.value)} rows={3} placeholder="Add a comment…" className={`${inputClass} resize-none`} />
@@ -100,7 +100,7 @@ export default function ForumPostPage({ params }: { params: { postId: string } }
             ? <p className="px-1 text-sm text-slate-500">No comments yet—be the first to reply.</p>
             : comments.map(c => <div key={c.id} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-soft">
               <p className="text-xs font-bold text-slate-400">{c.authorName} · {formatDate(c.createdAt)}</p>
-              <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-ink">{c.body}</p>
+              <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-heading">{c.body}</p>
             </div>)}
         </div>
       </div>

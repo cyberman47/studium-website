@@ -53,20 +53,20 @@ export default function PublishCommunityLessonPage() {
   if (!loaded) return null;
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/library/community" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Community</Link>
     <span className="eyebrow"><Sparkles size={13} />Publish</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Publish a lesson.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Write a real study guide other students can preview and add to their own Library. You'll be credited as the creator.</p>
 
     {!signedIn
-      ? <div className="mt-8 max-w-lg rounded-3xl border border-dashed border-slate-200 bg-white p-8 text-center shadow-soft">
-        <p className="text-sm font-extrabold text-ink">Sign in to publish</p>
+      ? <div className="mt-8 max-w-lg rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-8 text-center shadow-soft">
+        <p className="text-sm font-extrabold text-heading">Sign in to publish</p>
         <p className="mt-1.5 text-sm leading-relaxed text-slate-500">Publishing credits the lesson to your real Studium profile, so you'll need to be signed in first.</p>
         <Link href="/login" className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Sign in</Link>
       </div>
       : <div className="mt-8 max-w-2xl space-y-5">
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-7">
+        <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
           <Field label="Title" required><input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. High-Yield Genetics Review" className={inputClass} /></Field>
           <div className="mt-4"><Field label="Description" required><textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="What does this lesson cover, and who is it for?" className={`${inputClass} resize-none`} /></Field></div>
 
@@ -87,17 +87,17 @@ export default function PublishCommunityLessonPage() {
           <div className="mt-4 max-w-[160px]"><Field label="Estimated minutes"><input type="number" min={1} value={estimatedMinutes} onChange={e => setEstimatedMinutes(Math.max(1, Number(e.target.value) || 1))} className={inputClass} /></Field></div>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-7">
-          <p className="text-sm font-extrabold text-ink">Contents</p>
+        <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
+          <p className="text-sm font-extrabold text-heading">Contents</p>
           <p className="mt-1 text-xs text-slate-500">The list of concepts a student will see and can check off while studying—this is the real body of the lesson.</p>
           <div className="mt-4 space-y-2">
             {concepts.map((c, i) => <div key={i} className="flex items-center gap-2">
               <span className="w-5 shrink-0 text-xs font-extrabold text-slate-400">{i + 1}.</span>
               <input value={c} onChange={e => updateConcept(i, e.target.value)} placeholder={`Concept ${i + 1}`} className={inputClass} />
-              <button type="button" onClick={() => removeConcept(i)} disabled={concepts.length === 1} title="Remove" className="shrink-0 cursor-pointer rounded-full p-2 text-slate-300 transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-30"><Trash2 size={14} /></button>
+              <button type="button" onClick={() => removeConcept(i)} disabled={concepts.length === 1} title="Remove" className="shrink-0 cursor-pointer rounded-full p-2 text-slate-300 transition hover:bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-30"><Trash2 size={14} /></button>
             </div>)}
           </div>
-          <button type="button" onClick={addConcept} disabled={concepts.length >= PUBLISH_CONCEPTS_MAX} className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 py-2.5 text-xs font-bold text-slate-500 transition hover:border-teal-300 hover:text-teal-600 disabled:cursor-not-allowed disabled:opacity-40"><Plus size={14} />Add a concept</button>
+          <button type="button" onClick={addConcept} disabled={concepts.length >= PUBLISH_CONCEPTS_MAX} className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 py-2.5 text-xs font-bold text-slate-500 transition hover:border-teal-300 hover:text-teal-600 disabled:cursor-not-allowed disabled:opacity-40"><Plus size={14} />Add a concept</button>
         </div>
 
         <div className="flex justify-end">

@@ -11,10 +11,10 @@ function HeaderSkeleton({ titleWidth = "w-72" }: { titleWidth?: string }) {
 
 export function SettingsSkeleton({ cards = 1 }: { cards?: number }) {
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <HeaderSkeleton titleWidth="w-64" />
     <div className="mt-10 max-w-2xl space-y-6">
-      {Array.from({ length: cards }).map((_, i) => <div key={i} className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      {Array.from({ length: cards }).map((_, i) => <div key={i} className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft dark:border-white/[0.08] dark:bg-[#0d1917] dark:shadow-none sm:p-7">
         <div className="flex items-center gap-4">
           <div className="skeleton h-14 w-14 shrink-0 rounded-full" />
           <div className="min-w-0 flex-1 space-y-2">
@@ -34,9 +34,9 @@ export function SettingsSkeleton({ cards = 1 }: { cards?: number }) {
 
 export function SimplePageSkeleton() {
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <HeaderSkeleton titleWidth="w-80" />
-    <div className="mt-12 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-white py-20">
+    <div className="mt-12 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-white py-20 dark:border-white/10 dark:bg-[#0d1917]">
       <div className="skeleton h-14 w-14 rounded-2xl" />
       <div className="skeleton h-4 w-48 rounded-full" />
       <div className="skeleton h-3 w-64 rounded-full" />
@@ -46,7 +46,7 @@ export function SimplePageSkeleton() {
 
 export function CaseOfTheDaySkeleton() {
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <div className="skeleton h-4 w-32 rounded-full" />
     <div className="skeleton mt-4 h-6 w-40 rounded-full" />
     <div className="skeleton mt-5 h-9 w-80 rounded-2xl" />
@@ -60,7 +60,7 @@ export function CaseOfTheDaySkeleton() {
 
 export function ProgressPageSkeleton() {
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <HeaderSkeleton titleWidth="w-80" />
     <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton h-24 rounded-3xl" />)}
@@ -75,7 +75,7 @@ export function ProgressPageSkeleton() {
 
 export function DashboardHomeSkeleton() {
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <div className="skeleton h-6 w-32 rounded-full" />
     <div className="skeleton mt-5 h-10 w-80 rounded-2xl sm:h-12 sm:w-96" />
 

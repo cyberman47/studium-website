@@ -11,6 +11,15 @@ export const metadata: Metadata = {
   description: "Your intelligent study companion, designed around how you learn."
 };
 
+// Runs before React hydrates (a literal <head> script, not a component—
+// lib/theme.ts can't run this early), so the "dark" class and native
+// color-scheme are already correct on the very first paint instead of
+// flashing light-then-dark for a returning dark-mode user.
+const themeInitScript = `(function(){try{var m=localStorage.getItem('studium_theme')||'system';var d=m==='dark'||(m==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');document.documentElement.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en" className={`${figtree.variable} ${notoSans.variable}`}><body>{children}<CookieConsentBanner /></body></html>;
+  return <html lang="en" className={`${figtree.variable} ${notoSans.variable}`}>
+    <head><script dangerouslySetInnerHTML={{ __html: themeInitScript }} /></head>
+    <body>{children}<CookieConsentBanner /></body>
+  </html>;
 }

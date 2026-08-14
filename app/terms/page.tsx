@@ -81,7 +81,7 @@ export default function TermsPage() {
 
     <LegalSection heading="17. Contact Us">
       <p>Questions about these Terms? Reach us at <a href="mailto:hello@studium.app" className="cursor-pointer font-bold text-teal-600 hover:text-teal-700">hello@studium.app</a> or write to us at:</p>
-      <p className="font-bold text-ink">Studium, Inc.<br />[Company Address]<br />New York, NY [ZIP Code]</p>
+      <p className="font-bold text-heading">Studium, Inc.<br />[Company Address]<br />New York, NY [ZIP Code]</p>
     </LegalSection>
   </LegalDocument>;
 }

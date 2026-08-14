@@ -5,7 +5,7 @@ type Row = { label: string; value: string };
 function InfoRow({ label, value }: Row) {
   return <div className="flex flex-col gap-1 border-b border-slate-100 py-3 last:border-0 sm:flex-row sm:items-baseline sm:gap-4">
     <span className="w-full shrink-0 text-xs font-extrabold uppercase tracking-wide text-slate-500 sm:w-48">{label}</span>
-    <span className="text-sm font-semibold text-ink">{value}</span>
+    <span className="text-sm font-semibold text-heading">{value}</span>
   </div>;
 }
 

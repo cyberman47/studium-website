@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { PartyPopper, RotateCcw } from "lucide-react";
 import Link from "next/link";
+import { showKnowledgeToast } from "@/lib/kpToast";
 import { getLevelInfo } from "@/lib/progress";
 import {
   getDueTerms, getTermProgress, restoreTermProgress, reviewTerm, Term, TermProgressEntry
@@ -20,7 +21,6 @@ function buildHint(term: Term): string | null {
 export default function TerminologyReviewPage() {
   const router = useRouter();
   const [queue, setQueue] = useState<Term[] | null>(null);
-  const [floatingKP, setFloatingKP] = useState<number | null>(null);
   const [levelUpInfo, setLevelUpInfo] = useState<{ level: number; name: string } | null>(null);
   // Snapshot of each term's real Leitner-box state taken right before a
   // rating is applied, so Undo can restore it exactly—not a fake rewind.
@@ -32,8 +32,7 @@ export default function TerminologyReviewPage() {
     snapshots.current.set(card.id, getTermProgress(card.id));
     const result = reviewTerm(card.id, rating);
     if (result?.awarded) {
-      setFloatingKP(result.kpAwarded);
-      setTimeout(() => setFloatingKP(null), 1400);
+      showKnowledgeToast(result.kpAwarded);
       if (result.leveledUp) {
         const info = getLevelInfo(result.totalKP);
         setLevelUpInfo({ level: info.level, name: info.name });
@@ -50,9 +49,9 @@ export default function TerminologyReviewPage() {
 
   if (queue.length === 0) return <section className="relative py-10 sm:py-14">
     <div className="mx-auto max-w-lg">
-      <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-soft">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 text-teal-700"><RotateCcw size={26} /></span>
-        <p className="mt-4 text-base font-extrabold text-ink">Nothing due for review right now.</p>
+      <div className="rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-10 text-center shadow-soft">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-teal-700"><RotateCcw size={26} /></span>
+        <p className="mt-4 text-base font-extrabold text-heading">Nothing due for review right now.</p>
         <p className="mt-1.5 text-sm leading-relaxed text-slate-500">Save some terms from the categories page, and they'll show up here when they're due.</p>
         <Link href="/dashboard/terminology" className="mt-5 inline-block cursor-pointer rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Browse categories</Link>
       </div>
@@ -77,13 +76,6 @@ export default function TerminologyReviewPage() {
     />
 
     <AnimatePresence>
-      {floatingKP !== null && <motion.span
-        initial={{ opacity: 1, y: 0 }} animate={{ opacity: 0, y: -24 }} exit={{ opacity: 0 }} transition={{ duration: 1.2 }}
-        className="pointer-events-none fixed right-8 top-16 z-[110] text-sm font-extrabold text-teal-400"
-      >+{floatingKP} KP</motion.span>}
-    </AnimatePresence>
-
-    <AnimatePresence>
       {levelUpInfo && <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
         onClick={() => setLevelUpInfo(null)}
@@ -93,11 +85,11 @@ export default function TerminologyReviewPage() {
           initial={{ opacity: 0, scale: 0.7, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.7, y: 20 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           onClick={e => e.stopPropagation()}
-          className="w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-lift"
+          className="w-full max-w-sm rounded-3xl bg-white dark:bg-[#0d1917] p-8 text-center shadow-lift"
         >
-          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-teal-100 text-teal-600"><PartyPopper size={30} /></span>
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-teal-600"><PartyPopper size={30} /></span>
           <h2 className="display mt-5 text-2xl">🎉 Level Up!</h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-500">Congratulations! You've reached <span className="font-extrabold text-ink">Level {levelUpInfo.level} · {levelUpInfo.name}</span>.</p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">Congratulations! You've reached <span className="font-extrabold text-heading">Level {levelUpInfo.level} · {levelUpInfo.name}</span>.</p>
           <button type="button" onClick={() => setLevelUpInfo(null)} className="mt-6 w-full cursor-pointer rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Awesome!</button>
         </motion.div>
       </motion.div>}

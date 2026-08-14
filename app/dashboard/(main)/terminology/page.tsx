@@ -16,9 +16,9 @@ import {
 type StatusFilter = "all" | ConfidenceLevel | "saved";
 
 const statusMeta: Record<ConfidenceLevel, { label: string; dot: string; text: string; ring: string }> = {
-  "dont-know": { label: "Unfamiliar", dot: "bg-rose-500", text: "text-rose-700", ring: "border-rose-200 bg-rose-50" },
-  somewhat: { label: "Learning", dot: "bg-amber-500", text: "text-amber-700", ring: "border-amber-200 bg-amber-50" },
-  "know-well": { label: "Know", dot: "bg-teal-500", text: "text-teal-700", ring: "border-teal-200 bg-teal-50" }
+  "dont-know": { label: "Unfamiliar", dot: "bg-rose-500", text: "text-rose-700", ring: "border-rose-200 bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300" },
+  somewhat: { label: "Learning", dot: "bg-amber-500", text: "text-amber-700", ring: "border-amber-200 bg-amber-50 dark:bg-amber-500/15 dark:text-amber-300" },
+  "know-well": { label: "Know", dot: "bg-teal-500", text: "text-teal-700", ring: "border-teal-200 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300" }
 };
 
 const defaultStats: TerminologyStats = { totalLearned: 0, masteredCount: 0, dueForReview: 0, masteryPercent: 0, todayCount: 0, dailyGoal: 20 };
@@ -111,7 +111,7 @@ export default function TerminologyPage() {
   const goalPercent = Math.min(100, Math.round((stats.todayCount / stats.dailyGoal) * 100));
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <span className="eyebrow"><Sparkles size={13} />Terminology</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Medical Terminology.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Build and master your medical vocabulary.</p>
@@ -122,7 +122,7 @@ export default function TerminologyPage() {
         value={query}
         onChange={e => { setQuery(e.target.value); setVisibleCount(PAGE_SIZE); }}
         placeholder="Search medical terms..."
-        className="w-full rounded-full border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm text-ink shadow-soft outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:ring-4 focus:ring-teal-100"
+        className="w-full rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-3.5 pl-11 pr-4 text-sm text-heading shadow-soft outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:ring-4 focus:ring-teal-100"
       />
     </div>
 
@@ -131,22 +131,22 @@ export default function TerminologyPage() {
       {(["dont-know", "somewhat", "know-well"] as ConfidenceLevel[]).map(level => {
         const meta = statusMeta[level];
         const active = statusFilter === level;
-        return <button key={level} type="button" onClick={() => selectFilter(active ? "all" : level)} className={`cursor-pointer rounded-3xl border p-5 text-left shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift ${active ? meta.ring : "border-slate-100 bg-white"}`}>
+        return <button key={level} type="button" onClick={() => selectFilter(active ? "all" : level)} className={`cursor-pointer rounded-3xl border p-5 text-left shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift ${active ? meta.ring : "border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917]"}`}>
           <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><span className={`h-2.5 w-2.5 rounded-full ${meta.dot}`} />{meta.label}</div>
-          <p className={`mt-3 text-2xl font-extrabold ${active ? meta.text : "text-ink"}`}>{counts[level].toLocaleString()}</p>
+          <p className={`mt-3 text-2xl font-extrabold ${active ? meta.text : "text-heading"}`}>{counts[level].toLocaleString()}</p>
           <p className="mt-0.5 text-[11px] font-bold text-slate-400">terms</p>
         </button>;
       })}
-      <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft">
         <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500">Total terms</div>
-        <p className="mt-3 text-2xl font-extrabold text-ink">{counts.total.toLocaleString()}</p>
+        <p className="mt-3 text-2xl font-extrabold text-heading">{counts.total.toLocaleString()}</p>
         <p className="mt-0.5 text-[11px] font-bold text-slate-400">in Studium</p>
       </div>
     </div>
 
     <div className="mt-6 flex flex-wrap gap-3">
       <Link href="/dashboard/terminology/review" className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600"><RotateCcw size={16} />Review Due Terms{stats.dueForReview > 0 && ` (${stats.dueForReview})`}</Link>
-      <Link href="/dashboard/terminology/word-builder" className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 px-6 py-3 text-sm font-bold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc]"><Puzzle size={16} />Word Builder{wordBuilderBeta && <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-extrabold text-violet-600">BETA</span>}</Link>
+      <Link href="/dashboard/terminology/word-builder" className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 px-6 py-3 text-sm font-bold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5"><Puzzle size={16} />Word Builder{wordBuilderBeta && <span className="rounded-full bg-violet-100 dark:bg-violet-500/20 dark:text-violet-300 px-2 py-0.5 text-[10px] font-extrabold text-violet-600">BETA</span>}</Link>
       <span className="ml-auto hidden items-center gap-2 text-xs font-bold text-slate-400 sm:flex">{stats.todayCount} / {stats.dailyGoal} today's goal ({goalPercent}%)</span>
     </div>
 
@@ -158,10 +158,10 @@ export default function TerminologyPage() {
       <DiscoveryRail icon={Lightbulb} title="Recommended" terms={recommended} emptyText="Recommendations will appear as you rate terms." onOpen={setOpenTermId} />
     </div>
 
-    {weakCategories.length > 0 && <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50/60 p-5">
+    {weakCategories.length > 0 && <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50/60 dark:bg-amber-500/15 p-5">
       <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-amber-800"><AlertTriangle size={13} />Weak areas</p>
       <div className="mt-2.5 flex flex-wrap gap-2">
-        {weakCategories.map(w => <span key={w.category.id} className="rounded-full border border-amber-200 bg-white px-3 py-1.5 text-xs font-bold text-amber-800">{w.category.name} <span className="text-amber-500">· {w.dontKnowCount} unfamiliar</span></span>)}
+        {weakCategories.map(w => <span key={w.category.id} className="rounded-full border border-amber-200 bg-white dark:bg-[#0d1917] px-3 py-1.5 text-xs font-bold text-amber-800">{w.category.name} <span className="text-amber-500">· {w.dontKnowCount} unfamiliar</span></span>)}
       </div>
       <p className="mt-2.5 text-[11px] leading-relaxed text-amber-700/80">This is where quiz generation, flashcard recommendations, and Learning Path suggestions will eventually target first.</p>
     </div>}
@@ -171,7 +171,7 @@ export default function TerminologyPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-extrabold tracking-tight">All Terms</h2>
         <div className="flex flex-wrap gap-2">
-          {([["all", "All"], ["dont-know", "Unfamiliar"], ["somewhat", "Learning"], ["know-well", "Know"], ["saved", "Saved"]] as [StatusFilter, string][]).map(([id, label]) => <button key={id} type="button" onClick={() => selectFilter(id)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${statusFilter === id ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{label}</button>)}
+          {([["all", "All"], ["dont-know", "Unfamiliar"], ["somewhat", "Learning"], ["know-well", "Know"], ["saved", "Saved"]] as [StatusFilter, string][]).map(([id, label]) => <button key={id} type="button" onClick={() => selectFilter(id)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${statusFilter === id ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{label}</button>)}
         </div>
       </div>
 
@@ -184,10 +184,10 @@ export default function TerminologyPage() {
             // styling anymore (see the counts/filteredTerms fix above).
             const level = confidenceMap[term.id] ?? "dont-know";
             const meta = statusMeta[level];
-            return <button key={term.id} type="button" onClick={() => setOpenTermId(term.id)} className="flex w-full cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 text-left shadow-soft transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lift sm:p-5">
+            return <button key={term.id} type="button" onClick={() => setOpenTermId(term.id)} className="flex w-full cursor-pointer items-start justify-between gap-4 rounded-2xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 text-left shadow-soft transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lift sm:p-5">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-extrabold text-ink">{term.name}</p>
+                  <p className="text-sm font-extrabold text-heading">{term.name}</p>
                   {savedSet.has(term.id) && <Bookmark size={12} className="shrink-0 text-amber-500" fill="currentColor" />}
                 </div>
                 <p className="text-xs font-bold text-slate-400">{findTermCategory(term.categoryId)?.name}</p>
@@ -200,7 +200,7 @@ export default function TerminologyPage() {
           })}
         </div>}
 
-      {visibleCount < filteredTerms.length && <button type="button" onClick={() => setVisibleCount(c => c + PAGE_SIZE)} className="mt-5 w-full cursor-pointer rounded-2xl border border-dashed border-slate-200 py-3 text-xs font-extrabold text-slate-500 transition hover:border-teal-200 hover:text-teal-700">Show more ({filteredTerms.length - visibleCount} remaining)</button>}
+      {visibleCount < filteredTerms.length && <button type="button" onClick={() => setVisibleCount(c => c + PAGE_SIZE)} className="mt-5 w-full cursor-pointer rounded-2xl border border-dashed border-slate-200 dark:border-white/10 py-3 text-xs font-extrabold text-slate-500 transition hover:border-teal-200 hover:text-teal-700">Show more ({filteredTerms.length - visibleCount} remaining)</button>}
     </div>
 
     {openTermId && <ExpandedTermPanel initialTermId={openTermId} onClose={() => setOpenTermId(null)} />}
@@ -208,12 +208,12 @@ export default function TerminologyPage() {
 }
 
 function DiscoveryRail({ icon: Icon, title, terms, emptyText, onOpen }: { icon: typeof Eye; title: string; terms: Term[]; emptyText: string; onOpen: (id: string) => void }) {
-  return <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft">
+  return <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft">
     <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500"><Icon size={13} className="text-teal-600" />{title}</p>
     {terms.length === 0
       ? <p className="mt-3 text-xs text-slate-400">{emptyText}</p>
       : <div className="mt-3 flex flex-wrap gap-2">
-        {terms.map(t => <button key={t.id} type="button" onClick={() => onOpen(t.id)} className="cursor-pointer rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc]">{t.name}</button>)}
+        {terms.map(t => <button key={t.id} type="button" onClick={() => onOpen(t.id)} className="cursor-pointer rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-3 py-1.5 text-xs font-bold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5">{t.name}</button>)}
       </div>}
   </div>;
 }

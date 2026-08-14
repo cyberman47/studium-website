@@ -91,17 +91,17 @@ export default function CreateFlashcardsPage() {
   if (loadState === "loading") return null;
 
   if (loadState === "generating") return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/create" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Create</Link>
     <div className="mt-16 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-white py-20 text-center shadow-soft">
       <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal-100 text-teal-700"><Sparkles size={22} /></span>
-      <p className="text-sm font-extrabold text-ink">Generating flashcards from your notes…</p>
+      <p className="text-sm font-extrabold text-heading">Generating flashcards from your notes…</p>
       <p className="max-w-xs text-xs leading-relaxed text-slate-500">A real AI call is reading your text and writing cards. This takes a few seconds.</p>
     </div>
   </section>;
 
   if (loadState === "error") return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/create" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Create</Link>
     <div className="mt-16 flex flex-col items-center gap-3 rounded-3xl border border-rose-200 bg-rose-50 py-16 text-center">
       <p className="text-sm font-extrabold text-rose-700">Generation failed.</p>
@@ -111,7 +111,7 @@ export default function CreateFlashcardsPage() {
   </section>;
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/create" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Create</Link>
     <span className="eyebrow"><Brain size={13} />Generate Flashcards</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Created {cards.length} Flashcards.</h1>
@@ -138,12 +138,12 @@ export default function CreateFlashcardsPage() {
             </div> : <>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-ink">{card.question}</p>
+                  <p className="text-sm font-bold text-heading">{card.question}</p>
                   <p className="mt-1.5 text-sm text-slate-500">{card.answer}</p>
                   <span className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-extrabold ${difficultyClasses[card.difficulty]}`}>{card.difficulty}</span>
                 </div>
                 <div className="flex shrink-0 gap-1">
-                  <button type="button" onClick={() => startEdit(i)} aria-label="Edit" className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-ink"><Pencil size={14} /></button>
+                  <button type="button" onClick={() => startEdit(i)} aria-label="Edit" className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-heading"><Pencil size={14} /></button>
                   <button type="button" onClick={() => deleteCard(i)} aria-label="Delete" className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"><X size={14} /></button>
                 </div>
               </div>

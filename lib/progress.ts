@@ -220,6 +220,7 @@ function addKP(amount: number): number {
 export function setTotalKPOverride(amount: number) {
   if (typeof window === "undefined") return;
   localStorage.setItem(KP_KEY, String(Math.max(0, Math.floor(amount))));
+  notifyProgressChange();
 }
 
 // ---- Lifetime stats ----
@@ -380,6 +381,39 @@ export function getWeeklyActivityByDay(): DailyActivityPoint[] {
   });
 }
 
+export type KPGrowthPoint = { date: string; kp: number; cumulativeKP: number; isToday: boolean };
+
+// The real "Knowledge Growth over time" series for the Progress page—reuses
+// the same daily-activity store bumpDailyActivity() already writes to on
+// every KP-earning event, rather than a second history log. cumulativeKP
+// starts from a real baseline (the sum of every recorded day *before* the
+// window) so the chart's first point reflects genuine prior progress
+// instead of falsely resetting to 0 for a student who was active earlier
+// than the requested window.
+export function getKPGrowthSeries(days: number): KPGrowthPoint[] {
+  const map = getDailyActivityMap();
+  const today = new Date();
+  const windowStart = new Date(today);
+  windowStart.setDate(today.getDate() - (days - 1));
+  const windowStartKey = toDateKey(windowStart);
+
+  let running = 0;
+  for (const [key, entry] of Object.entries(map)) {
+    if (key < windowStartKey) running += entry.kp;
+  }
+
+  const points: KPGrowthPoint[] = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(windowStart);
+    d.setDate(windowStart.getDate() + i);
+    const key = toDateKey(d);
+    const dayKP = map[key]?.kp ?? 0;
+    running += dayKP;
+    points.push({ date: key, kp: dayKP, cumulativeKP: running, isToday: key === toDateKey(today) });
+  }
+  return points;
+}
+
 // ---- Streak ----
 // Your streak is kept alive by the real Study Shield / Study Planner
 // system (lib/studyShield.ts, lib/studyPlanner.ts)—earning enough real
@@ -417,11 +451,17 @@ export function logFlashcards(count: number): void {
   if (typeof window === "undefined") return;
   saveStats({ ...getStats(), flashcardsCompleted: getStats().flashcardsCompleted + count });
   bumpDailyActivity({ flashcards: count });
+  ensureFlashcards100Claimed();
 }
 
-export function logQuiz(): void {
+// scorePercent is the quiz's real percent-correct when the caller has one
+// (components/practice-quiz.tsx grades every question, so the Quizzes page
+// always has a real score to pass)—only the in-lesson quiz step, which
+// doesn't currently thread its grading result through here, falls back to a
+// plausible placeholder rather than leaving quizScores empty.
+export function logQuiz(scorePercent?: number): void {
   if (typeof window === "undefined") return;
-  const score = Math.floor(75 + Math.random() * 26); // 75-100
+  const score = scorePercent ?? Math.floor(75 + Math.random() * 26); // 75-100 fallback
   const stats = getStats();
   saveStats({ ...stats, aiQuizzesCompleted: stats.aiQuizzesCompleted + 1, quizScores: [...stats.quizScores, score].slice(-50) });
   bumpDailyActivity({ quizzes: 1 });
@@ -622,21 +662,41 @@ export function claimStudySession(): ClaimResult {
   return claim("studySession", 25, s => ({ ...s, studySessions: s.studySessions + 1, studyMinutes: s.studyMinutes + 30, longestSessionMinutes: Math.max(s.longestSessionMinutes, 30) }), { minutes: 30 });
 }
 
+// Auto-claimed (see ensureFlashcards100Claimed below), not a manual
+// self-report: purely the +40 KP threshold bonus, with no activity/stat
+// side effects of its own—the real flashcard count and lifetime stat that
+// got the student to 100 today were already recorded by whatever real event
+// (logFlashcards, awardFlashcardReviewKP) triggered this.
 export function claimFlashcards100(): ClaimResult {
-  return claim("flashcards100", 40, s => ({ ...s, flashcardsCompleted: s.flashcardsCompleted + 100 }), { flashcards: 100 });
+  return claim("flashcards100", 40, s => s);
 }
 
+// Fires the moment today's real flashcard count (every real source that
+// already feeds getTodayActivity().flashcards) reaches 100. Safe to call
+// from every flashcard event: claim()'s own once-per-day guard makes this a
+// no-op once today's bonus is already claimed.
+export function ensureFlashcards100Claimed(): void {
+  if (getTodayActivity().flashcards >= 100) claimFlashcards100();
+}
+
+// Auto-claimed from a real AI-generated quiz completion (see the Quizzes
+// page)—purely the +35 KP daily bonus. No stat/activity side effects here
+// either: logQuiz() already records the real aiQuizzesCompleted/quizScores
+// stats and today's quiz count for the same completion event.
 export function claimAIQuiz(): ClaimResult {
-  const score = Math.floor(75 + Math.random() * 26); // 75-100
-  return claim("aiQuiz", 35, s => ({ ...s, aiQuizzesCompleted: s.aiQuizzesCompleted + 1, quizScores: [...s.quizScores, score].slice(-50) }), { quizzes: 1 });
+  return claim("aiQuiz", 35, s => s);
 }
 
 export function claimDailyGoal(): ClaimResult {
   return claim("dailyGoal", 50, s => s);
 }
 
-export function claimClinicalCase(): ClaimResult {
-  return claim("clinicalCase", 30, s => ({ ...s, casesCompleted: s.casesCompleted + 1 }));
+// kp defaults to 30 (the old fixed reward) for any other caller, but the
+// Daily Medical Case flow passes a variable amount from
+// lib/clinicalCases.ts's getCaseRewardKP—same once-per-day claim id/gating
+// as before, just no longer a flat reward.
+export function claimClinicalCase(kp: number = 30): ClaimResult {
+  return claim("clinicalCase", kp, s => ({ ...s, casesCompleted: s.casesCompleted + 1 }));
 }
 
 export function claimTerminologyGoal(): ClaimResult {
@@ -649,6 +709,32 @@ export function awardLessonKP(kp: number): ClaimResult {
   const beforeTotal = getTotalKP();
   const beforeLevel = getLevelInfo(beforeTotal).level;
   bumpDailyActivity({ lessons: 1 });
+  const totalKP = addKP(kp);
+  const toLevel = getLevelInfo(totalKP).level;
+  const achievements = getAchievements();
+  return {
+    awarded: true,
+    kpAwarded: kp,
+    totalKP,
+    leveledUp: toLevel > beforeLevel,
+    fromLevel: beforeLevel,
+    toLevel,
+    newlyUnlockedAchievements: achievements.filter(a => a.justUnlocked).map(a => a.id)
+  };
+}
+
+// Awards KP for a Simple Smart Flashcard Review System answer
+// (lib/spacedRepetitionCore.ts's kpForReviewOutcome decides the amount, 0
+// for a wrong answer never even calls this). Same uncapped-per-event shape
+// as awardLessonKP above—reviews happen many times per session, unlike the
+// once-a-day claim* rewards further up this file—just bumping `flashcards`
+// in the daily activity log instead of `lessons`, since that's what this
+// event actually is.
+export function awardFlashcardReviewKP(kp: number): ClaimResult {
+  const beforeTotal = getTotalKP();
+  const beforeLevel = getLevelInfo(beforeTotal).level;
+  bumpDailyActivity({ flashcards: 1 });
+  ensureFlashcards100Claimed();
   const totalKP = addKP(kp);
   const toLevel = getLevelInfo(totalKP).level;
   const achievements = getAchievements();

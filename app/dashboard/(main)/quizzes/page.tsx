@@ -17,6 +17,7 @@ import { PracticeQuiz, PracticeQuizItem } from "@/components/practice-quiz";
 import { deleteQuiz, duplicateQuiz, GeneratedQuestion, getQuizzes, SavedQuiz } from "@/lib/create";
 import { BuiltInQuiz, getBuiltInQuizzes } from "@/lib/mcatConcepts";
 import { logAttempt } from "@/lib/practiceHistory";
+import { claimAIQuiz, logQuiz } from "@/lib/progress";
 
 type Session = { questions: PracticeQuizItem[]; title: string; contextLabel?: string; fromBuiltIn: boolean } | null;
 
@@ -109,6 +110,21 @@ export default function QuizzesPage() {
     logAttempt(q.id.split(":")[0], q.concept, correct, q.id);
   }
 
+  // Real completion of either quiz source: logQuiz() records the actual
+  // graded score (from PracticeQuiz's own results, not a guess) and counts
+  // toward today's real quiz activity either way. Only a genuinely
+  // AI-generated quiz ("Your Quizzes", built via /api/generate) also earns
+  // the daily "Complete an AI Quiz" bonus—a built-in, pre-authored MCAT
+  // quiz is real content too, just not AI-generated, so it doesn't claim a
+  // reward whose name specifically promises that.
+  function handleComplete(results: { correct: boolean }[]) {
+    const fromBuiltIn = session?.fromBuiltIn ?? false;
+    const scorePercent = results.length > 0 ? Math.round((results.filter(r => r.correct).length / results.length) * 100) : 0;
+    logQuiz(scorePercent);
+    if (!fromBuiltIn) claimAIQuiz();
+    setSession(null);
+  }
+
   if (session) {
     return <PracticeQuiz
       questions={session.questions}
@@ -116,27 +132,27 @@ export default function QuizzesPage() {
       contextLabel={session.contextLabel}
       completeLabel="Finish"
       onAnswer={handleAnswer}
-      onComplete={() => setSession(null)}
+      onComplete={handleComplete}
       defaultFullscreen
       onExit={() => setSession(null)}
     />;
   }
 
-  return <section className="mx-auto max-w-5xl bg-slate-50 px-4 py-10 sm:px-6 sm:py-14">
+  return <section className="mx-auto max-w-5xl bg-slate-50 dark:bg-white/5 px-4 py-10 sm:px-6 sm:py-14">
     <span className="eyebrow"><ListChecks size={13} />Review</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Quizzes.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Everything you can be quizzed on—the quizzes you've made yourself, and the ones already built into Studium.</p>
 
     {/* ---- Your Quizzes ---- */}
     <div className="mt-10 flex items-center justify-between gap-3">
-      <h2 className="text-lg font-extrabold tracking-tight text-ink">Your Quizzes</h2>
-      <Link href="/dashboard/create/build-quiz" className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-ink shadow-soft transition hover:-translate-y-0.5 hover:border-teal-200 hover:bg-[#f9fcfc]"><Plus size={13} />Create a Quiz</Link>
+      <h2 className="text-lg font-extrabold tracking-tight text-heading">Your Quizzes</h2>
+      <Link href="/dashboard/create/build-quiz" className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-4 py-2 text-xs font-bold text-heading shadow-soft transition hover:-translate-y-0.5 hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5"><Plus size={13} />Create a Quiz</Link>
     </div>
 
     {quizzes.length === 0
-      ? <div className="mt-4 flex flex-col items-center gap-2 rounded-3xl border border-dashed border-slate-200 bg-white py-14 text-center">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-100 text-amber-600"><ListChecks size={22} /></span>
-        <p className="mt-1 text-sm font-bold text-ink">You haven't saved any quizzes yet.</p>
+      ? <div className="mt-4 flex flex-col items-center gap-2 rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-14 text-center">
+        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-100 dark:bg-amber-500/20 dark:text-amber-300 text-amber-600"><ListChecks size={22} /></span>
+        <p className="mt-1 text-sm font-bold text-heading">You haven't saved any quizzes yet.</p>
         <p className="max-w-sm text-xs leading-relaxed text-slate-500">Build one from your own notes or a topic list, and it'll show up here.</p>
         <Link href="/dashboard/create/build-quiz" className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-5 py-2.5 text-xs font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Create your first quiz →</Link>
       </div>
@@ -144,31 +160,31 @@ export default function QuizzesPage() {
         {quizzes.map(quiz => {
           const takeable = toTakeableItems(quiz);
           const expanded = expandedId === quiz.id;
-          return <div key={quiz.id} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-soft sm:p-5">
+          return <div key={quiz.id} className="rounded-2xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 shadow-soft sm:p-5">
             <div className="flex flex-wrap items-center gap-4">
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-extrabold text-ink">{quiz.title}</p>
+                <p className="truncate text-sm font-extrabold text-heading">{quiz.title}</p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  {typeBreakdown(quiz).map(({ type, count }) => <span key={type} className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold text-slate-600">{count} {genTypeLabels[type]}</span>)}
+                  {typeBreakdown(quiz).map(({ type, count }) => <span key={type} className="rounded-full bg-slate-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-extrabold text-slate-600">{count} {genTypeLabels[type]}</span>)}
                   <span className="text-[11px] text-slate-400">· {new Date(quiz.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-1">
                 {takeable && <button type="button" onClick={() => startOwnQuiz(quiz)} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_20px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600"><Play size={12} />Take Quiz</button>}
-                <button type="button" onClick={() => setExpandedId(expanded ? null : quiz.id)} aria-label={expanded ? "Collapse preview" : "Preview questions"} className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-ink">{expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</button>
-                <button type="button" onClick={() => handleDuplicate(quiz.id)} aria-label="Duplicate" className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-ink"><Copy size={15} /></button>
-                <button type="button" onClick={() => handleDelete(quiz.id)} aria-label="Delete" className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"><Trash2 size={15} /></button>
+                <button type="button" onClick={() => setExpandedId(expanded ? null : quiz.id)} aria-label={expanded ? "Collapse preview" : "Preview questions"} className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading">{expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</button>
+                <button type="button" onClick={() => handleDuplicate(quiz.id)} aria-label="Duplicate" className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><Copy size={15} /></button>
+                <button type="button" onClick={() => handleDelete(quiz.id)} aria-label="Delete" className="cursor-pointer rounded-full p-2 text-slate-400 transition hover:bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300 hover:text-rose-600"><Trash2 size={15} /></button>
               </div>
             </div>
             {!takeable && <p className="mt-2 text-[11px] font-semibold text-amber-600">Includes non-multiple-choice questions—preview only, can't be auto-graded yet.</p>}
 
-            {expanded && <div className="mt-4 space-y-3 border-t border-slate-100 pt-4">
-              {quiz.questions.map((q, i) => <div key={i} className="rounded-xl border border-slate-100 bg-[#fbfdfd] p-3.5">
+            {expanded && <div className="mt-4 space-y-3 border-t border-slate-100 dark:border-white/10 pt-4">
+              {quiz.questions.map((q, i) => <div key={i} className="rounded-xl border border-slate-100 dark:border-white/10 bg-[#fbfdfd] dark:bg-black/20 p-3.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold text-slate-600">{genTypeLabels[q.type]}</span>
+                  <span className="rounded-full bg-slate-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-extrabold text-slate-600">{genTypeLabels[q.type]}</span>
                   <span className="text-[10px] font-extrabold text-slate-400">{q.difficulty}</span>
                 </div>
-                <p className="mt-2 text-sm font-bold text-ink">{i + 1}. {q.question}</p>
+                <p className="mt-2 text-sm font-bold text-heading">{i + 1}. {q.question}</p>
                 {q.options && <ul className="mt-1.5 space-y-1 pl-4 text-xs text-slate-500">{q.options.map(o => <li key={o} className={o === q.correctAnswer ? "font-extrabold text-teal-700" : ""}>{o}</li>)}</ul>}
                 <p className="mt-1.5 text-xs leading-relaxed text-slate-500"><span className="font-extrabold text-teal-700">Answer:</span> {q.correctAnswer}</p>
                 <p className="mt-1 text-xs leading-relaxed text-slate-400">{q.explanation}</p>
@@ -180,7 +196,7 @@ export default function QuizzesPage() {
 
     {/* ---- Existing Quizzes ---- */}
     <div className="mt-12">
-      <h2 className="text-lg font-extrabold tracking-tight text-ink">Existing Quizzes</h2>
+      <h2 className="text-lg font-extrabold tracking-tight text-heading">Existing Quizzes</h2>
       <p className="mt-1 text-sm text-slate-500">Real, pre-written practice quizzes already in Studium's MCAT curriculum, one per subject.</p>
 
       {builtInBySection.length === 0
@@ -189,9 +205,9 @@ export default function QuizzesPage() {
           {builtInBySection.map(group => <div key={group.sectionId}>
             <p className="text-[11px] font-extrabold uppercase tracking-wide text-teal-700">{group.sectionTitle}</p>
             <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
-              {group.quizzes.map(quiz => <div key={quiz.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-soft">
+              {group.quizzes.map(quiz => <div key={quiz.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 shadow-soft">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-extrabold text-ink">{quiz.title}</p>
+                  <p className="truncate text-sm font-extrabold text-heading">{quiz.title}</p>
                   <p className="mt-0.5 text-xs text-slate-500">{quiz.questions.length} question{quiz.questions.length === 1 ? "" : "s"}</p>
                 </div>
                 <button type="button" onClick={() => startBuiltInQuiz(quiz)} className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_20px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600"><Play size={12} />Start</button>
@@ -201,7 +217,7 @@ export default function QuizzesPage() {
         </div>}
     </div>
 
-    <div className="mt-10 flex items-center gap-2 rounded-2xl border border-slate-100 bg-white p-4 text-xs text-slate-500 shadow-soft">
+    <div className="mt-10 flex items-center gap-2 rounded-2xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 text-xs text-slate-500 shadow-soft">
       <Sparkles size={14} className="shrink-0 text-teal-600" />
       Want a custom mix by topic instead? <Link href="/dashboard/learning-paths/mcat/practice" className="cursor-pointer font-bold text-teal-700 hover:underline">Try the Practice Workspace →</Link>
     </div>

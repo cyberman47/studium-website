@@ -13,7 +13,7 @@ export function PrimaryButton({ children, href = "/signup", className = "" }: { 
   return <a href={href} className={`group inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-accent-500 px-5 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-lg focus-visible:ring-4 focus-visible:ring-accent-100 ${className}`}>{children}<ArrowRight size={16} className="transition group-hover:translate-x-1" /></a>;
 }
 
-export function VideoButton() { return <button type="button" className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-3 text-sm font-bold text-slate-600 transition hover:text-ink"><span className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white"><Play size={11} fill="currentColor" /></span>See how it works</button>; }
+export function VideoButton({ className = "" }: { className?: string }) { return <button type="button" className={`inline-flex cursor-pointer items-center gap-2.5 rounded-full border border-slate-200 dark:border-white/15 bg-white/70 dark:bg-white/5 px-5 py-3 text-sm font-bold text-heading backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-200 dark:hover:border-teal-500/30 hover:bg-white dark:hover:bg-white/10 ${className}`}><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300"><Play size={10} fill="currentColor" /></span>See how it works</button>; }
 
 export function Counter({ value, suffix = "", label }: { value: number; suffix?: string; label: string }) {
   const ref = useRef<HTMLDivElement>(null); const active = useInView(ref, { once: true, amount: .5 }); const [count, setCount] = useState(0);
@@ -21,9 +21,9 @@ export function Counter({ value, suffix = "", label }: { value: number; suffix?:
   return <div ref={ref}><div className="display text-3xl sm:text-4xl">{count.toLocaleString()}{suffix}</div><div className="mt-1 text-xs font-bold uppercase tracking-[.12em] text-slate-500">{label}</div></div>;
 }
 
-export function CheckLine({ children }: { children: React.ReactNode }) { return <li className="flex items-center gap-2 text-sm font-medium text-slate-600"><span className="grid h-5 w-5 place-items-center rounded-full bg-teal-50 text-teal-600"><Check size={12} strokeWidth={3} /></span>{children}</li>; }
+export function CheckLine({ children }: { children: React.ReactNode }) { return <li className="flex items-center gap-2 text-sm font-medium text-slate-600"><span className="grid h-5 w-5 place-items-center rounded-full bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-600"><Check size={12} strokeWidth={3} /></span>{children}</li>; }
 
-export const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-500 focus:border-teal-400 focus:ring-4 focus:ring-teal-100";
+export const inputClass = "w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-4 py-3 text-sm text-heading outline-none transition placeholder:text-slate-500 focus:border-teal-400 focus:ring-4 focus:ring-teal-100";
 
 export function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return <label className="block"><span className="mb-1.5 block text-xs font-extrabold text-slate-600">{label}{required && <span className="text-teal-500"> *</span>}</span>{children}</label>;
@@ -31,9 +31,9 @@ export function Field({ label, required, children }: { label: string; required?:
 
 export function ToggleRow({ label, desc, checked, onChange, disabled }: { label: string; desc?: string; checked: boolean; onChange?: () => void; disabled?: boolean }) {
   return <div className="flex items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0">
-    <div className="min-w-0"><p className="text-sm font-bold text-ink">{label}</p>{desc && <p className="mt-0.5 text-xs text-slate-500">{desc}</p>}</div>
+    <div className="min-w-0"><p className="text-sm font-bold text-heading">{label}</p>{desc && <p className="mt-0.5 text-xs text-slate-500">{desc}</p>}</div>
     <button type="button" role="switch" aria-checked={checked} aria-label={label} disabled={disabled} onClick={onChange} className={`relative h-6 w-11 shrink-0 rounded-full transition ${checked ? "bg-teal-500" : "bg-slate-200"} ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
-      <span className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${checked ? "translate-x-5" : "translate-x-0"}`} />
+      <span className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white dark:bg-[#0d1917] shadow transition-transform ${checked ? "translate-x-5" : "translate-x-0"}`} />
     </button>
   </div>;
 }
@@ -81,7 +81,7 @@ export function OAuthButtons({ actionLabel }: { actionLabel: string }) {
   return <>
     <div className="mt-6 flex items-center gap-3"><div className="h-px flex-1 bg-slate-200" /><span className="text-xs font-bold uppercase tracking-wider text-slate-500">Or</span><div className="h-px flex-1 bg-slate-200" /></div>
     <div className="mt-6 space-y-3">
-      <button type="button" onClick={() => handle("google")} disabled={loadingProvider !== null} className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-slate-200 bg-white py-3.5 text-sm font-bold text-ink transition hover:-translate-y-0.5 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"><GoogleIcon />{loadingProvider === "google" ? "Redirecting…" : `${actionLabel} with Google`}</button>
+      <button type="button" onClick={() => handle("google")} disabled={loadingProvider !== null} className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-3.5 text-sm font-bold text-heading transition hover:-translate-y-0.5 hover:bg-slate-50 dark:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"><GoogleIcon />{loadingProvider === "google" ? "Redirecting…" : `${actionLabel} with Google`}</button>
       <button type="button" onClick={() => handle("apple")} disabled={loadingProvider !== null} className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"><AppleIcon size={18} />{loadingProvider === "apple" ? "Redirecting…" : `${actionLabel} with Apple`}</button>
     </div>
     {error && <p className="mt-4 text-center text-xs font-bold text-rose-600">{error}</p>}

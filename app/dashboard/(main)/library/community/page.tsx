@@ -58,7 +58,7 @@ export default function CommunityLibraryPage() {
   const isFiltering = query.trim() !== "" || pathFilter !== null;
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/library" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Library</Link>
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
@@ -71,18 +71,18 @@ export default function CommunityLibraryPage() {
 
     <div className="relative mt-8 max-w-xl">
       <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-      <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search community content…" className="w-full rounded-full border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm font-semibold text-ink outline-none focus:border-teal-400" />
+      <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search community content…" className="w-full rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-3 pl-11 pr-4 text-sm font-semibold text-heading outline-none focus:border-teal-400" />
     </div>
 
     {pathNames.length > 0 && <div className="mt-4 flex flex-wrap items-center gap-2">
-      <button type="button" onClick={() => setPathFilter(null)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${!pathFilter ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>All</button>
-      {pathNames.map(p => <button key={p} type="button" onClick={() => setPathFilter(pathFilter === p ? null : p)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${pathFilter === p ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{p}</button>)}
+      <button type="button" onClick={() => setPathFilter(null)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${!pathFilter ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>All</button>
+      {pathNames.map(p => <button key={p} type="button" onClick={() => setPathFilter(pathFilter === p ? null : p)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${pathFilter === p ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{p}</button>)}
     </div>}
 
     {all.length === 0
-      ? <div className="mt-10 rounded-3xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-soft">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 text-teal-700"><Globe size={26} /></span>
-        <p className="mt-4 text-base font-extrabold text-ink">Community content is coming soon.</p>
+      ? <div className="mt-10 rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-10 text-center shadow-soft">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-teal-700"><Globe size={26} /></span>
+        <p className="mt-4 text-base font-extrabold text-heading">Community content is coming soon.</p>
         <p className="mx-auto mt-1.5 max-w-sm text-sm leading-relaxed text-slate-500">Student-created lessons and study resources will appear here.</p>
         <Link href="/dashboard/library/community/publish" className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600"><Plus size={16} />Be the first to publish</Link>
       </div>
@@ -103,7 +103,7 @@ export default function CommunityLibraryPage() {
 
 function DiscoverySection({ title, subtitle, lessons }: { title: string; subtitle: string; lessons: CommunityLesson[] }) {
   return <div>
-    <h2 className="text-lg font-extrabold tracking-tight text-ink">{title}</h2>
+    <h2 className="text-lg font-extrabold tracking-tight text-heading">{title}</h2>
     <p className="mt-1 text-xs text-slate-500">{subtitle}</p>
     <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {lessons.map(l => <CommunityLessonCard key={l.id} lesson={l} onSave={addCommunityLessonToLibrary} onUnsave={removeCommunityLessonFromLibrary} />)}

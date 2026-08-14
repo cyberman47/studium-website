@@ -38,7 +38,7 @@ export function DeckPicker({ onConfirm, onCancel, confirmLabel = "Add", startCre
     if (selectedId) onConfirm(selectedId);
   }
 
-  return <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-lift">
+  return <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 shadow-lift">
     <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Add to deck</p>
 
     {!creating && <div className="mt-3 max-h-48 space-y-1.5 overflow-y-auto pr-1">
@@ -47,7 +47,7 @@ export function DeckPicker({ onConfirm, onCancel, confirmLabel = "Add", startCre
         key={d.id}
         type="button"
         onClick={() => setSelectedId(d.id)}
-        className={`flex w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left text-sm font-bold transition ${selectedId === d.id ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-100 text-ink hover:border-teal-200 hover:bg-[#f9fcfc]"}`}
+        className={`flex w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left text-sm font-bold transition ${selectedId === d.id ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-100 dark:border-white/10 text-heading hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5"}`}
       >
         <span className="flex items-center gap-2 truncate"><Layers size={14} className="shrink-0 text-slate-400" />{d.name}</span>
         <span className="flex shrink-0 items-center gap-2 text-xs font-bold text-slate-400">{d.cardIds.length} cards{selectedId === d.id && <Check size={14} className="text-teal-600" />}</span>
@@ -60,12 +60,12 @@ export function DeckPicker({ onConfirm, onCancel, confirmLabel = "Add", startCre
         value={newName}
         onChange={e => setNewName(e.target.value)}
         placeholder="Deck name, e.g. Biochemistry Midterm"
-        className="mt-3 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-teal-400"
+        className="mt-3 w-full rounded-xl border border-slate-200 dark:border-white/10 px-3 py-2 text-sm font-semibold text-heading outline-none focus:border-teal-400"
       />
-      : <button type="button" onClick={() => setCreating(true)} className="mt-2 flex w-full cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-bold text-teal-600 hover:bg-teal-50"><FolderPlus size={15} />New deck</button>}
+      : <button type="button" onClick={() => setCreating(true)} className="mt-2 flex w-full cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-bold text-teal-600 hover:bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300"><FolderPlus size={15} />New deck</button>}
 
     <div className="mt-4 flex justify-end gap-2">
-      <button type="button" onClick={onCancel} className="cursor-pointer rounded-full px-4 py-2 text-xs font-bold text-slate-500 hover:text-ink">Cancel</button>
+      <button type="button" onClick={onCancel} className="cursor-pointer rounded-full px-4 py-2 text-xs font-bold text-slate-500 hover:text-heading">Cancel</button>
       <button
         type="button"
         onClick={handleConfirm}

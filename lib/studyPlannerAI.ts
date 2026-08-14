@@ -9,6 +9,10 @@
 // Caching: Claude is only called when the real underlying signals actually
 // changed (a new day, or a subject's quadrant/confidence/accuracy shifted)
 // or the student explicitly asks for a refresh—not on every page view.
+//
+// Daily cap: real API spend, so every actual call (cache-skips don't count)
+// is capped at MAX_AI_CALLS_PER_DAY real days—enough for a setup + a
+// couple of plan edits, not enough to be pinged on every keystroke.
 
 import {
   attachAIRecommendation, calculateDailyTarget, getAllSubjectSignals, getDaysRemaining, getExamConfig, getExamStage,
@@ -16,11 +20,33 @@ import {
 } from "./studyPlanner";
 
 const AI_CACHE_KEY = "studium_study_plan_ai_cache";
+const AI_CALLS_KEY = "studium_study_plan_ai_calls";
+export const MAX_AI_CALLS_PER_DAY = 3;
 
 type AICacheEntry = { dateKey: string; inputsHash: string };
+type AICallRecord = { dateKey: string; count: number };
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function readCallRecord(): AICallRecord {
+  if (typeof window === "undefined") return { dateKey: today(), count: 0 };
+  const raw = localStorage.getItem(AI_CALLS_KEY);
+  const parsed: AICallRecord | null = raw ? JSON.parse(raw) : null;
+  // A stored count from a previous day doesn't carry over—the cap resets
+  // with the real calendar day, not a rolling 24h window.
+  return parsed && parsed.dateKey === today() ? parsed : { dateKey: today(), count: 0 };
+}
+
+function bumpCallCount() {
+  if (typeof window === "undefined") return;
+  const rec = readCallRecord();
+  localStorage.setItem(AI_CALLS_KEY, JSON.stringify({ dateKey: today(), count: rec.count + 1 }));
+}
+
+export function getAICallsRemainingToday(): number {
+  return Math.max(0, MAX_AI_CALLS_PER_DAY - readCallRecord().count);
 }
 
 function hashInputs(signals: SubjectSignals[], dailyTarget: number): string {
@@ -41,7 +67,7 @@ function writeCache(entry: AICacheEntry) {
   localStorage.setItem(AI_CACHE_KEY, JSON.stringify(entry));
 }
 
-export type AIPlanResult = { ok: true; skipped: boolean } | { ok: false; error: string };
+export type AIPlanResult = { ok: true; skipped: boolean } | { ok: false; error: string; limitReached?: boolean };
 
 export async function refreshAIRecommendation(force = false): Promise<AIPlanResult> {
   const config = getExamConfig();
@@ -55,6 +81,17 @@ export async function refreshAIRecommendation(force = false): Promise<AIPlanResu
   const cache = readCache();
   if (!force && cache && cache.dateKey === today() && cache.inputsHash === inputsHash) {
     return { ok: true, skipped: true };
+  }
+
+  // Hard daily cap, checked before ever touching the network—applies even
+  // when force=true (an explicit plan edit), since that's exactly the
+  // repeatable action a cap needs to guard against.
+  if (getAICallsRemainingToday() <= 0) {
+    return {
+      ok: false,
+      limitReached: true,
+      error: `You've used today's ${MAX_AI_CALLS_PER_DAY} AI recommendations. Your plan still updates for real—just without a fresh note until tomorrow.`
+    };
   }
 
   const body = {
@@ -91,6 +128,7 @@ export async function refreshAIRecommendation(force = false): Promise<AIPlanResu
     const data = await res.json();
     attachAIRecommendation(data.recommendation, data.daily_kp_target);
     writeCache({ dateKey: today(), inputsHash });
+    bumpCallCount();
     return { ok: true, skipped: false };
   } catch {
     return { ok: false, error: "Couldn't reach the AI recommendation service." };

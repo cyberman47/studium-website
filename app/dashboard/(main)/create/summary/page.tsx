@@ -9,38 +9,38 @@ export default function CreateSummaryPage() {
   const [saved, setSaved] = useState(false);
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/create" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Create</Link>
     <span className="eyebrow"><FileText size={13} />Create Summary</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Study summary.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">A sample summary generated from {sampleDocument.fileName}.</p>
 
     <div className="mt-8 max-w-2xl space-y-6">
-      {saved && <div className="rounded-3xl border border-teal-100 bg-teal-50 p-5 text-center">
+      {saved && <div className="rounded-3xl border border-teal-100 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 p-5 text-center">
         <p className="text-sm font-extrabold text-teal-700">Summary saved to My Creations ✓</p>
       </div>}
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Short Summary</h2>
         <p className="mt-2 text-sm leading-relaxed text-slate-600">{sampleSummary.shortSummary}</p>
       </div>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="text-xs font-extrabold uppercase tracking-wide text-slate-500">High-Yield Notes</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-600">{sampleSummary.highYieldNotes.map(n => <li key={n}>{n}</li>)}</ul>
       </div>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Important Concepts</h2>
-        <div className="mt-3 flex flex-wrap gap-2">{sampleSummary.importantConcepts.map(c => <span key={c} className="rounded-full bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-700">{c}</span>)}</div>
+        <div className="mt-3 flex flex-wrap gap-2">{sampleSummary.importantConcepts.map(c => <span key={c} className="rounded-full bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 px-3 py-1.5 text-xs font-bold text-teal-700">{c}</span>)}</div>
       </div>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Key Definitions</h2>
-        <div className="mt-3 space-y-2.5">{sampleSummary.keyDefinitions.map(d => <p key={d.term} className="text-sm leading-relaxed text-slate-600"><span className="font-extrabold text-ink">{d.term}:</span> {d.definition}</p>)}</div>
+        <div className="mt-3 space-y-2.5">{sampleSummary.keyDefinitions.map(d => <p key={d.term} className="text-sm leading-relaxed text-slate-600"><span className="font-extrabold text-heading">{d.term}:</span> {d.definition}</p>)}</div>
       </div>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+      <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <h2 className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Exam Tips</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-600">{sampleSummary.examTips.map(t => <li key={t}>{t}</li>)}</ul>
       </div>

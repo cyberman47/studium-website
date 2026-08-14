@@ -70,7 +70,7 @@ export default function ForumPage() {
     <div className="mt-6 space-y-3">
       {filteredPosts.length === 0 && <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-white py-16 text-center shadow-soft">
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal-100 text-teal-700"><MessagesSquare size={22} /></span>
-        <p className="text-sm font-extrabold text-ink">{categoryFilter ? "No posts in this category yet." : "No posts yet."}</p>
+        <p className="text-sm font-extrabold text-heading">{categoryFilter ? "No posts in this category yet." : "No posts yet."}</p>
         <p className="max-w-xs text-xs leading-relaxed text-slate-500">Be the first to start a discussion.</p>
       </div>}
 
@@ -85,7 +85,7 @@ export default function ForumPage() {
         </button>
         <div className="min-w-0 flex-1">
           <span className={`rounded-full px-2.5 py-1 text-[11px] font-extrabold ${categoryColors[post.category]}`}>{forumCategoryLabels[post.category]}</span>
-          <h2 className="mt-2 text-base font-extrabold leading-snug text-ink">{post.title}</h2>
+          <h2 className="mt-2 text-base font-extrabold leading-snug text-heading">{post.title}</h2>
           <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-slate-500">{post.body}</p>
           <p className="mt-2.5 flex items-center gap-3 text-[11px] font-bold text-slate-400">
             <span>{post.authorName} · {formatDate(post.createdAt)}</span>
@@ -118,8 +118,8 @@ function NewPostModal({ authorName, onClose, onCreated }: { authorName: string; 
   return <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 p-4 sm:items-center" onClick={onClose}>
     <div onClick={e => e.stopPropagation()} className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-lift sm:p-7">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-extrabold text-ink">New Post</h3>
-        <button type="button" onClick={onClose} className="cursor-pointer rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-ink" aria-label="Close"><X size={16} /></button>
+        <h3 className="text-base font-extrabold text-heading">New Post</h3>
+        <button type="button" onClick={onClose} className="cursor-pointer rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-heading" aria-label="Close"><X size={16} /></button>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -131,7 +131,7 @@ function NewPostModal({ authorName, onClose, onCreated }: { authorName: string; 
       {error && <p className="mt-2 text-xs font-bold text-rose-600">{error}</p>}
 
       <div className="mt-5 flex justify-end gap-2">
-        <button type="button" onClick={onClose} className="cursor-pointer rounded-full px-4 py-2 text-sm font-bold text-slate-500 hover:text-ink">Cancel</button>
+        <button type="button" onClick={onClose} className="cursor-pointer rounded-full px-4 py-2 text-sm font-bold text-slate-500 hover:text-heading">Cancel</button>
         <button type="button" onClick={submit} className="cursor-pointer rounded-full bg-accent-500 px-6 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_-10px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Post</button>
       </div>
     </div>

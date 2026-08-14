@@ -1403,6 +1403,7 @@ export function getSectionProgress(section: SectionDef): SubjectProgress {
 // ---- Bookmarked flashcards ----
 
 const BOOKMARKS_KEY = "studium_lesson_bookmarks";
+export const BOOKMARKED_CARDS_EVENT = "studium:lessonBookmarksChange";
 
 function getBookmarksMap(): Record<string, number[]> {
   if (typeof window === "undefined") return {};
@@ -1420,4 +1421,16 @@ export function toggleBookmarkedCard(lessonId: string, cardIndex: number) {
   const current = map[lessonId] ?? [];
   map[lessonId] = current.includes(cardIndex) ? current.filter(i => i !== cardIndex) : [...current, cardIndex];
   localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(map));
+  window.dispatchEvent(new CustomEvent(BOOKMARKED_CARDS_EVENT));
+}
+
+export type BookmarkedCard = { lessonId: string; cardIndex: number };
+
+// Flattened, cross-lesson view of every bookmarked flashcard—the map above
+// is keyed by lesson for fast per-lesson lookup during a study session, but
+// anything listing bookmarks app-wide (My Library) needs every lesson's
+// entries together.
+export function getAllBookmarkedCards(): BookmarkedCard[] {
+  const map = getBookmarksMap();
+  return Object.entries(map).flatMap(([lessonId, indices]) => indices.map(cardIndex => ({ lessonId, cardIndex })));
 }

@@ -18,10 +18,10 @@ export default function GuidelinesPage() {
     <LegalSection heading="3. Post in the Right Place">
       <p>The Forum is organized into a few real categories, and using the right one helps everyone find what they need:</p>
       <ul className={legalList}>
-        <li><span className="font-bold text-ink">General:</span> open discussion about studying, school, or anything else on your mind.</li>
-        <li><span className="font-bold text-ink">Study Tips:</span> techniques, resources, and approaches that have worked for you.</li>
-        <li><span className="font-bold text-ink">Feedback:</span> ideas and suggestions for how Studium itself could be better.</li>
-        <li><span className="font-bold text-ink">Bug:</span> something in the Service that isn't working the way it should.</li>
+        <li><span className="font-bold text-heading">General:</span> open discussion about studying, school, or anything else on your mind.</li>
+        <li><span className="font-bold text-heading">Study Tips:</span> techniques, resources, and approaches that have worked for you.</li>
+        <li><span className="font-bold text-heading">Feedback:</span> ideas and suggestions for how Studium itself could be better.</li>
+        <li><span className="font-bold text-heading">Bug:</span> something in the Service that isn't working the way it should.</li>
       </ul>
     </LegalSection>
 

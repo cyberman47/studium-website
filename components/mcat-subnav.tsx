@@ -34,7 +34,7 @@ export function McatSubnav({
   backLabel = "Back to Dashboard"
 }: { backHref?: string; backLabel?: string } = {}) {
   const pathname = usePathname();
-  return <div className="border-b border-slate-100 pb-5">
+  return <div className="border-b border-slate-100 dark:border-white/10 pb-5">
     <Link href={backHref} className="mb-3 inline-flex cursor-pointer items-center gap-1.5 text-xs font-bold text-slate-500 transition hover:text-teal-600">
       <ArrowLeft size={13} />{backLabel}
     </Link>
@@ -44,7 +44,7 @@ export function McatSubnav({
         return <Link
           key={tab.href}
           href={tab.href}
-          className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-extrabold transition ${active ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200 hover:bg-[#f9fcfc]"}`}
+          className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-extrabold transition ${active ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5"}`}
         >
           <tab.icon size={13} />{tab.label}
         </Link>;

@@ -189,13 +189,13 @@ export default function McatPracticePage() {
     const recommended = recommendedMinutes(pendingSession.questions.length);
     const sliderMin = Math.max(1, Math.round(recommended * 0.4));
     const sliderMax = Math.max(sliderMin + 1, Math.round(recommended * 1.8));
-    return <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50 px-6 py-10 text-center">
+    return <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50 dark:bg-white/5 px-6 py-10 text-center">
       <span className="eyebrow justify-center"><Clock3 size={13} />Session Setup</span>
       <h1 className="display mt-5 text-3xl leading-tight sm:text-4xl">{pendingSession.title}</h1>
-      <p className="mt-3 text-base text-slate-500">This test has <span className="font-extrabold text-ink">{pendingSession.questions.length} question{pendingSession.questions.length === 1 ? "" : "s"}</span>.</p>
+      <p className="mt-3 text-base text-slate-500">This test has <span className="font-extrabold text-heading">{pendingSession.questions.length} question{pendingSession.questions.length === 1 ? "" : "s"}</span>.</p>
 
-      <div className="mt-8 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-soft">
-        <p className="text-sm font-bold text-ink">How much time would you like?</p>
+      <div className="mt-8 w-full max-w-md rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-7 shadow-soft">
+        <p className="text-sm font-bold text-heading">How much time would you like?</p>
         <p className="mt-1 text-xs text-slate-500">Recommended: {recommended} min (~95 sec/question, real MCAT pacing)</p>
 
         <p className="mt-6 text-4xl font-extrabold text-teal-600 tabular-nums">{setupMinutes}<span className="ml-1.5 text-base font-bold text-slate-400">min</span></p>
@@ -213,7 +213,7 @@ export default function McatPracticePage() {
       </div>
 
       <div className="mt-8 flex items-center gap-4">
-        <button type="button" onClick={() => setPendingSession(null)} className="cursor-pointer text-sm font-bold text-slate-500 hover:text-ink">Cancel</button>
+        <button type="button" onClick={() => setPendingSession(null)} className="cursor-pointer text-sm font-bold text-slate-500 hover:text-heading">Cancel</button>
         <button type="button" onClick={confirmSetupAndStart} className="cursor-pointer rounded-full bg-accent-500 px-8 py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Start Test</button>
       </div>
     </div>;
@@ -221,14 +221,14 @@ export default function McatPracticePage() {
 
   const quickCounts = [10, 25].filter(n => n < total);
 
-  return <section className="mx-auto max-w-5xl bg-slate-50 px-4 py-10 sm:px-6 sm:py-14">
+  return <section className="mx-auto max-w-5xl bg-slate-50 dark:bg-white/5 px-4 py-10 sm:px-6 sm:py-14">
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
         <span className="eyebrow"><Sparkles size={13} />Practice</span>
         <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Practice Workspace.</h1>
         <p className="mt-4 max-w-md text-base leading-relaxed text-slate-500">Build custom drills or launch a timed mixed session.</p>
       </div>
-      <button type="button" onClick={openSavedQuestions} disabled={savedCount === 0} className="mt-1 inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-ink shadow-soft transition hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50">
+      <button type="button" onClick={openSavedQuestions} disabled={savedCount === 0} className="mt-1 inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-4 py-2.5 text-sm font-bold text-heading shadow-soft transition hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50 dark:bg-amber-500/15 dark:text-amber-300 disabled:cursor-not-allowed disabled:opacity-50">
         <Bookmark size={15} className="text-amber-500" fill={savedCount > 0 ? "currentColor" : "none"} />Saved Questions ({savedCount})
       </button>
     </div>
@@ -239,24 +239,24 @@ export default function McatPracticePage() {
 
     <div className="mt-8 grid gap-5 sm:grid-cols-2">
       {/* Card A: Custom Drill Builder */}
-      <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-soft">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal-100 text-teal-700"><ListFilter size={22} /></span>
-        <h2 className="mt-5 text-lg font-extrabold tracking-tight text-ink">Custom Drill Builder</h2>
+      <div className="flex h-full flex-col rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-7 shadow-soft">
+        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-teal-700"><ListFilter size={22} /></span>
+        <h2 className="mt-5 text-lg font-extrabold tracking-tight text-heading">Custom Drill Builder</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-slate-500">Build a targeted session by topic, passage type, or focus on your weakest concepts.</p>
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {["Discrete & Passages", "Topic Filtering", "Weak Spot Targeting"].map(tag => <span key={tag} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">{tag}</span>)}
+          {["Discrete & Passages", "Topic Filtering", "Weak Spot Targeting"].map(tag => <span key={tag} className="rounded-full bg-slate-100 dark:bg-white/10 px-2.5 py-1 text-[11px] font-bold text-slate-600">{tag}</span>)}
         </div>
         <button type="button" onClick={() => setDrawerOpen(true)} className="mt-6 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Configure Drill →</button>
       </div>
 
       {/* Card B: Mixed Exam Simulation */}
-      <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-soft">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-violet-100 text-violet-600"><Shuffle size={22} /></span>
-        <h2 className="mt-5 text-lg font-extrabold tracking-tight text-ink">Mixed Exam Simulation</h2>
+      <div className="flex h-full flex-col rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-7 shadow-soft">
+        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-violet-100 dark:bg-violet-500/20 dark:text-violet-300 text-violet-600"><Shuffle size={22} /></span>
+        <h2 className="mt-5 text-lg font-extrabold tracking-tight text-heading">Mixed Exam Simulation</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-slate-500">Simulate test day with a randomized, timed set across all MCAT sections.</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {quickCounts.map(n => <button key={n} type="button" onClick={() => setMixedCount(n)} disabled={total === 0} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition disabled:cursor-not-allowed disabled:opacity-40 ${mixedCount === n ? "border-violet-500 bg-violet-50 text-violet-700" : "border-slate-200 text-ink hover:border-violet-200 hover:bg-violet-50"}`}>{n} Questions {n === 10 ? "(Quick)" : ""}</button>)}
-          <button type="button" onClick={() => setMixedCount(total)} disabled={total === 0} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition disabled:cursor-not-allowed disabled:opacity-40 ${mixedCount === total ? "border-violet-500 bg-violet-50 text-violet-700" : "border-slate-200 text-ink hover:border-violet-200 hover:bg-violet-50"}`}>All available ({total})</button>
+          {quickCounts.map(n => <button key={n} type="button" onClick={() => setMixedCount(n)} disabled={total === 0} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition disabled:cursor-not-allowed disabled:opacity-40 ${mixedCount === n ? "border-violet-500 bg-violet-50 dark:bg-violet-500/15 dark:text-violet-300 dark:bg-violet-500/15 dark:text-violet-300 text-violet-700" : "border-slate-200 dark:border-white/10 text-heading hover:border-violet-200 hover:bg-violet-50 dark:bg-violet-500/15 dark:text-violet-300 dark:bg-violet-500/15 dark:text-violet-300"}`}>{n} Questions {n === 10 ? "(Quick)" : ""}</button>)}
+          <button type="button" onClick={() => setMixedCount(total)} disabled={total === 0} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition disabled:cursor-not-allowed disabled:opacity-40 ${mixedCount === total ? "border-violet-500 bg-violet-50 dark:bg-violet-500/15 dark:text-violet-300 dark:bg-violet-500/15 dark:text-violet-300 text-violet-700" : "border-slate-200 dark:border-white/10 text-heading hover:border-violet-200 hover:bg-violet-50 dark:bg-violet-500/15 dark:text-violet-300 dark:bg-violet-500/15 dark:text-violet-300"}`}>All available ({total})</button>
         </div>
         <button type="button" onClick={startMixedExam} disabled={total === 0 || mixedCount === 0} className="mt-6 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-40">Start Mixed Session →</button>
         {total === 0 && <p className="mt-2 text-xs text-slate-400">No practice questions have been authored yet.</p>}
@@ -265,16 +265,16 @@ export default function McatPracticePage() {
 
     {/* Filter drawer */}
     {drawerOpen && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 p-4 sm:items-center" onClick={() => setDrawerOpen(false)}>
-      <div onClick={e => e.stopPropagation()} className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-lift sm:p-7">
+      <div onClick={e => e.stopPropagation()} className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-lift sm:p-7">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-extrabold text-ink">Configure Drill</h3>
-          <button type="button" onClick={() => setDrawerOpen(false)} className="cursor-pointer rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-ink"><X size={16} /></button>
+          <h3 className="text-base font-extrabold text-heading">Configure Drill</h3>
+          <button type="button" onClick={() => setDrawerOpen(false)} className="cursor-pointer rounded-full p-1.5 text-slate-400 hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><X size={16} /></button>
         </div>
 
         <div className="mt-5">
           <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">Sections</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {mcatSections.map(s => <button key={s.id} type="button" onClick={() => toggleSection(s.id)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${selectedSections.has(s.id) ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{s.shortTitle}</button>)}
+            {mcatSections.map(s => <button key={s.id} type="button" onClick={() => toggleSection(s.id)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${selectedSections.has(s.id) ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{s.shortTitle}</button>)}
           </div>
         </div>
 
@@ -283,15 +283,15 @@ export default function McatPracticePage() {
           {availableTopics.length === 0
             ? <p className="mt-2 text-xs text-slate-400">No topics available for the selected sections.</p>
             : <div className="mt-2 flex max-h-32 flex-wrap gap-2 overflow-y-auto pr-1">
-              {availableTopics.map(topic => <button key={topic} type="button" onClick={() => toggleTopic(topic)} className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-bold transition ${selectedTopics.has(topic) ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{topic}</button>)}
+              {availableTopics.map(topic => <button key={topic} type="button" onClick={() => toggleTopic(topic)} className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-bold transition ${selectedTopics.has(topic) ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{topic}</button>)}
             </div>}
         </div>
 
         <div className="mt-5">
           <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">Question Format</p>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setFormat("discrete")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${format === "discrete" ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{format === "discrete" && <Check size={13} />}Discrete Questions</button>
-            <button type="button" onClick={() => setFormat("passage")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${format === "passage" ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{format === "passage" && <Check size={13} />}Passage-Based</button>
+            <button type="button" onClick={() => setFormat("discrete")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${format === "discrete" ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{format === "discrete" && <Check size={13} />}Discrete Questions</button>
+            <button type="button" onClick={() => setFormat("passage")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${format === "passage" ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{format === "passage" && <Check size={13} />}Passage-Based</button>
           </div>
           {format === "passage" && <p className="mt-1.5 text-[11px] font-bold text-amber-600">No passage-based content exists yet—this will return 0 questions.</p>}
         </div>
@@ -299,33 +299,33 @@ export default function McatPracticePage() {
         <div className="mt-5">
           <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">Target Pool</p>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setTargetPool("unused")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${targetPool === "unused" ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>All Unused Questions</button>
-            <button type="button" onClick={() => setTargetPool("weak")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${targetPool === "weak" ? "border-amber-400 bg-amber-50 text-amber-700" : "border-slate-200 text-slate-500 hover:border-amber-200"}`}><TriangleAlert size={13} />Weak Areas Only</button>
+            <button type="button" onClick={() => setTargetPool("unused")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${targetPool === "unused" ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>All Unused Questions</button>
+            <button type="button" onClick={() => setTargetPool("weak")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${targetPool === "weak" ? "border-amber-400 bg-amber-50 dark:bg-amber-500/15 dark:text-amber-300 text-amber-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-amber-200"}`}><TriangleAlert size={13} />Weak Areas Only</button>
           </div>
-          {usedFallback && <div className="mt-2.5 flex items-start gap-2 rounded-xl border border-teal-200 bg-teal-50 p-3">
+          {usedFallback && <div className="mt-2.5 flex items-start gap-2 rounded-xl border border-teal-200 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 p-3">
             <Info size={14} className="mt-0.5 shrink-0 text-teal-600" />
-            <p className="text-[11px] font-semibold leading-relaxed text-teal-800">You&apos;ve completed all unused questions in these topics! Automatically including previously answered questions so you can review.</p>
+            <p className="text-[11px] font-semibold leading-relaxed text-teal-800 dark:text-teal-300">You&apos;ve completed all unused questions in these topics! Automatically including previously answered questions so you can review.</p>
           </div>}
         </div>
 
         <div className="mt-5">
           <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">Question Count</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {[5, 10, 15, 20].filter(n => n < drillPool.length).map(n => <button key={n} type="button" onClick={() => setDrillCount(n)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${drillCount === n ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{n}</button>)}
-            <button type="button" onClick={() => setDrillCount("all")} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${drillCount === "all" ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>All matching ({drillPool.length})</button>
+            {[5, 10, 15, 20].filter(n => n < drillPool.length).map(n => <button key={n} type="button" onClick={() => setDrillCount(n)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${drillCount === n ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{n}</button>)}
+            <button type="button" onClick={() => setDrillCount("all")} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${drillCount === "all" ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>All matching ({drillPool.length})</button>
           </div>
         </div>
 
         <div className="mt-5">
           <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">Mode</p>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setMode("tutor")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${mode === "tutor" ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}><GraduationCap size={13} />Tutor Mode</button>
-            <button type="button" onClick={() => setMode("timed")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${mode === "timed" ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}><Clock3 size={13} />Timed</button>
+            <button type="button" onClick={() => setMode("tutor")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${mode === "tutor" ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}><GraduationCap size={13} />Tutor Mode</button>
+            <button type="button" onClick={() => setMode("timed")} className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${mode === "timed" ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}><Clock3 size={13} />Timed</button>
           </div>
           <p className="mt-1.5 text-[11px] text-slate-400">{mode === "tutor" ? "See correct answers and explanations right after each question." : "Feedback is withheld until a results summary at the end—real exam conditions. You'll set the time on the next screen."}</p>
         </div>
 
-        <div className="mt-6 flex items-center justify-between gap-3 border-t border-slate-100 pt-5">
+        <div className="mt-6 flex items-center justify-between gap-3 border-t border-slate-100 dark:border-white/10 pt-5">
           <p className="text-xs font-bold text-slate-500">{effectiveCount < drillPool.length ? `Using ${effectiveCount} of ${drillPool.length} matching questions` : `${drillPool.length} question${drillPool.length === 1 ? "" : "s"} match`}</p>
           <button type="button" onClick={startDrill} disabled={drillPool.length === 0} className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-40"><Zap size={14} />{mode === "timed" ? "Next: Set Time" : "Start Drill"}</button>
         </div>

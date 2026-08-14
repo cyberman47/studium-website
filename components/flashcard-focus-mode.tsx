@@ -158,31 +158,31 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
 
   const progressPercent = cards.length > 0 ? Math.min(100, Math.round((index / cards.length) * 100)) : 0;
 
-  return <div className="fixed inset-0 z-[100] flex flex-col bg-white text-ink">
+  return <div className="fixed inset-0 z-[100] flex flex-col bg-white dark:bg-[#0d1917] text-heading">
     {/* Progress bar */}
-    <div className="h-1 w-full bg-slate-100">
+    <div className="h-1 w-full bg-slate-100 dark:bg-white/10">
       <motion.div className="h-full bg-teal-500" animate={{ width: `${progressPercent}%` }} transition={{ duration: 0.3 }} />
     </div>
 
     {/* Header */}
-    <header className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-8">
-      <button type="button" onClick={onExit} title="Exit focus mode" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-ink"><XIcon size={18} /></button>
+    <header className="flex items-center justify-between gap-4 border-b border-slate-100 dark:border-white/10 px-5 py-4 sm:px-8">
+      <button type="button" onClick={onExit} title="Exit focus mode" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><XIcon size={18} /></button>
 
       <div className="min-w-0 text-center">
-        <p className="truncate text-sm font-extrabold text-ink">{deckTitle}</p>
+        <p className="truncate text-sm font-extrabold text-heading">{deckTitle}</p>
         {!done && <p className="text-xs font-bold text-slate-400">{index + 1} / {cards.length}</p>}
       </div>
 
       <div className="relative flex items-center gap-1.5">
-        <button type="button" onClick={() => setOptionsOpen(o => !o)} title="Options" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-ink"><MoreVertical size={17} /></button>
+        <button type="button" onClick={() => setOptionsOpen(o => !o)} title="Options" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><MoreVertical size={17} /></button>
 
         <AnimatePresence>
           {optionsOpen && <motion.div
             initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}
-            className="absolute right-0 top-11 z-10 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lift"
+            className="absolute right-0 top-11 z-10 w-48 overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] shadow-lift"
           >
-            <button type="button" onClick={shuffle} className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 text-left text-xs font-bold text-ink hover:bg-slate-50"><Shuffle size={13} className="text-teal-600" />Shuffle remaining</button>
-            <button type="button" onClick={restart} className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 text-left text-xs font-bold text-ink hover:bg-slate-50"><Undo2 size={13} className="text-teal-600" />Restart session</button>
+            <button type="button" onClick={shuffle} className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 text-left text-xs font-bold text-heading hover:bg-slate-50 dark:bg-white/5"><Shuffle size={13} className="text-teal-600" />Shuffle remaining</button>
+            <button type="button" onClick={restart} className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 text-left text-xs font-bold text-heading hover:bg-slate-50 dark:bg-white/5"><Undo2 size={13} className="text-teal-600" />Restart session</button>
           </motion.div>}
         </AnimatePresence>
       </div>
@@ -206,8 +206,8 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
             back={<InteractiveText text={current.back} />}
             height="h-72 sm:h-80"
             frontExtra={current.hint ? <div onClick={e => e.stopPropagation()} className="mt-5">
-              {showHint ? <p className="mx-auto max-w-sm rounded-xl bg-teal-50 px-4 py-2.5 text-xs leading-relaxed text-teal-800">{current.hint}</p>
-                : <button type="button" onClick={() => setShowHint(true)} className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 px-3.5 py-1.5 text-xs font-bold text-slate-500 transition hover:border-teal-300 hover:text-teal-700"><Lightbulb size={13} />Get a hint</button>}
+              {showHint ? <p className="mx-auto max-w-sm rounded-xl bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 px-4 py-2.5 text-xs leading-relaxed text-teal-800">{current.hint}</p>
+                : <button type="button" onClick={() => setShowHint(true)} className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 px-3.5 py-1.5 text-xs font-bold text-slate-500 transition hover:border-teal-300 hover:text-teal-700"><Lightbulb size={13} />Get a hint</button>}
             </div> : undefined}
           />
         </div>}
@@ -216,8 +216,8 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
     {/* Footer controls: the shared four-point Again/Hard/Good/Easy scale,
         the same rating row used everywhere a flashcard appears, plus this
         session's own Undo button. */}
-    {!done && current && <footer className="flex items-center justify-center gap-2 border-t border-slate-100 px-5 py-5 sm:gap-4 sm:px-8">
-      <button type="button" onClick={undo} disabled={history.length === 0} title="Undo" className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full border border-slate-200 text-slate-400 transition hover:border-slate-300 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"><Undo2 size={16} /></button>
+    {!done && current && <footer className="flex items-center justify-center gap-2 border-t border-slate-100 dark:border-white/10 px-5 py-5 sm:gap-4 sm:px-8">
+      <button type="button" onClick={undo} disabled={history.length === 0} title="Undo" className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full border border-slate-200 dark:border-white/10 text-slate-400 transition hover:border-slate-300 hover:text-heading disabled:cursor-not-allowed disabled:opacity-30"><Undo2 size={16} /></button>
       <div className="w-full max-w-md">
         <FlashcardRatingRow onRate={rate} />
       </div>
@@ -226,7 +226,7 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
     <AnimatePresence>
       {aiOpen && liveTutorContext && <motion.aside
         initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ duration: 0.25, ease: "easeInOut" }}
-        className="fixed right-0 top-0 z-[110] h-full w-full max-w-[400px] border-l border-slate-200 bg-white shadow-lift"
+        className="fixed right-0 top-0 z-[110] h-full w-full max-w-[400px] border-l border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] shadow-lift"
       >
         <AiTutorPanel context={liveTutorContext} proactiveTip={null} onDismissTip={() => {}} onCollapse={() => setAiOpen(false)} />
       </motion.aside>}
@@ -251,19 +251,19 @@ function CompletionScreen({ deckTitle, counts, onExit, onRestart }: { deckTitle:
   const needsReview = counts.again + counts.hard;
   const pct = total > 0 ? Math.round((knowTotal / total) * 100) : 0;
   return <div className="w-full max-w-sm text-center">
-    <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-teal-50 text-teal-600"><PartyPopper size={28} /></span>
-    <h2 className="mt-5 text-2xl font-extrabold text-ink">Session complete!</h2>
+    <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-600"><PartyPopper size={28} /></span>
+    <h2 className="mt-5 text-2xl font-extrabold text-heading">Session complete!</h2>
     <p className="mt-1.5 text-sm text-slate-500">You went through {total} card{total === 1 ? "" : "s"} in "{deckTitle}".</p>
     <div className="mt-6 grid grid-cols-2 gap-3">
-      <div className="rounded-2xl border border-slate-200 bg-[#f9fcfc] p-4"><p className="text-xl font-extrabold text-teal-700">{knowTotal}</p><p className="mt-0.5 text-[11px] font-bold text-slate-500">Good + Easy</p></div>
-      <div className="rounded-2xl border border-slate-200 bg-[#f9fcfc] p-4"><p className="text-xl font-extrabold text-slate-600">{needsReview}</p><p className="mt-0.5 text-[11px] font-bold text-slate-500">Again + Hard</p></div>
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-[#f9fcfc] dark:bg-white/5 p-4"><p className="text-xl font-extrabold text-teal-700">{knowTotal}</p><p className="mt-0.5 text-[11px] font-bold text-slate-500">Good + Easy</p></div>
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-[#f9fcfc] dark:bg-white/5 p-4"><p className="text-xl font-extrabold text-slate-600">{needsReview}</p><p className="mt-0.5 text-[11px] font-bold text-slate-500">Again + Hard</p></div>
     </div>
     {total > 0 && <div className="mt-4">
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500" style={{ width: `${pct}%` }} /></div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><div className="h-full rounded-full bg-teal-500" style={{ width: `${pct}%` }} /></div>
       <p className="mt-1.5 text-xs font-bold text-slate-500">{pct}% marked Good or Easy</p>
     </div>}
     <div className="mt-7 flex flex-col gap-2.5 sm:flex-row">
-      {needsReview > 0 && <button type="button" onClick={onRestart} className="flex-1 cursor-pointer rounded-full border border-slate-200 py-3 text-sm font-bold text-ink transition hover:bg-slate-50">Review again</button>}
+      {needsReview > 0 && <button type="button" onClick={onRestart} className="flex-1 cursor-pointer rounded-full border border-slate-200 dark:border-white/10 py-3 text-sm font-bold text-heading transition hover:bg-slate-50 dark:bg-white/5">Review again</button>}
       <button type="button" onClick={onExit} className="flex-1 cursor-pointer rounded-full bg-accent-500 py-3 text-sm font-bold text-white transition hover:bg-accent-600">Done</button>
     </div>
   </div>;

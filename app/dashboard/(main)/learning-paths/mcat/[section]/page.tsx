@@ -8,8 +8,8 @@ import { McatSubnav } from "@/components/mcat-subnav";
 import { findSection, getSubjectProgress, SubjectProgress } from "@/lib/mcatPath";
 
 const tileColors = [
-  "bg-teal-100 text-teal-700", "bg-violet-100 text-violet-600", "bg-pink-100 text-pink-600", "bg-amber-100 text-amber-600",
-  "bg-sky-100 text-sky-600", "bg-indigo-100 text-indigo-600", "bg-emerald-100 text-emerald-600", "bg-red-100 text-red-600"
+  "bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-teal-700", "bg-violet-100 dark:bg-violet-500/20 dark:text-violet-300 text-violet-600", "bg-pink-100 dark:bg-pink-500/20 dark:text-pink-300 text-pink-600", "bg-amber-100 dark:bg-amber-500/20 dark:text-amber-300 text-amber-600",
+  "bg-sky-100 dark:bg-sky-500/20 dark:text-sky-300 text-sky-600", "bg-indigo-100 dark:bg-indigo-500/20 dark:text-indigo-300 text-indigo-600", "bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-300 text-emerald-600", "bg-red-100 text-red-600"
 ];
 
 export default function MCATSectionPage({ params }: { params: { section: string } }) {
@@ -31,7 +31,7 @@ export default function MCATSectionPage({ params }: { params: { section: string 
   }
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <McatSubnav />
 
     <div className="mt-8">
@@ -54,17 +54,17 @@ export default function MCATSectionPage({ params }: { params: { section: string 
             <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${tileColors[i % tileColors.length]}`}><BookOpen size={19} /></span>
             {hasContent && <ChevronRight size={18} className="mt-2 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-teal-500" />}
           </div>
-          <h2 className="mt-4 text-base font-extrabold tracking-tight text-ink">{subject.name}</h2>
+          <h2 className="mt-4 text-base font-extrabold tracking-tight text-heading">{subject.name}</h2>
           {hasContent
             ? <>
               <p className="mt-1 text-xs font-bold text-slate-500">{p?.completed ?? 0} / {p?.total ?? 0} lessons · {p?.percent ?? 0}%</p>
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500" style={{ width: `${p?.percent ?? 0}%` }} /></div>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><div className="h-full rounded-full bg-teal-500" style={{ width: `${p?.percent ?? 0}%` }} /></div>
             </>
             : <p className="mt-1 text-xs font-bold text-slate-400">Coming soon</p>}
         </>;
         return hasContent
-          ? <Reveal key={subject.id} delay={i * 0.03}><Link href={`/dashboard/learning-paths/mcat/${section.id}/${subject.id}`} className="group flex h-full flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">{content}</Link></Reveal>
-          : <Reveal key={subject.id} delay={i * 0.03}><div className="flex h-full flex-col rounded-3xl border border-slate-100 bg-slate-50 p-5 opacity-70">{content}</div></Reveal>;
+          ? <Reveal key={subject.id} delay={i * 0.03}><Link href={`/dashboard/learning-paths/mcat/${section.id}/${subject.id}`} className="group flex h-full flex-col rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">{content}</Link></Reveal>
+          : <Reveal key={subject.id} delay={i * 0.03}><div className="flex h-full flex-col rounded-3xl border border-slate-100 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-5 opacity-70">{content}</div></Reveal>;
       })}
     </div>
   </section>;

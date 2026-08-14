@@ -147,9 +147,9 @@ export function PracticeQuiz({
   }, [timed, timeLimitSeconds, secondsLeft, showSummary, questions.length]);
 
   if (questions.length === 0) {
-    return <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-8 text-center shadow-soft">
-      <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-slate-100 text-slate-400"><HelpCircle size={20} /></span>
-      <p className="mt-3 text-sm font-extrabold text-ink">Nothing here yet.</p>
+    return <div className="rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-8 text-center shadow-soft">
+      <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-slate-100 dark:bg-white/10 text-slate-400"><HelpCircle size={20} /></span>
+      <p className="mt-3 text-sm font-extrabold text-heading">Nothing here yet.</p>
       <p className="mt-1 text-xs leading-relaxed text-slate-500">{emptyMessage}</p>
     </div>;
   }
@@ -258,12 +258,12 @@ export function PracticeQuiz({
 
   const bookmarkButton = <button
     type="button" onClick={handleToggleSave} title={isSaved ? "Remove from saved questions" : "Save this question"}
-    className={`grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full transition ${isSaved ? "text-amber-500" : "text-slate-400 hover:bg-slate-100 hover:text-ink"}`}
+    className={`grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full transition ${isSaved ? "text-amber-500" : "text-slate-400 hover:bg-slate-100 dark:bg-white/10 hover:text-heading"}`}
   ><Bookmark size={16} fill={isSaved ? "currentColor" : "none"} /></button>;
 
-  const tutorToggle = liveTutorContext && <button type="button" onClick={() => setAiOpen(o => !o)} title="Ask Studium AI" className={`grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full transition ${aiOpen ? "bg-teal-50 text-teal-600" : "text-slate-400 hover:bg-slate-100 hover:text-ink"}`}><Bot size={16} /></button>;
+  const tutorToggle = liveTutorContext && <button type="button" onClick={() => setAiOpen(o => !o)} title="Ask Studium AI" className={`grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full transition ${aiOpen ? "bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-600" : "text-slate-400 hover:bg-slate-100 dark:bg-white/10 hover:text-heading"}`}><Bot size={16} /></button>;
 
-  const timerBadge = timed && timeLimitSeconds ? <span className={`flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-extrabold tabular-nums ${secondsLeft <= 30 ? "bg-rose-100 text-rose-700" : "bg-slate-100 text-slate-600"}`}><Clock3 size={13} />{formatClock(secondsLeft)}</span> : null;
+  const timerBadge = timed && timeLimitSeconds ? <span className={`flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-extrabold tabular-nums ${secondsLeft <= 30 ? "bg-rose-100 dark:bg-rose-500/20 dark:text-rose-300 text-rose-700" : "bg-slate-100 dark:bg-white/10 text-slate-600"}`}><Clock3 size={13} />{formatClock(secondsLeft)}</span> : null;
 
   const revealed = current.submitted && !timed;
   const letters = ["A", "B", "C", "D", "E", "F"];
@@ -273,20 +273,20 @@ export function PracticeQuiz({
       const isCorrect = i === q.correctIndex;
       const isSelected = current.selected === i;
       const isStruck = current.struck.includes(i);
-      let cls = "border-slate-200 hover:border-teal-500 hover:bg-teal-50/30";
-      if (revealed) cls = isCorrect ? "border-teal-500 bg-teal-50" : isSelected ? "border-rose-300 bg-rose-50" : "border-slate-100 opacity-60";
-      else if (isSelected) cls = "border-teal-500 bg-teal-50";
+      let cls = "border-slate-200 dark:border-white/10 hover:border-teal-500 hover:bg-teal-50/30 dark:bg-teal-500/15";
+      if (revealed) cls = isCorrect ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300" : isSelected ? "border-rose-300 bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300" : "border-slate-100 dark:border-white/10 opacity-60";
+      else if (isSelected) cls = "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300";
       const disabled = revealed || (!timed && current.submitted && !isFullscreen);
       return isFullscreen
         ? <button key={i} type="button" disabled={disabled} onClick={() => handleOptionClick(i)} className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left transition ${disabled ? "cursor-default" : "cursor-pointer"} ${cls}`}>
           <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 text-xs font-extrabold transition ${isSelected && !isStruck ? "border-teal-500 bg-teal-500 text-white" : "border-slate-300 text-slate-500"}`}>{letters[i]}</span>
-          <span className={`flex-1 text-sm font-bold text-ink ${isStruck ? "text-slate-400 line-through" : ""}`}>{opt}</span>
+          <span className={`flex-1 text-sm font-bold text-heading ${isStruck ? "text-slate-400 line-through" : ""}`}>{opt}</span>
           {revealed && isCorrect && <Check size={17} className="shrink-0 text-teal-600" />}
           {revealed && isSelected && !isCorrect && <X size={17} className="shrink-0 text-rose-500" />}
           {!revealed && isSelected && !isStruck && <Check size={16} className="shrink-0 text-teal-600" />}
         </button>
         : <div key={i}>
-          <button type="button" disabled={disabled} onClick={() => handleOptionClick(i)} className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-bold text-ink transition ${disabled ? "cursor-default" : "cursor-pointer"} ${cls}`}>
+          <button type="button" disabled={disabled} onClick={() => handleOptionClick(i)} className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-bold text-heading transition ${disabled ? "cursor-default" : "cursor-pointer"} ${cls}`}>
             <span className="flex items-center gap-2.5"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full border border-slate-300 text-[10px] font-extrabold text-slate-500">{letters[i]}</span>{opt}</span>
             {revealed && isCorrect && <Check size={16} className="shrink-0 text-teal-600" />}
             {revealed && isSelected && !isCorrect && <X size={16} className="shrink-0 text-rose-500" />}
@@ -300,7 +300,7 @@ export function PracticeQuiz({
   // right under the options, unchanged in spirit from before.
   const embeddedFooter = !isFullscreen && current.submitted && <div className="mt-5 flex flex-wrap gap-2.5">
     <button type="button" onClick={handlePrimaryButton} className="cursor-pointer rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">{qIndex + 1 < questions.length ? "Next question" : completeLabel}</button>
-    {onAskTutor && <button type="button" onClick={() => onAskTutor(q)} className="cursor-pointer rounded-full border border-slate-200 px-4 py-3 text-xs font-extrabold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc]">Ask tutor about this</button>}
+    {onAskTutor && <button type="button" onClick={() => onAskTutor(q)} className="cursor-pointer rounded-full border border-slate-200 dark:border-white/10 px-4 py-3 text-xs font-extrabold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5">Ask tutor about this</button>}
   </div>;
 
   const total = questions.length;
@@ -311,14 +311,14 @@ export function PracticeQuiz({
     .filter(({ st, qq }) => st && st.selected !== null && st.selected !== qq.correctIndex);
 
   const summaryBody = <div className="mx-auto w-full max-w-2xl text-center">
-    <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-teal-50 text-teal-600"><PartyPopper size={26} /></span>
-    <h2 className="mt-4 text-2xl font-extrabold text-ink">Session complete</h2>
+    <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-600"><PartyPopper size={26} /></span>
+    <h2 className="mt-4 text-2xl font-extrabold text-heading">Session complete</h2>
     <p className="mt-1.5 text-sm text-slate-500">{correctCount} / {answeredCount} correct{answeredCount > 0 ? ` (${Math.round((correctCount / answeredCount) * 100)}%)` : ""}{answeredCount < total ? ` · ${total - answeredCount} unanswered` : ""}</p>
 
     {missedList.length > 0 && <div className="mt-7 space-y-4 text-left">
       <p className="text-xs font-extrabold uppercase tracking-wide text-slate-400">Review missed questions</p>
-      {missedList.map(({ qq, idx, st }) => <div key={idx} className="rounded-2xl border border-slate-100 bg-[#f9fcfc] p-4">
-        <p className="text-sm font-bold text-ink"><InteractiveText text={qq.question} /></p>
+      {missedList.map(({ qq, idx, st }) => <div key={idx} className="rounded-2xl border border-slate-100 dark:border-white/10 bg-[#f9fcfc] dark:bg-white/5 p-4">
+        <p className="text-sm font-bold text-heading"><InteractiveText text={qq.question} /></p>
         <p className="mt-1.5 text-xs text-rose-600">Your answer: {qq.options[st!.selected!]}</p>
         <p className="mt-1 text-xs text-teal-700">Correct: {qq.options[qq.correctIndex]}</p>
         <p className="mt-1.5 text-xs leading-relaxed text-slate-500"><InteractiveText text={qq.optionExplanations[qq.correctIndex]} /></p>
@@ -337,7 +337,7 @@ export function PracticeQuiz({
       <motion.aside
         initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ duration: 0.25, ease: "easeInOut" }}
         onClick={e => e.stopPropagation()}
-        className="h-full w-full max-w-[400px] border-l border-slate-200 bg-white shadow-lift"
+        className="h-full w-full max-w-[400px] border-l border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] shadow-lift"
       >
         <AiTutorPanel context={liveTutorContext} proactiveTip={null} onDismissTip={() => {}} onCollapse={() => setAiOpen(false)} />
       </motion.aside>
@@ -359,11 +359,11 @@ export function PracticeQuiz({
     // inset-0 above everything, including the app's left sidebar. A
     // slate-50 canvas with a real white question card on top, instead of
     // text floating in a plain white void.
-    return <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 text-ink">
-      <header className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-4 sm:px-8">
-        <button type="button" onClick={handleClose} title="Exit" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-ink"><X size={18} /></button>
+    return <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 dark:bg-white/5 text-heading">
+      <header className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-5 py-4 sm:px-8">
+        <button type="button" onClick={handleClose} title="Exit" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><X size={18} /></button>
         <div className="min-w-0 text-center">
-          <p className="truncate text-sm font-extrabold text-ink">{title}</p>
+          <p className="truncate text-sm font-extrabold text-heading">{title}</p>
           {contextLabel && !showSummary && <p className="truncate text-xs font-bold text-slate-400">{contextLabel}</p>}
         </div>
         <div className="flex items-center gap-1.5">
@@ -375,41 +375,41 @@ export function PracticeQuiz({
               there's no smaller view to shrink back into, so offering the
               toggle there was confusing dead weight. Uncontrolled callers
               (the lesson page's embedded card, expanded manually) keep it. */}
-          {!controlledFullscreen && <button type="button" onClick={() => setIsFullscreen(false)} title="Exit fullscreen" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-ink"><Minimize size={16} /></button>}
+          {!controlledFullscreen && <button type="button" onClick={() => setIsFullscreen(false)} title="Exit fullscreen" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><Minimize size={16} /></button>}
         </div>
       </header>
 
       <div className="flex flex-1 justify-center overflow-y-auto px-5 py-8 sm:px-8">
         {showSummary ? summaryBody : <div className="w-full max-w-4xl">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-sm sm:p-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-extrabold text-teal-700">{topicPill}</span>
+              <span className="rounded-full bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 px-3 py-1 text-xs font-extrabold text-teal-700">{topicPill}</span>
               <div className="flex items-center gap-2">
-                {flagged.has(qIndex) && <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-extrabold text-amber-700"><Flag size={11} fill="currentColor" />Flagged</span>}
+                {flagged.has(qIndex) && <span className="flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-500/20 dark:text-amber-300 px-2.5 py-1 text-[11px] font-extrabold text-amber-700"><Flag size={11} fill="currentColor" />Flagged</span>}
                 <span className="text-xs font-bold text-slate-400">Question {qIndex + 1} of {questions.length}</span>
               </div>
             </div>
-            <p className="mt-6 text-xl font-medium leading-relaxed text-slate-900"><InteractiveText text={q.question} /></p>
+            <p className="mt-6 text-xl font-medium leading-relaxed text-slate-900 dark:text-white"><InteractiveText text={q.question} /></p>
             {optionsList}
             {revealed && onAskTutor && <button type="button" onClick={() => onAskTutor(q)} className="mt-5 cursor-pointer text-xs font-extrabold text-teal-600 hover:text-teal-700">Ask tutor about this →</button>}
           </div>
         </div>}
       </div>
 
-      {!showSummary && <footer className="border-t border-slate-200 bg-white px-5 py-4 sm:px-8">
+      {!showSummary && <footer className="border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-5 py-4 sm:px-8">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <button type="button" onClick={toggleFlag} className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-extrabold transition ${flagged.has(qIndex) ? "border-amber-300 bg-amber-50 text-amber-700" : "border-slate-200 text-slate-500 hover:border-amber-200 hover:bg-amber-50"}`}><Flag size={13} fill={flagged.has(qIndex) ? "currentColor" : "none"} />Flag for Review</button>
-            <button type="button" onClick={() => setStrikeoutMode(s => !s)} className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-extrabold transition ${strikeoutMode ? "border-violet-300 bg-violet-50 text-violet-700" : "border-slate-200 text-slate-500 hover:border-violet-200 hover:bg-violet-50"}`}><Eraser size={13} />Strikeout Mode</button>
+            <button type="button" onClick={toggleFlag} className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-extrabold transition ${flagged.has(qIndex) ? "border-amber-300 bg-amber-50 dark:bg-amber-500/15 dark:text-amber-300 text-amber-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-amber-200 hover:bg-amber-50 dark:bg-amber-500/15 dark:text-amber-300"}`}><Flag size={13} fill={flagged.has(qIndex) ? "currentColor" : "none"} />Flag for Review</button>
+            <button type="button" onClick={() => setStrikeoutMode(s => !s)} className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-extrabold transition ${strikeoutMode ? "border-violet-300 bg-violet-50 dark:bg-violet-500/15 dark:text-violet-300 dark:bg-violet-500/15 dark:text-violet-300 text-violet-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-violet-200 hover:bg-violet-50 dark:bg-violet-500/15 dark:text-violet-300 dark:bg-violet-500/15 dark:text-violet-300"}`}><Eraser size={13} />Strikeout Mode</button>
           </div>
 
           <div className="flex min-w-[140px] flex-1 items-center justify-center gap-3">
-            <div className="h-1.5 w-full max-w-[180px] overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500 transition-all" style={{ width: `${Math.round(((qIndex + 1) / questions.length) * 100)}%` }} /></div>
+            <div className="h-1.5 w-full max-w-[180px] overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><div className="h-full rounded-full bg-teal-500 transition-all" style={{ width: `${Math.round(((qIndex + 1) / questions.length) * 100)}%` }} /></div>
             <span className="shrink-0 whitespace-nowrap text-xs font-bold text-slate-500 tabular-nums">{qIndex + 1} / {questions.length}</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <button type="button" onClick={goPrevious} disabled={qIndex === 0} className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 px-4 py-2.5 text-xs font-extrabold text-ink transition hover:border-teal-200 hover:bg-[#f9fcfc] disabled:cursor-not-allowed disabled:opacity-40"><ArrowLeft size={14} />Previous</button>
+            <button type="button" onClick={goPrevious} disabled={qIndex === 0} className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 px-4 py-2.5 text-xs font-extrabold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"><ArrowLeft size={14} />Previous</button>
             <button type="button" onClick={handlePrimaryButton} disabled={primaryDisabled} className="flex cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-5 py-2.5 text-xs font-extrabold text-white shadow-[0_10px_20px_-10px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0">{primaryLabel}{primaryLabel.includes("Next") && <ArrowRight size={14} />}</button>
           </div>
         </div>
@@ -419,17 +419,17 @@ export function PracticeQuiz({
     </div>;
   }
 
-  return <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-7">
+  return <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
     <div className="flex items-center justify-between">
       <h2 className="text-lg font-extrabold tracking-tight">{title}</h2>
       <div className="flex items-center gap-2">
         {tutorToggle}
         {bookmarkButton}
-        <button type="button" onClick={() => setIsFullscreen(true)} title="Fullscreen" className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-ink"><Maximize size={15} /></button>
+        <button type="button" onClick={() => setIsFullscreen(true)} title="Fullscreen" className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><Maximize size={15} /></button>
         <p className="ml-1 shrink-0 text-xs font-bold text-slate-500">{qIndex + 1} / {questions.length}</p>
       </div>
     </div>
-    <p className="mt-4 text-sm font-bold text-ink"><InteractiveText text={q.question} /></p>
+    <p className="mt-4 text-sm font-bold text-heading"><InteractiveText text={q.question} /></p>
     {optionsList}
     {embeddedFooter}
     {tutorDrawer}

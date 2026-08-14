@@ -158,8 +158,8 @@ export default function MCATSubjectPage({ params }: { params: { section: string;
 
   return <>
     {lessons.length === 0
-      ? <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-white py-20 text-center shadow-soft">
-        <p className="text-base font-extrabold text-ink">This subject's lessons are still being written.</p>
+      ? <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-20 text-center shadow-soft">
+        <p className="text-base font-extrabold text-heading">This subject's lessons are still being written.</p>
         <p className="max-w-xs text-sm leading-relaxed text-slate-500">Check back soon—Biology is fully built out as a preview of what's coming.</p>
       </div>
       : <div className="grid gap-8 lg:grid-cols-[1fr_336px]">
@@ -167,7 +167,7 @@ export default function MCATSubjectPage({ params }: { params: { section: string;
         <div className="min-w-0">
           {progress && <div className="mb-5">
             <p className="text-sm font-bold text-slate-500">{progress.completed} / {progress.total} lessons complete · {progress.hoursRemaining} hrs remaining</p>
-            <div className="mt-2 h-2 w-full max-w-sm overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500 transition-[width] duration-500" style={{ width: `${progress.percent}%` }} /></div>
+            <div className="mt-2 h-2 w-full max-w-sm overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><div className="h-full rounded-full bg-teal-500 transition-[width] duration-500" style={{ width: `${progress.percent}%` }} /></div>
           </div>}
 
           <div className="space-y-3">
@@ -184,7 +184,7 @@ export default function MCATSubjectPage({ params }: { params: { section: string;
               const readHref = lesson.content ? `/dashboard/learning-paths/mcat/${params.section}/${params.subject}/${lesson.id}` : "#";
 
               const upNext = interactive && !completed;
-              return <div key={lesson.id} className={`flex flex-wrap items-center gap-4 rounded-2xl border p-4 transition ${locked ? "border-slate-100 bg-slate-50" : isSelected ? "border-teal-300 bg-teal-50/60 shadow-soft" : completed ? "border-teal-100 bg-white shadow-soft" : "border-slate-200 bg-white shadow-soft"}`}>
+              return <div key={lesson.id} className={`flex flex-wrap items-center gap-4 rounded-2xl border p-4 transition ${locked ? "border-slate-100 dark:border-white/10 bg-slate-50 dark:bg-white/5" : isSelected ? "border-teal-300 bg-teal-50/60 dark:bg-teal-500/15 shadow-soft" : completed ? "border-teal-100 bg-white dark:bg-[#0d1917] shadow-soft" : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] shadow-soft"}`}>
                 {interactive
                   ? <button type="button" onClick={() => toggleSelect(lesson.id)} className="shrink-0 cursor-pointer text-slate-300 hover:text-teal-600" aria-label={`Select ${lesson.title}`}>
                     {isSelected ? <CheckSquare size={18} className="text-teal-600" /> : <Square size={18} />}
@@ -200,20 +200,20 @@ export default function MCATSubjectPage({ params }: { params: { section: string;
                 })()}
 
                 <div className="min-w-0 flex-1">
-                  <p className={`flex items-center gap-2 text-sm font-bold ${locked ? "text-slate-400" : "text-ink"}`}>
+                  <p className={`flex items-center gap-2 text-sm font-bold ${locked ? "text-slate-400" : "text-heading"}`}>
                     {lesson.title}
                     {upNext && <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-accent-700">Up next</span>}
                   </p>
                   <p className="text-xs text-slate-500">{!hasContent ? "Content unavailable" : completed ? `Completed · ${lesson.content?.difficulty}` : locked ? "Locked" : `${lesson.content?.estimatedMinutes ?? 20} min · ${lesson.content?.difficulty ?? "Beginner"}`}</p>
                   {interactive && concepts.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">
-                    {concepts.map(tag => <span key={tag} className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-slate-500 ring-1 ring-inset ring-slate-200">{tag}</span>)}
+                    {concepts.map(tag => <span key={tag} className="rounded-full bg-white dark:bg-[#0d1917] px-2 py-0.5 text-[10px] font-bold text-slate-500 ring-1 ring-inset ring-slate-200">{tag}</span>)}
                   </div>}
                 </div>
 
                 {interactive && <div className="flex shrink-0 flex-wrap items-center gap-1.5">
-                  <Link href={readHref} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-extrabold text-ink transition hover:border-teal-300 hover:bg-[#f9fcfc]"><BookOpen size={12} />Read</Link>
-                  <button type="button" onClick={() => setActiveQuiz({ title: lesson.title, contextLabel: "Lesson Practice", questions: lessonQuizItems(lesson) })} disabled={questionCount === 0} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-extrabold text-ink transition hover:border-teal-300 hover:bg-[#f9fcfc] disabled:cursor-not-allowed disabled:opacity-40"><ListChecks size={12} />Practice</button>
-                  <button type="button" onClick={() => setActiveDeck({ title: lesson.title, cards: lessonFlashcards(lesson) })} disabled={cardCount === 0} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-extrabold text-ink transition hover:border-teal-300 hover:bg-[#f9fcfc] disabled:cursor-not-allowed disabled:opacity-40"><Layers size={12} />{cardCount} Card{cardCount === 1 ? "" : "s"}</button>
+                  <Link href={readHref} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-3 py-1.5 text-[11px] font-extrabold text-heading transition hover:border-teal-300 hover:bg-[#f9fcfc] dark:bg-white/5"><BookOpen size={12} />Read</Link>
+                  <button type="button" onClick={() => setActiveQuiz({ title: lesson.title, contextLabel: "Lesson Practice", questions: lessonQuizItems(lesson) })} disabled={questionCount === 0} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-3 py-1.5 text-[11px] font-extrabold text-heading transition hover:border-teal-300 hover:bg-[#f9fcfc] dark:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"><ListChecks size={12} />Practice</button>
+                  <button type="button" onClick={() => setActiveDeck({ title: lesson.title, cards: lessonFlashcards(lesson) })} disabled={cardCount === 0} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-3 py-1.5 text-[11px] font-extrabold text-heading transition hover:border-teal-300 hover:bg-[#f9fcfc] dark:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"><Layers size={12} />{cardCount} Card{cardCount === 1 ? "" : "s"}</button>
                 </div>}
               </div>;
             })}
@@ -222,31 +222,31 @@ export default function MCATSubjectPage({ params }: { params: { section: string;
 
         {/* Sidebar */}
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft">
+          <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft">
             <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-400"><Target size={13} />Exam Context</p>
             {section
-              ? <p className="mt-2 text-sm leading-relaxed text-slate-600">Covers <span className="font-extrabold text-ink">{questionShare}%</span> of the {section.shortTitle} practice question bank <span className="text-slate-400">({subjectQuestionCount} of {sectionQuestionTotal} questions)</span>.</p>
+              ? <p className="mt-2 text-sm leading-relaxed text-slate-600">Covers <span className="font-extrabold text-heading">{questionShare}%</span> of the {section.shortTitle} practice question bank <span className="text-slate-400">({subjectQuestionCount} of {sectionQuestionTotal} questions)</span>.</p>
               : <p className="mt-2 text-sm text-slate-400">Not mapped to a real exam section.</p>}
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft">
+          <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft">
             <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-400"><TrendingUp size={13} />Subject Stats</p>
 
-            <div className="mt-3.5 flex items-center justify-between text-xs font-bold text-slate-500"><span>Mastery</span><span className="text-ink">{progress?.percent ?? 0}%</span></div>
-            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500 transition-[width] duration-500" style={{ width: `${progress?.percent ?? 0}%` }} /></div>
+            <div className="mt-3.5 flex items-center justify-between text-xs font-bold text-slate-500"><span>Mastery</span><span className="text-heading">{progress?.percent ?? 0}%</span></div>
+            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><div className="h-full rounded-full bg-teal-500 transition-[width] duration-500" style={{ width: `${progress?.percent ?? 0}%` }} /></div>
 
-            <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+            <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-white/10 pt-4">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Flashcards Due</p>
-                <p className="text-xl font-extrabold text-ink">{dueCount}</p>
+                <p className="text-xl font-extrabold text-heading">{dueCount}</p>
               </div>
               <button type="button" onClick={openDueCardsReview} disabled={dueCount === 0} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-3.5 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0">Review Due</button>
             </div>
 
-            <div className="mt-4 border-t border-slate-100 pt-4">
+            <div className="mt-4 border-t border-slate-100 dark:border-white/10 pt-4">
               <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Question Bank Accuracy</p>
               {accuracy.total > 0
-                ? <p className="mt-0.5 text-xl font-extrabold text-ink">{accuracy.correct} <span className="text-sm font-bold text-slate-400">/ {accuracy.total} correct</span></p>
+                ? <p className="mt-0.5 text-xl font-extrabold text-heading">{accuracy.correct} <span className="text-sm font-bold text-slate-400">/ {accuracy.total} correct</span></p>
                 : <p className="mt-0.5 text-sm font-bold text-slate-400">No attempts yet</p>}
             </div>
           </div>
@@ -262,11 +262,11 @@ export default function MCATSubjectPage({ params }: { params: { section: string;
         initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
         className="fixed inset-x-0 bottom-6 z-40 flex justify-center px-4"
       >
-        <div className="flex flex-wrap items-center gap-3 rounded-full border border-slate-200 bg-white px-5 py-3 shadow-lift">
-          <span className="text-sm font-bold text-ink">{selected.size} lesson{selected.size === 1 ? "" : "s"} selected</span>
-          <button type="button" onClick={openBatchFlashcards} disabled={batchCardCount === 0} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-ink transition hover:border-teal-300 hover:bg-[#f9fcfc] disabled:cursor-not-allowed disabled:opacity-40"><Layers size={13} />Launch Flashcards</button>
+        <div className="flex flex-wrap items-center gap-3 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-5 py-3 shadow-lift">
+          <span className="text-sm font-bold text-heading">{selected.size} lesson{selected.size === 1 ? "" : "s"} selected</span>
+          <button type="button" onClick={openBatchFlashcards} disabled={batchCardCount === 0} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 px-4 py-2 text-xs font-bold text-heading transition hover:border-teal-300 hover:bg-[#f9fcfc] dark:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"><Layers size={13} />Launch Flashcards</button>
           <button type="button" onClick={openBatchQuiz} disabled={batchQuestionCount === 0} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-4 py-2 text-xs font-bold text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-40"><ListChecks size={13} />Start Custom Quiz</button>
-          <button type="button" onClick={() => setSelected(new Set())} className="cursor-pointer text-slate-400 hover:text-ink" aria-label="Clear selection"><X size={16} /></button>
+          <button type="button" onClick={() => setSelected(new Set())} className="cursor-pointer text-slate-400 hover:text-heading" aria-label="Clear selection"><X size={16} /></button>
         </div>
       </motion.div>}
     </AnimatePresence>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Activity, BookOpen, BrainCircuit, ChevronDown, FileQuestion, Gift, GraduationCap, Heart, HeartPulse, Instagram, Layers3, Linkedin, MessageCircle, Microscope, Orbit, PlayCircle, Quote, Rocket, Smartphone, Sparkles, WandSparkles } from "lucide-react";
+import { Activity, BookOpen, Bot, BrainCircuit, ChevronDown, FileQuestion, Gift, GraduationCap, Heart, HeartPulse, Home as HomeIcon, Instagram, Layers3, Linkedin, MessageCircle, Microscope, Orbit, PlayCircle, Quote, Rocket, Smartphone, Sparkles, WandSparkles } from "lucide-react";
 import { DashboardMockup, AIChat } from "@/components/dashboard";
 import { Logo, Navigation } from "@/components/navigation";
 import { AppleIcon, CheckLine, Counter, GooglePlayIcon, PrimaryButton, Reveal, TikTokIcon, VideoButton } from "@/components/ui";
@@ -20,7 +20,31 @@ const faqs = [["What is Studium?", "Studium is an AI-powered learning workspace 
 export default function Home() {
   return <main id="home" className="overflow-hidden"><Navigation /><Hero /><Trust /><ImmersiveContent /><Features /><LearningShowcase /><HowItWorks /><DashboardSection /><Stats /><Testimonials /><FAQ /><CTA /><DownloadApps /><GiftCards /><Footer /></main>;
 }
-function Hero() { return <section className="relative pt-[164px] sm:pt-[196px]"><div className="dot-grid absolute inset-x-0 top-0 -z-10 h-[540px] opacity-45 [mask-image:linear-gradient(to_bottom,black,transparent)]" /><div className="absolute left-1/2 top-28 -z-20 h-80 w-[min(800px,100vw)] -translate-x-1/2 rounded-full bg-teal-100/60 blur-[90px]" /><div className="container-page"><div className="mx-auto max-w-3xl text-center"><Reveal><span className="eyebrow"><Sparkles size={13} />The intelligent way to learn</span></Reveal><Reveal delay={.08}><h1 className="display mt-6 text-5xl leading-[.98] sm:text-7xl">Study smarter.<br /><span className="text-teal-500">Learn deeper.</span></h1></Reveal><Reveal delay={.15}><p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-500 sm:text-lg">Everything you need to master medicine in one place—from AI-powered learning and organized notes to community flashcards, quizzes, and real clinical cases.</p></Reveal><Reveal delay={.22} className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row"><PrimaryButton className="w-full sm:w-auto">Start learning for free</PrimaryButton><VideoButton /></Reveal></div><Reveal delay={.18} className="relative mt-14 pb-5 sm:mt-16"><div className="absolute -left-2 top-24 hidden rounded-2xl border border-white bg-white/90 p-3 shadow-lift backdrop-blur md:block float"><div className="flex items-center gap-2"><div className="text-lg">🔥</div><div><p className="text-[10px] font-extrabold">12 day streak</p><p className="text-[9px] text-slate-500">You&apos;re on a roll!</p></div></div></div><DashboardMockup hero /></Reveal></div></section>; }
+function Hero() {
+  return <section className="relative overflow-hidden pt-[164px] sm:pt-[196px]">
+    {/* Background depth: the dot grid + ambient glow are the same pieces as
+        before, just finally dark-mode aware—previously bg-teal-100/60 with
+        no dark: variant rendered as a washed-out pale mint blob on the
+        app's near-black dark background, the same "gradient dark-mode gap"
+        pattern fixed elsewhere in the app this session. */}
+    <div className="dot-grid absolute inset-x-0 top-0 -z-10 h-[560px] opacity-45 dark:opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+    <div className="absolute left-1/2 top-24 -z-20 h-[420px] w-[min(1000px,100vw)] -translate-x-1/2 rounded-full bg-teal-100/60 blur-[100px] dark:bg-teal-500/10" />
+    <div className="container-page">
+      <div className="mx-auto max-w-3xl text-center">
+        <Reveal><span className="eyebrow"><Sparkles size={13} />The intelligent way to learn</span></Reveal>
+        <Reveal delay={.08}><h1 className="display mt-6 text-5xl leading-[.98] sm:text-7xl">Study smarter.<br /><span className="bg-gradient-to-r from-teal-500 to-accent-500 bg-clip-text text-transparent dark:from-teal-300 dark:to-accent-300">Learn deeper.</span></h1></Reveal>
+        <Reveal delay={.15}><p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-500 sm:text-lg">Everything you need to master your studies in one place—from AI-powered learning and organized notes to flashcards, quizzes, and clinical cases.</p></Reveal>
+        <Reveal delay={.22} className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"><PrimaryButton className="w-full !px-7 !py-3.5 !text-base sm:w-auto">Start learning for free</PrimaryButton><VideoButton className="w-full sm:w-auto" /></Reveal>
+      </div>
+      <Reveal delay={.18} className="relative mt-16 pb-6 sm:mt-20">
+        <div className="absolute -left-4 -top-6 z-10 hidden rounded-2xl border border-white bg-white/90 p-3 shadow-lift backdrop-blur dark:border-white/10 dark:bg-[#0d1917]/90 md:block float">
+          <div className="flex items-center gap-2"><div className="text-lg">🔥</div><div><p className="text-[10px] font-extrabold text-heading">12 day streak</p><p className="text-[9px] text-slate-500">You&apos;re on a roll!</p></div></div>
+        </div>
+        <DashboardMockup hero />
+      </Reveal>
+    </div>
+  </section>;
+}
 function Trust() { return <section className="border-y border-slate-100 bg-white py-7"><div className="container-page text-center"><p className="text-sm font-bold text-slate-600">Notes, flashcards, quizzes, and AI—built to help you master any subject.</p></div></section>; }
 function ImmersiveContent() { return <section className="container-page pb-10 pt-20 sm:pb-12 sm:pt-24"><div className="grid items-center gap-10 overflow-hidden rounded-[30px] border border-teal-100 bg-[#f3fbfa] p-7 sm:p-10 lg:grid-cols-[1.1fr_.9fr] lg:p-12"><Reveal><span className="eyebrow">Built for the real world</span><h2 className="display mt-5 max-w-xl text-4xl leading-tight sm:text-5xl">Immerse yourself in real-world content.</h2><p className="mt-5 max-w-xl text-base leading-relaxed text-slate-500">Study with real medical cases, diagnostic challenges, anatomy, and clinical reasoning instead of memorizing isolated facts.</p></Reveal><Reveal delay={.12}><div className="grid grid-cols-2 gap-3"><div className="col-span-2 flex items-center gap-4 rounded-2xl bg-ink p-5 text-white shadow-soft"><span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-400 text-teal-950"><HeartPulse size={22} /></span><div><p className="text-xs font-extrabold">Clinical case of the day</p><p className="mt-1 text-[10px] text-slate-300">Chest pain · Assess, reason, decide</p></div></div><div className="rounded-2xl border border-teal-100 bg-white p-4"><Microscope size={20} className="text-teal-600" /><p className="mt-5 text-xs font-extrabold">Explore anatomy</p><p className="mt-1 text-[10px] text-slate-500">See systems in context</p></div><div className="rounded-2xl border border-teal-100 bg-white p-4"><BrainCircuit size={20} className="text-violet-500" /><p className="mt-5 text-xs font-extrabold">Think clinically</p><p className="mt-1 text-[10px] text-slate-500">Build diagnostic instinct</p></div></div></Reveal></div></section>; }
 function Features() { return <section id="features" className="container-page pb-24 pt-12 sm:pb-32 sm:pt-16"><Reveal className="max-w-xl"><span className="eyebrow">Made to help you thrive</span><h2 className="display mt-5 text-4xl leading-tight sm:text-5xl">Everything you need to learn with confidence.</h2></Reveal><div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{features.map(([Icon, title, description, color], i) => <Reveal key={title} delay={i * .05}><motion.article whileHover={{ y: -6 }} className="group h-full rounded-3xl border border-slate-100 bg-white p-6 shadow-soft transition-shadow hover:shadow-lift"><span className={`grid h-11 w-11 place-items-center rounded-2xl ${color}`}><Icon size={21} /></span><h3 className="mt-6 text-lg font-extrabold tracking-tight">{title}</h3><p className="mt-2 text-sm leading-relaxed text-slate-500">{description}</p><div className="mt-5 h-px w-0 bg-teal-300 transition-all duration-300 group-hover:w-9" /></motion.article></Reveal>)}</div></section>; }
@@ -28,26 +52,46 @@ function LearningShowcase() {
   return (
     <section className="relative overflow-hidden bg-[#f3fbfa] py-24 sm:py-32">
       <div className="absolute right-0 top-0 h-full w-1/2 bg-[radial-gradient(circle_at_center,rgba(126,211,209,.32),transparent_66%)]" />
-      <div className="container-page relative grid items-center gap-14 lg:grid-cols-[.95fr_1.05fr] lg:gap-20">
-        <Reveal className="order-2 lg:order-1">
-          <div className="relative mx-auto w-[260px] sm:w-[300px]">
-            <div className="absolute -left-20 top-20 h-32 w-32 rounded-full bg-teal-200/70 blur-2xl" />
-            <div className="absolute -right-12 bottom-20 h-28 w-28 rounded-full bg-teal-100 blur-2xl" />
-            <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} className="relative overflow-hidden rounded-[38px] border-[7px] border-ink bg-white p-3 shadow-[0_28px_55px_-18px_rgba(15,80,80,.4)]">
-              <div className="mx-auto h-5 w-20 rounded-b-xl bg-ink" />
-              <div className="px-2 pb-4 pt-4">
-                <div className="flex items-center justify-between"><p className="text-[10px] font-extrabold text-ink">Medical revision</p><span className="text-[9px] font-bold text-teal-600">7 / 12</span></div>
-                <div className="mt-4 overflow-hidden rounded-2xl border border-teal-100 bg-[#effbfa]">
-                  <div className="flex h-28 items-center justify-center bg-[radial-gradient(circle_at_center,#d8f4f1,transparent_70%)]"><div className="relative grid h-16 w-16 place-items-center rounded-full border-4 border-teal-400/40 bg-white text-teal-600 shadow-sm"><HeartPulse size={31} /><span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-teal-500 text-white"><Activity size={10} /></span></div></div>
-                  <div className="bg-white p-3"><p className="text-[9px] font-bold text-slate-500">CARDIOLOGY</p><p className="mt-1 text-xs font-extrabold leading-snug">What does the mitral valve do?</p></div>
+      <div className="container-page relative grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
+        <Reveal className="order-2 lg:order-1 lg:col-span-5">
+          {/* Slim iPhone-15-Pro-style frame: thin bezel, dynamic island,
+              and a fixed size (no continuous bounce) so it reads as a
+              real device next to the copy rather than a floating blob. */}
+          <div className="relative mx-auto w-full max-w-[240px] sm:max-w-[270px]">
+            <div className="absolute inset-x-4 inset-y-10 -z-10 rounded-[60px] bg-teal-500/10 blur-2xl" />
+            {/* True iPhone proportions (9:19.5) instead of a squared-off
+                card—an explicit aspect-ratio, a real status bar, and a
+                bottom tab bar + home indicator are what make it read as
+                a phone rather than a rounded rectangle. */}
+            <div className="relative aspect-[9/19.5] overflow-hidden rounded-[46px] border-[3px] border-ink bg-white shadow-[0_28px_55px_-18px_rgba(15,80,80,.35)]">
+              <div className="absolute left-1/2 top-2 z-10 h-[18px] w-[72px] -translate-x-1/2 rounded-full bg-ink" />
+              <div className="flex h-full flex-col">
+                <div className="flex items-center justify-between px-5 pb-1 pt-3 text-[8px] font-bold text-heading">
+                  <span>9:41</span>
+                  <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-ink/60" /><span className="h-2 w-3.5 rounded-[3px] border border-ink/60" /></span>
                 </div>
-                <div className="mt-3 grid grid-cols-2 gap-2"><div className="rounded-xl border border-slate-100 p-2.5"><Microscope size={15} className="text-violet-500" /><p className="mt-2 text-[9px] font-extrabold">Anatomy</p></div><div className="rounded-xl border border-slate-100 p-2.5"><BrainCircuit size={15} className="text-teal-600" /><p className="mt-2 text-[9px] font-extrabold">Recall</p></div></div>
+                <div className="flex flex-1 flex-col px-3.5 pb-2 pt-4">
+                  <div className="flex items-center justify-between"><p className="text-[9px] font-extrabold text-heading">Medical revision</p><span className="text-[8px] font-bold text-teal-600">7 / 12</span></div>
+                  <div className="mt-3 overflow-hidden rounded-2xl border border-teal-100 bg-[#effbfa]">
+                    <div className="flex h-24 items-center justify-center bg-[radial-gradient(circle_at_center,#d8f4f1,transparent_70%)]"><div className="relative grid h-14 w-14 place-items-center rounded-full border-4 border-teal-400/40 bg-white text-teal-600 shadow-sm"><HeartPulse size={26} /><span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-teal-500 text-white"><Activity size={9} /></span></div></div>
+                    <div className="bg-white p-2.5"><p className="text-[8px] font-bold text-slate-500">CARDIOLOGY</p><p className="mt-1 text-[11px] font-extrabold leading-snug">What does the mitral valve do?</p></div>
+                  </div>
+                  <div className="mt-2.5 grid grid-cols-2 gap-2"><div className="rounded-xl border border-slate-100 p-2"><Microscope size={13} className="text-violet-500" /><p className="mt-1.5 text-[8px] font-extrabold">Anatomy</p></div><div className="rounded-xl border border-slate-100 p-2"><BrainCircuit size={13} className="text-teal-600" /><p className="mt-1.5 text-[8px] font-extrabold">Recall</p></div></div>
+                  <div className="mt-3"><div className="flex items-center justify-between text-[7px] font-bold text-slate-500"><span>Deck progress</span><span>58%</span></div><div className="mt-1 h-1 overflow-hidden rounded-full bg-slate-100"><div className="h-full w-[58%] rounded-full bg-teal-500" /></div></div>
+                </div>
+                <div className="flex items-center justify-around border-t border-slate-100 px-3 py-2.5">
+                  <span className="grid h-7 w-7 place-items-center rounded-lg bg-teal-50 text-teal-600"><HomeIcon size={13} /></span>
+                  <span className="grid h-7 w-7 place-items-center text-slate-300"><BookOpen size={13} /></span>
+                  <span className="grid h-7 w-7 place-items-center text-slate-300"><Layers3 size={13} /></span>
+                  <span className="grid h-7 w-7 place-items-center text-slate-300"><Bot size={13} /></span>
+                </div>
+                <div className="flex justify-center pb-1.5 pt-0.5"><div className="h-1 w-20 rounded-full bg-ink/50" /></div>
               </div>
-            </motion.div>
-            <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: .6 }} className="absolute -right-16 top-32 rounded-2xl border border-white bg-white/95 p-3 shadow-lift"><p className="text-[9px] font-extrabold text-teal-700">+20 XP</p><p className="mt-1 text-[8px] text-slate-500">Great recall!</p></motion.div>
+            </div>
+            <div className="absolute -right-4 -top-3 rounded-2xl border border-white bg-white/95 p-2.5 shadow-md"><p className="text-[9px] font-extrabold text-teal-700">+20 XP</p><p className="mt-1 text-[8px] text-slate-500">Great recall!</p></div>
           </div>
         </Reveal>
-        <Reveal delay={.12} className="order-1 max-w-xl lg:order-2">
+        <Reveal delay={.12} className="order-1 max-w-xl lg:order-2 lg:col-span-7">
           <span className="eyebrow">Study smarter, naturally</span>
           <h2 className="display mt-5 text-4xl leading-tight sm:text-5xl">Learn the Way Your Brain Was Designed To.</h2>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-500">Forget endless memorization. Studium uses an immersive, science-backed learning approach that helps you understand and retain information naturally.</p>

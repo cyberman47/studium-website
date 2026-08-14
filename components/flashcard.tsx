@@ -37,8 +37,8 @@ export type FlashcardProps = {
 };
 
 const DEFAULT_HEIGHT = "h-56";
-const DEFAULT_FRONT_TEXT = "text-xl font-extrabold tracking-tight text-ink sm:text-2xl";
-const DEFAULT_BACK_TEXT = "text-sm leading-relaxed text-teal-900 sm:text-base";
+const DEFAULT_FRONT_TEXT = "text-xl font-extrabold tracking-tight text-heading sm:text-2xl";
+const DEFAULT_BACK_TEXT = "text-sm leading-relaxed text-teal-900 dark:text-teal-200 sm:text-base";
 
 export function Flashcard({
   cardKey, direction, flipped, onFlip, front, back, imageSrc, imageAlt, frontExtra,
@@ -95,9 +95,15 @@ export function Flashcard({
 
   return <div className={`relative ${height}`}>
     {/* Deck-stack ghost layers—two static offset outlines behind the active
-        card give it a physical-deck depth cue without animating themselves. */}
-    <div className={`pointer-events-none absolute inset-x-5 top-3 z-0 ${height} rounded-2xl border border-slate-200/70 bg-white`} style={{ transform: "scale(0.96)" }} />
-    <div className={`pointer-events-none absolute inset-x-2.5 top-1.5 z-0 ${height} rounded-2xl border border-slate-200 bg-white`} style={{ transform: "scale(0.98)" }} />
+        card give it a physical-deck depth cue without animating themselves.
+        Their offset was tuned to peek out from behind a left-right flip;
+        a top-bottom flip swings the real card's top/bottom edges through
+        3D space, which briefly exposes far more of these static layers
+        than intended—reading as "another card behind it" instead of a
+        subtle stack. Fading them out for the mid-flip instant sidesteps
+        the geometry mismatch entirely, on either axis. */}
+    <div className={`pointer-events-none absolute inset-x-5 top-3 z-0 ${height} rounded-2xl border border-slate-200/70 dark:border-white/10 bg-white dark:bg-[#0d1917] transition-opacity duration-150 ${midFlip ? "opacity-0" : "opacity-100"}`} style={{ transform: "scale(0.96)" }} />
+    <div className={`pointer-events-none absolute inset-x-2.5 top-1.5 z-0 ${height} rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] transition-opacity duration-150 ${midFlip ? "opacity-0" : "opacity-100"}`} style={{ transform: "scale(0.98)" }} />
 
     {/* Entrance slide: a real @keyframes animation (.flashcard-enter, in
         app/globals.css), not a Framer Motion initial->animate handshake or
@@ -113,20 +119,20 @@ export function Flashcard({
     >
       <motion.div
         onClick={onFlip}
-        animate={{ rotateY: midFlip ? 90 : 0 }}
+        animate={{ rotateX: midFlip ? 90 : 0 }}
         transition={{ duration: 0.15, ease: "easeIn" }}
         className="relative h-full w-full cursor-pointer select-none rounded-2xl shadow-md"
       >
-        {displayFace === "front" ? <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 text-center">
+        {displayFace === "front" ? <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-white to-slate-50 dark:from-[#0d1917] dark:to-[#0b1615] p-6 text-center">
           {imageSrc && <img src={imageSrc} alt={imageAlt ?? ""} className="mb-3 max-h-24 rounded-lg object-contain" />}
           <div className={frontTextClassName}>{front}</div>
           {frontExtra}
           <p className="absolute bottom-5 flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
-            Click to flip <kbd className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">Space</kbd>
+            Click to flip <kbd className="rounded border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">Space</kbd>
           </p>
-        </div> : <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-teal-500/20 bg-gradient-to-br from-teal-50 to-teal-100/60 p-6 text-center">
+        </div> : <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-teal-500/20 bg-gradient-to-br from-teal-50 to-teal-100/60 dark:from-teal-500/10 dark:to-teal-500/[0.06] p-6 text-center">
           <div className={backTextClassName}>{back}</div>
-          <p className="absolute bottom-5 text-[11px] font-bold text-teal-600/60">Click to flip back</p>
+          <p className="absolute bottom-5 text-[11px] font-bold text-teal-600/60 dark:text-teal-300/60">Click to flip back</p>
         </div>}
       </motion.div>
     </div>
@@ -134,9 +140,9 @@ export function Flashcard({
 }
 
 const tieredRatings: { rating: FlashcardRating; key: string; label: string; className: string }[] = [
-  { rating: "again", key: "1", label: "Again", className: "border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100" },
-  { rating: "hard", key: "2", label: "Hard", className: "border-amber-200 bg-amber-50 text-amber-700 hover:border-amber-300 hover:bg-amber-100" },
-  { rating: "good", key: "3", label: "Good", className: "border-teal-200 bg-teal-50 text-teal-700 hover:border-teal-300 hover:bg-teal-100" }
+  { rating: "again", key: "1", label: "Again", className: "border-rose-200 bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300 text-rose-700 hover:border-rose-300 hover:bg-rose-100 dark:bg-rose-500/20 dark:text-rose-300" },
+  { rating: "hard", key: "2", label: "Hard", className: "border-amber-200 bg-amber-50 dark:bg-amber-500/15 dark:text-amber-300 text-amber-700 hover:border-amber-300 hover:bg-amber-100 dark:bg-amber-500/20 dark:text-amber-300" },
+  { rating: "good", key: "3", label: "Good", className: "border-teal-200 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700 hover:border-teal-300 hover:bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300" }
 ];
 
 // The one real 4-point Again/Hard/Good/Easy scale (lib/spacedRepetitionCore.ts's

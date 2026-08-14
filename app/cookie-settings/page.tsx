@@ -33,7 +33,7 @@ function PreferencesPanel() {
   if (!loaded) return null;
 
   return <div className="mb-8 rounded-3xl border border-teal-100 bg-[#f9fcfc] p-5 sm:p-6">
-    <p className="text-sm font-extrabold text-ink">Manage your cookie preferences</p>
+    <p className="text-sm font-extrabold text-heading">Manage your cookie preferences</p>
     <p className="mt-1 text-xs leading-relaxed text-slate-500">
       {consent
         ? `You last made a choice on ${new Date(consent.decidedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}. You can change it below at any time.`
@@ -61,10 +61,10 @@ export default function CookieSettingsPage() {
 
     <LegalSection heading="2. Types of Cookies We Use">
       <ul className={legalList}>
-        <li><span className="font-bold text-ink">Essential cookies:</span> required for the Service to function, such as keeping you signed in and remembering security settings. The Service cannot function properly without these.</li>
-        <li><span className="font-bold text-ink">Preference cookies:</span> remember choices you make, such as language or display settings, so you don't have to set them again.</li>
-        <li><span className="font-bold text-ink">Analytics cookies:</span> help us understand how visitors use the Service, such as which pages are visited most, so we can improve it. Where required, these are only set with your consent.</li>
-        <li><span className="font-bold text-ink">Marketing cookies:</span> may be used, where applicable, to measure the effectiveness of our marketing and show you relevant content on other platforms.</li>
+        <li><span className="font-bold text-heading">Essential cookies:</span> required for the Service to function, such as keeping you signed in and remembering security settings. The Service cannot function properly without these.</li>
+        <li><span className="font-bold text-heading">Preference cookies:</span> remember choices you make, such as language or display settings, so you don't have to set them again.</li>
+        <li><span className="font-bold text-heading">Analytics cookies:</span> help us understand how visitors use the Service, such as which pages are visited most, so we can improve it. Where required, these are only set with your consent.</li>
+        <li><span className="font-bold text-heading">Marketing cookies:</span> may be used, where applicable, to measure the effectiveness of our marketing and show you relevant content on other platforms.</li>
       </ul>
     </LegalSection>
 

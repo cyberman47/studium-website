@@ -71,11 +71,37 @@ function randomId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+// A real, genuine first post—authored by "Studium Team" (not a fake student,
+// same honesty rule as everything else in this file), seeded once into this
+// browser's actual post list so it's fully real: upvotable, commentable, and
+// viewable exactly like anything a student posts. Timestamped at the real
+// moment it's first seeded (not a fake epoch date, which would just look
+// like a bug), so as the very first thing written to an empty post list
+// it's genuinely the oldest post there is.
+const WELCOME_POST_ID = "studium-welcome";
+
+function ensureWelcomePost() {
+  if (typeof window === "undefined") return;
+  const existing = readPosts();
+  if (existing.some(p => p.id === WELCOME_POST_ID)) return;
+  const welcome: ForumPost = {
+    id: WELCOME_POST_ID,
+    title: "Welcome to the Studium Forum!",
+    body: "Hi, welcome to the forum! Feel free to share anything you like, dislike, or think we could improve—your feedback genuinely helps shape what we build next. Say hello, ask a question, or start a discussion.",
+    category: "general",
+    authorName: "Studium Team",
+    createdAt: new Date().toISOString()
+  };
+  localStorage.setItem(POSTS_KEY, JSON.stringify([...existing, welcome]));
+}
+
 export function getPosts(): ForumPost[] {
+  ensureWelcomePost();
   return readPosts().slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 export function getPost(id: string): ForumPost | undefined {
+  ensureWelcomePost();
   return readPosts().find(p => p.id === id);
 }
 

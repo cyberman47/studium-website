@@ -23,7 +23,7 @@ function LicenseTable({ rows }: { rows: LicenseRow[] }) {
         <tr><th className="px-4 py-3">Project</th><th className="px-4 py-3">License</th><th className="px-4 py-3">Used for</th></tr>
       </thead>
       <tbody className="divide-y divide-slate-100">
-        {rows.map(r => <tr key={r.name}><td className="px-4 py-3 font-bold text-ink">{r.name}</td><td className="px-4 py-3 text-slate-600">{r.license}</td><td className="px-4 py-3 text-slate-500">{r.use}</td></tr>)}
+        {rows.map(r => <tr key={r.name}><td className="px-4 py-3 font-bold text-heading">{r.name}</td><td className="px-4 py-3 text-slate-600">{r.license}</td><td className="px-4 py-3 text-slate-500">{r.use}</td></tr>)}
       </tbody>
     </table>
   </div>;

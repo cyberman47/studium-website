@@ -4,7 +4,7 @@
 // to /api/tutor (a secure server route holding the Anthropic key), and the
 // reply is written into the same chat history incrementally as it arrives.
 
-export type TutorMode = "tutor" | "socratic" | "simplify";
+export type TutorMode = "tutor" | "deepdive" | "simplify";
 
 export type ChatMessage = {
   id: string;
@@ -65,9 +65,11 @@ function patchMessage(lessonId: string, id: string, patch: Partial<ChatMessage>)
 
 export const modeLabels: Record<TutorMode, string> = {
   tutor: "Tutor",
-  socratic: "Socratic",
+  deepdive: "Deep Dive",
   simplify: "Simplify"
 };
+
+const validModes: TutorMode[] = ["tutor", "deepdive", "simplify"];
 
 // Streams a real reply from /api/tutor into the assistant placeholder
 // already sitting in chat history, throttling writes so a fast stream
@@ -143,7 +145,11 @@ export function clearChatHistory(lessonId: string) {
 
 export function getTutorMode(): TutorMode {
   if (typeof window === "undefined") return "tutor";
-  return (localStorage.getItem(MODE_KEY) as TutorMode | null) ?? "tutor";
+  const stored = localStorage.getItem(MODE_KEY);
+  // Guards against a stale "socratic" value left in localStorage from
+  // before Deep Dive replaced it—falls back to the default instead of
+  // handing an unrecognized mode to the UI or the API route.
+  return validModes.includes(stored as TutorMode) ? (stored as TutorMode) : "tutor";
 }
 
 export function setTutorMode(mode: TutorMode) {

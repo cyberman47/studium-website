@@ -168,23 +168,30 @@ export function getSubjectAccuracy(subject: RealSubject): SubjectAccuracy {
 }
 
 export type Trend = "improving" | "declining" | "flat" | null;
+export type TrendDetail = { trend: Trend; deltaPercent: number | null };
 
 // Compares the last real 7 days of attempts against the 7 days before
 // that—returns null rather than guessing when there isn't enough real data
-// yet to call a trend (fewer than 3 attempts in either window).
-export function getSubjectTrend(subject: RealSubject): Trend {
+// yet to call a trend (fewer than 3 attempts in either window). Also
+// exposes the real percentage-point delta (deltaPercent) so callers that
+// want to say something specific—e.g. the Progress page's "Your X accuracy
+// has increased N% this month" insight—never have to fabricate a number.
+export function getSubjectTrendDetail(subject: RealSubject): TrendDetail {
   const attempts: PracticeAttempt[] = subject.lessonIds.flatMap(getAttemptsForLesson);
-  if (attempts.length < 6) return null;
+  if (attempts.length < 6) return { trend: null, deltaPercent: null };
   const now = Date.now();
   const withinDays = (a: PracticeAttempt, days: number) => now - new Date(a.attemptedAt).getTime() <= days * 86400000;
   const recent = attempts.filter(a => withinDays(a, 7));
   const prior = attempts.filter(a => !withinDays(a, 7) && withinDays(a, 14));
-  if (recent.length < 3 || prior.length < 3) return null;
+  if (recent.length < 3 || prior.length < 3) return { trend: null, deltaPercent: null };
   const accuracyOf = (list: PracticeAttempt[]) => Math.round((list.filter(a => a.correct).length / list.length) * 100);
   const diff = accuracyOf(recent) - accuracyOf(prior);
-  if (diff >= 8) return "improving";
-  if (diff <= -8) return "declining";
-  return "flat";
+  const trend: Trend = diff >= 8 ? "improving" : diff <= -8 ? "declining" : "flat";
+  return { trend, deltaPercent: diff };
+}
+
+export function getSubjectTrend(subject: RealSubject): Trend {
+  return getSubjectTrendDetail(subject).trend;
 }
 
 export function getSubjectWeakConcepts(subject: RealSubject): WeakConcept[] {
@@ -219,6 +226,33 @@ export function getQuadrant(confidence: ConfidenceLevel | null, accuracyPercent:
   return { label: "unrated", priorityWeight: 2, insight: "Middling confidence and performance—keep practicing." };
 }
 
+// ---- Mastery status (Progress page's "Your Medical Profile") ----
+// Turns a subject's real progress+accuracy into an intuitive label instead
+// of a bare percentage—Mastered/Strong/Developing/Needs Work track real
+// blended scores; Unfamiliar means genuinely no data yet (never a fabricated 0%).
+
+export type MasteryStatus = "Mastered" | "Strong" | "Developing" | "Needs Work" | "Unfamiliar";
+
+function subjectHasData(progressPercent: number, accuracy: SubjectAccuracy): boolean {
+  return progressPercent > 0 || accuracy.total > 0;
+}
+
+// Blends real lesson completion with real practice accuracy—same "learn %
+// blended with accuracy once there's any" idea as lib/mcatConcepts.ts's
+// getMcatReadiness, just scoped to one subject instead of the whole exam.
+export function getSubjectMasteryScore(progressPercent: number, accuracy: SubjectAccuracy): number {
+  return accuracy.percent !== null ? Math.round((progressPercent + accuracy.percent) / 2) : progressPercent;
+}
+
+export function getMasteryStatus(progressPercent: number, accuracy: SubjectAccuracy): MasteryStatus {
+  if (!subjectHasData(progressPercent, accuracy)) return "Unfamiliar";
+  const score = getSubjectMasteryScore(progressPercent, accuracy);
+  if (score >= 85) return "Mastered";
+  if (score >= 65) return "Strong";
+  if (score >= 40) return "Developing";
+  return "Needs Work";
+}
+
 // ---- Per-subject priority ----
 
 export type SubjectSignals = {
@@ -232,6 +266,8 @@ export type SubjectSignals = {
   confidence: ConfidenceLevel | null;
   quadrant: QuadrantResult;
   priorityScore: number;
+  masteryScore: number;
+  masteryStatus: MasteryStatus;
 };
 
 function isWithinDays(iso: string, days: number): boolean {
@@ -254,8 +290,10 @@ function computeSubjectSignals(subject: RealSubject, stage: ExamStage): SubjectS
   const stageBias = stage === "early" ? (100 - progressPercent) / 100 : weakConcepts.length > 0 ? 0.5 : 0;
   const recencyBoost = weakConcepts.some(w => isWithinDays(w.lastAttempt, 3)) ? 1.2 : 1;
   const priorityScore = quadrant.priorityWeight * (1 + stageBias) * recencyBoost;
+  const masteryScore = getSubjectMasteryScore(progressPercent, accuracy);
+  const masteryStatus = getMasteryStatus(progressPercent, accuracy);
 
-  return { subject, lessonsCompleted: completed, lessonsTotal: total, progressPercent, accuracy, trend, weakConcepts, confidence, quadrant, priorityScore };
+  return { subject, lessonsCompleted: completed, lessonsTotal: total, progressPercent, accuracy, trend, weakConcepts, confidence, quadrant, priorityScore, masteryScore, masteryStatus };
 }
 
 // Sorted highest-priority first—the input every other function in this
@@ -354,7 +392,7 @@ function nextIncompleteLessonId(subject: RealSubject): string | null {
   return subject.lessonIds.find(id => getLessonEntry(id)?.status !== "completed") ?? null;
 }
 
-function practiceHref(subject: RealSubject): string {
+export function practiceHref(subject: RealSubject): string {
   return `/dashboard/learning-paths/mcat/${subject.sectionId}/${subject.subjectId}/practice`;
 }
 

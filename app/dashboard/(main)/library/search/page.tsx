@@ -52,14 +52,14 @@ function LibrarySearchContent() {
   if (!loaded) return null;
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/library" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Library</Link>
     <span className="eyebrow"><Search size={13} />Search</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Search the Library.</h1>
 
     <form onSubmit={submit} className="relative mt-6 max-w-xl">
       <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-      <input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder="Search lessons, community, articles, resources…" className="w-full rounded-full border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm font-semibold text-ink outline-none focus:border-teal-400" />
+      <input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder="Search lessons, community, articles, resources…" className="w-full rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-3.5 pl-11 pr-4 text-sm font-semibold text-heading outline-none focus:border-teal-400" />
     </form>
 
     {!q
@@ -71,29 +71,29 @@ function LibrarySearchContent() {
           ? <p className="mt-6 text-sm text-slate-400">Nothing matched. Try a different word.</p>
           : <div className="mt-6 space-y-8">
             {matchedLessons.length > 0 && <ResultGroup icon={BookOpen} label="Lessons">
-              {matchedLessons.map(l => <Link key={l.content.id} href={`/dashboard/learning-paths/mcat/${l.content.sectionId}/${l.content.subjectId}/${l.content.id}`} className="block cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
-                <p className="text-sm font-extrabold text-ink">{l.content.title}</p>
+              {matchedLessons.map(l => <Link key={l.content.id} href={`/dashboard/learning-paths/mcat/${l.content.sectionId}/${l.content.subjectId}/${l.content.id}`} className="block cursor-pointer rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+                <p className="text-sm font-extrabold text-heading">{l.content.title}</p>
                 <p className="mt-0.5 text-xs text-slate-500">{l.sectionTitle} · {l.subjectName}</p>
               </Link>)}
             </ResultGroup>}
 
             {matchedCommunity.length > 0 && <ResultGroup icon={Globe} label="Community">
-              {matchedCommunity.map(l => <Link key={l.id} href={`/dashboard/library/community/${l.id}`} className="block cursor-pointer rounded-2xl border border-slate-200 bg-[#fdfefe] p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
-                <p className="text-sm font-extrabold text-ink">{l.title}</p>
+              {matchedCommunity.map(l => <Link key={l.id} href={`/dashboard/library/community/${l.id}`} className="block cursor-pointer rounded-2xl border border-slate-200 dark:border-white/10 bg-[#fdfefe] dark:bg-[#0d1917] p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+                <p className="text-sm font-extrabold text-heading">{l.title}</p>
                 <p className="mt-0.5 text-xs text-slate-500">by {l.creatorName} · {l.pathName} · {l.subject}</p>
               </Link>)}
             </ResultGroup>}
 
             {matchedArticles.length > 0 && <ResultGroup icon={FileText} label="Articles">
-              {matchedArticles.map(a => <Link key={a.id} href={`/dashboard/library/articles/${a.id}`} className="block cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
-                <p className="text-sm font-extrabold text-ink">{a.title}</p>
+              {matchedArticles.map(a => <Link key={a.id} href={`/dashboard/library/articles/${a.id}`} className="block cursor-pointer rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+                <p className="text-sm font-extrabold text-heading">{a.title}</p>
                 <p className="mt-0.5 text-xs text-slate-500">{a.topic} · {a.readingMinutes} min read</p>
               </Link>)}
             </ResultGroup>}
 
             {matchedResources.length > 0 && <ResultGroup icon={Link2} label="Resources">
-              {matchedResources.map(r => <a key={r.id} href={r.url} target="_blank" rel="noreferrer" className="block cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
-                <p className="text-sm font-extrabold text-ink">{r.title}</p>
+              {matchedResources.map(r => <a key={r.id} href={r.url} target="_blank" rel="noreferrer" className="block cursor-pointer rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+                <p className="text-sm font-extrabold text-heading">{r.title}</p>
                 <p className="mt-0.5 text-xs text-slate-500">{r.type} · {r.source}</p>
               </a>)}
             </ResultGroup>}

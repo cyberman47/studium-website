@@ -2,18 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+:root { --color-heading: 16 40 41; }
+/* "heading" is a separate token from "ink" on purpose: `ink` (tailwind.config.ts)
+   also gets used as a solid *background*—active pill/tab states, dark CTA
+   cards, the Apple sign-in button—which must stay dark regardless of theme,
+   so it stays a flat hex. `heading` is the text-only sibling, resolving
+   through this variable instead so its ~500 existing usages (headings, stat
+   values, option labels) go legible-on-dark automatically the moment .dark
+   lands on <html>, without hand-pairing each one with its own
+   dark:text-white. Pure white to match every dark:text-white already
+   hand-authored elsewhere this session. */
+.dark { --color-heading: 255 255 255; }
+
 @layer base {
   html { scroll-behavior: smooth; }
-  body { @apply bg-[#fcfdfd] text-ink antialiased font-sans; }
-  * { @apply border-slate-200; }
-  ::selection { @apply bg-teal-100 text-teal-700; }
-  :focus-visible { @apply outline-none ring-4 ring-teal-200 ring-offset-2 ring-offset-white; }
+  body { @apply bg-[#fcfdfd] text-heading antialiased font-sans dark:bg-[#070d0c] dark:text-slate-100; }
+  * { @apply border-slate-200 dark:border-white/10; }
+  ::selection { @apply bg-teal-100 text-teal-700 dark:bg-teal-500/30 dark:text-teal-100; }
+  :focus-visible { @apply outline-none ring-4 ring-teal-200 ring-offset-2 ring-offset-white dark:ring-teal-500/40 dark:ring-offset-[#070d0c]; }
 }
 
 @layer components {
   .container-page { @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8; }
   .dashboard-shell { @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8; }
-  .eyebrow { @apply inline-flex items-center gap-2 rounded-full border border-teal-100 bg-white/80 px-3 py-1.5 text-xs font-extrabold tracking-[.13em] text-teal-700 uppercase shadow-sm; }
+  .eyebrow { @apply inline-flex items-center gap-2 rounded-full border border-teal-100 bg-white/80 px-3 py-1.5 text-xs font-extrabold tracking-[.13em] text-teal-700 uppercase shadow-sm dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-teal-300 dark:shadow-none; }
   /* No hardcoded color here on purpose: the page body already defaults to
      text-ink everywhere, so light-background usages look identical either
      way—but a hardcoded color here would win over an ancestor's text-white
@@ -21,6 +33,10 @@
      element itself), silently rendering dark-on-dark invisible text. */
   .display { @apply font-display font-extrabold tracking-[-.03em]; }
   .dot-grid { background-image: radial-gradient(#bfd8d6 1px, transparent 1px); background-size: 18px 18px; }
+  /* Same dot texture, re-tinted for a dark ground—the light-mode dot color
+     read as a near-invisible smudge against the app's near-black dark
+     background instead of the intended faint grid. */
+  .dark .dot-grid { background-image: radial-gradient(rgba(15, 139, 141, .4) 1px, transparent 1px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -43,4 +59,5 @@
 .float-slow { animation: float 7s ease-in-out 1s infinite; }
 .pulse-ring { animation: pulse-ring 2.5s ease-out infinite; }
 .skeleton { background-image: linear-gradient(90deg, #eef2f4 25%, #e1e8eb 37%, #eef2f4 63%); background-size: 400px 100%; animation: shimmer 1.4s ease-in-out infinite; }
+.dark .skeleton { background-image: linear-gradient(90deg, #10201d 25%, #17332d 37%, #10201d 63%); }
 .flashcard-enter { animation: flashcard-enter 200ms ease-out both; }

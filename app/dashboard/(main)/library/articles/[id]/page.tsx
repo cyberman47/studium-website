@@ -25,7 +25,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
   </section>;
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/library/articles" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Articles</Link>
 
     <div className="mx-auto max-w-2xl">
@@ -35,7 +35,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
         <span>{article.source}</span><span>·</span><span className="flex items-center gap-1"><Clock3 size={12} />{article.readingMinutes} min read</span><span>·</span><span>{new Date(article.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
       </div>
 
-      <button type="button" onClick={() => toggleLibrarySave("article", article.id)} className={`mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition ${saved ? "border-2 border-teal-500 bg-teal-50 text-teal-700" : "bg-accent-500 text-white shadow-[0_12px_25px_-12px_#047857] hover:-translate-y-0.5 hover:bg-accent-600"}`}>
+      <button type="button" onClick={() => toggleLibrarySave("article", article.id)} className={`mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition ${saved ? "border-2 border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "bg-accent-500 text-white shadow-[0_12px_25px_-12px_#047857] hover:-translate-y-0.5 hover:bg-accent-600"}`}>
         {saved ? <><Check size={16} />Saved to My Library</> : <><Bookmark size={15} />Save to My Library</>}
       </button>
 

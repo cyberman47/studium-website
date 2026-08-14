@@ -8,12 +8,12 @@ export default function PrivacyPage() {
 
     <LegalSection heading="2. Information We Collect">
       <ul className={legalList}>
-        <li><span className="font-bold text-ink">Account information:</span> your name, email address, username, password (stored securely, never in plain text), and profile photo if you choose to add one.</li>
-        <li><span className="font-bold text-ink">Study data:</span> your onboarding answers, study preferences, streaks, flashcard and quiz activity, and other progress data you generate while using the Service.</li>
-        <li><span className="font-bold text-ink">Payment information:</span> if you subscribe to a paid plan, our payment processor collects your payment details directly; we do not store full card numbers on our servers.</li>
-        <li><span className="font-bold text-ink">Communications:</span> messages you send us, such as support requests.</li>
-        <li><span className="font-bold text-ink">Usage data:</span> information about how you interact with the Service, such as pages viewed, features used, and device or browser information, collected automatically.</li>
-        <li><span className="font-bold text-ink">Cookies and local storage:</span> see our <a href="/cookie-settings" className="cursor-pointer font-bold text-teal-600 hover:text-teal-700">Cookie Policy</a> for details.</li>
+        <li><span className="font-bold text-heading">Account information:</span> your name, email address, username, password (stored securely, never in plain text), and profile photo if you choose to add one.</li>
+        <li><span className="font-bold text-heading">Study data:</span> your onboarding answers, study preferences, streaks, flashcard and quiz activity, and other progress data you generate while using the Service.</li>
+        <li><span className="font-bold text-heading">Payment information:</span> if you subscribe to a paid plan, our payment processor collects your payment details directly; we do not store full card numbers on our servers.</li>
+        <li><span className="font-bold text-heading">Communications:</span> messages you send us, such as support requests.</li>
+        <li><span className="font-bold text-heading">Usage data:</span> information about how you interact with the Service, such as pages viewed, features used, and device or browser information, collected automatically.</li>
+        <li><span className="font-bold text-heading">Cookies and local storage:</span> see our <a href="/cookie-settings" className="cursor-pointer font-bold text-teal-600 hover:text-teal-700">Cookie Policy</a> for details.</li>
       </ul>
     </LegalSection>
 
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
 
     <LegalSection heading="12. Contact Us">
       <p>Questions about this Policy or your data? Contact us at <a href="mailto:hello@studium.app" className="cursor-pointer font-bold text-teal-600 hover:text-teal-700">hello@studium.app</a> or write to us at:</p>
-      <p className="font-bold text-ink">Studium, Inc.<br />[Company Address]<br />New York, NY [ZIP Code]</p>
+      <p className="font-bold text-heading">Studium, Inc.<br />[Company Address]<br />New York, NY [ZIP Code]</p>
     </LegalSection>
   </LegalDocument>;
 }

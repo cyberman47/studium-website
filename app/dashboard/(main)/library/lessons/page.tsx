@@ -49,22 +49,22 @@ export default function AllLessonsPage() {
   }, [lessons, subject, difficulty, duration, sort]);
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/library" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Library</Link>
     <span className="eyebrow"><BookOpen size={13} />All Lessons</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Every official lesson.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Real, hand-written Studium lessons—filter by subject, difficulty, or how long you have.</p>
 
     <div className="mt-8 flex flex-wrap items-center gap-2">
-      <button type="button" onClick={() => setSubject(null)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${!subject ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>All subjects</button>
-      {subjects.map(s => <button key={s} type="button" onClick={() => setSubject(subject === s ? null : s)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${subject === s ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{s}</button>)}
+      <button type="button" onClick={() => setSubject(null)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${!subject ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>All subjects</button>
+      {subjects.map(s => <button key={s} type="button" onClick={() => setSubject(subject === s ? null : s)} className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition ${subject === s ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{s}</button>)}
     </div>
 
     <div className="mt-3 flex flex-wrap items-center gap-2">
-      {(["Beginner", "Intermediate", "Advanced"] as Difficulty[]).map(d => <button key={d} type="button" onClick={() => setDifficulty(difficulty === d ? null : d)} className={`cursor-pointer rounded-full border px-3 py-1 text-[11px] font-bold transition ${difficulty === d ? "border-teal-400 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{d}</button>)}
+      {(["Beginner", "Intermediate", "Advanced"] as Difficulty[]).map(d => <button key={d} type="button" onClick={() => setDifficulty(difficulty === d ? null : d)} className={`cursor-pointer rounded-full border px-3 py-1 text-[11px] font-bold transition ${difficulty === d ? "border-teal-400 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{d}</button>)}
       <span className="mx-1 h-4 w-px bg-slate-200" />
-      {(Object.entries(durationBuckets) as [DurationBucket, typeof durationBuckets[DurationBucket]][]).map(([key, b]) => <button key={key} type="button" onClick={() => setDuration(duration === key ? null : key)} className={`cursor-pointer rounded-full border px-3 py-1 text-[11px] font-bold transition ${duration === key ? "border-teal-400 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-500 hover:border-teal-200"}`}>{b.label}</button>)}
-      <select value={sort} onChange={e => setSort(e.target.value as SortOption)} className="ml-auto cursor-pointer rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-extrabold text-ink outline-none focus:border-teal-400">
+      {(Object.entries(durationBuckets) as [DurationBucket, typeof durationBuckets[DurationBucket]][]).map(([key, b]) => <button key={key} type="button" onClick={() => setDuration(duration === key ? null : key)} className={`cursor-pointer rounded-full border px-3 py-1 text-[11px] font-bold transition ${duration === key ? "border-teal-400 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-700" : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-teal-200"}`}>{b.label}</button>)}
+      <select value={sort} onChange={e => setSort(e.target.value as SortOption)} className="ml-auto cursor-pointer rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-3.5 py-1.5 text-xs font-extrabold text-heading outline-none focus:border-teal-400">
         <option value="title">Sort: A–Z</option>
         <option value="duration">Sort: Shortest first</option>
         <option value="difficulty">Sort: Easiest first</option>
@@ -85,13 +85,13 @@ export default function AllLessonsPage() {
 function LessonCard({ lesson, saved, onToggleSave }: { lesson: BrowsableLesson; saved: boolean; onToggleSave: () => void }) {
   const { content, sectionTitle, subjectName } = lesson;
   const entry = getLessonEntry(content.id);
-  return <div className="flex flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+  return <div className="flex flex-col rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
     <div className="flex items-start justify-between gap-2">
       <div className="min-w-0">
         <p className="text-[11px] font-extrabold uppercase tracking-wide text-teal-600">{sectionTitle} · {subjectName}</p>
-        <h3 className="mt-1 text-base font-extrabold tracking-tight text-ink">{content.title}</h3>
+        <h3 className="mt-1 text-base font-extrabold tracking-tight text-heading">{content.title}</h3>
       </div>
-      <button type="button" onClick={onToggleSave} title={saved ? "Remove from Library" : "Save to Library"} aria-pressed={saved} className={`grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full border transition ${saved ? "border-teal-500 bg-teal-50 text-teal-600" : "border-slate-200 text-slate-400 hover:border-teal-200 hover:text-teal-600"}`}>
+      <button type="button" onClick={onToggleSave} title={saved ? "Remove from Library" : "Save to Library"} aria-pressed={saved} className={`grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full border transition ${saved ? "border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-600" : "border-slate-200 dark:border-white/10 text-slate-400 hover:border-teal-200 hover:text-teal-600"}`}>
         <Bookmark size={14} fill={saved ? "currentColor" : "none"} />
       </button>
     </div>
@@ -100,7 +100,7 @@ function LessonCard({ lesson, saved, onToggleSave }: { lesson: BrowsableLesson; 
       <span className="flex items-center gap-1"><Clock3 size={12} />{content.estimatedMinutes} min</span>
       <span>·</span>
       <span>{content.difficulty}</span>
-      {entry?.status === "completed" && <span className="ml-auto flex items-center gap-1 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-extrabold text-teal-700"><Check size={11} />Completed</span>}
+      {entry?.status === "completed" && <span className="ml-auto flex items-center gap-1 rounded-full bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 px-2 py-0.5 text-[10px] font-extrabold text-teal-700"><Check size={11} />Completed</span>}
     </div>
     <Link href={`/dashboard/learning-paths/mcat/${content.sectionId}/${content.subjectId}/${content.id}`} className="mt-4 inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-accent-500 px-4 py-2.5 text-xs font-bold text-white shadow-[0_10px_20px_-10px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">
       <Sparkles size={13} />{entry?.status === "completed" ? "Review Lesson" : "Start Lesson"}

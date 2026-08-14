@@ -5,20 +5,26 @@
 //   - Personal highlight-cards (lib/personalFlashcards.ts) → id (already unique, "pf-...")
 //
 // Progress/spaced-repetition is *composed*, not reimplemented: term cards
-// keep using the real Leitner engine in lib/terminology.ts untouched; lesson
-// and personal cards share one new instance of the same box math
-// (lib/spacedRepetitionCore.ts) keyed by their unified id. Both produce the
-// same ReviewEntry shape, so the rest of the app can treat "progress" the
-// same way regardless of where a card came from.
+// keep using their own real Leitner engine in lib/terminology.ts untouched
+// (a separate, long-established feature with its own review page, daily
+// goals, and settings); lesson and personal cards share one instance of the
+// Simple Smart Flashcard Review System (lib/spacedRepetitionCore.ts) keyed
+// by their unified id. getCardProgress composes both into one shared
+// ReviewEntry shape (read-only) so the rest of the app—status badges,
+// filters, sorting—can treat "progress" as one concept regardless of
+// source. That composed shape is for *display* only, though: a true undo
+// needs each source's own real, unconverted data back, which is what
+// getCardSnapshot/restoreLibraryCard below use instead.
 
 import { mcatSections } from "./mcatPath";
 import { getLessonContent } from "./mcatPath";
 import {
   getAllTerms, getTerm, getTermProgress, reviewTerm, restoreTermProgress,
-  isTermMastered as isTermMasteredReal, isCustomTerm, findTermCategory, Rating as TermRating
+  isTermMastered as isTermMasteredReal, isCustomTerm, findTermCategory, Rating as TermRating, TermProgressEntry
 } from "./terminology";
 import { getPersonalFlashcards } from "./personalFlashcards";
-import { createProgressStore, Rating, ReviewEntry, CardDisplayStatus, getEntryStatus } from "./spacedRepetitionCore";
+import { createProgressStore, Rating, ReviewEntry, CardDisplayStatus, getEntryStatus, kpForReviewOutcome } from "./spacedRepetitionCore";
+import { awardFlashcardReviewKP, getTotalKP } from "./progress";
 
 export type CardSource = "terminology" | "lesson" | "personal";
 
@@ -127,16 +133,38 @@ export function getLibraryCardsByIds(ids: string[]): LibraryCard[] {
 
 // ---- Progress, composed across sources ----
 
+// term box (1-5) → an approximate correctStreak/status for cross-source
+// display parity only (sorting "least/most mastered," status badges).
+// Term cards' *real* scheduling stays entirely inside lib/terminology.ts;
+// this never feeds back into it.
+function approximateEntryFromTermProgress(p: TermProgressEntry): ReviewEntry {
+  const TERM_MAX_BOX = 5;
+  return {
+    reviewCount: p.timesReviewed,
+    correctStreak: Math.max(0, p.box - 1),
+    status: p.box >= TERM_MAX_BOX ? "mastered" : "learning",
+    lastReviewedAt: p.lastRatedAt ?? p.learnedAt,
+    // Term's nextReview is a date-only yyyy-mm-dd string—treated as due
+    // starting midnight local-ish (UTC) that day, consistent with how
+    // spacedRepetitionCore.ts's own nextReviewAt comparisons work.
+    nextReviewAt: new Date(`${p.nextReview}T00:00:00.000Z`).toISOString()
+  };
+}
+
 export function getCardProgress(id: string): ReviewEntry | null {
   if (id.startsWith("term:")) {
     const p = getTermProgress(id.slice("term:".length));
-    if (!p) return null;
-    // TermProgressEntry and ReviewEntry are the same real Leitner shape, just
-    // named slightly differently at this one field (lastRatedAt vs
-    // lastReviewedAt)—terminology.ts stays untouched (see file-top comment),
-    // this composes it into the shared shape at the boundary instead.
-    return { box: p.box, nextReview: p.nextReview, timesReviewed: p.timesReviewed, lastRating: p.lastRating, learnedAt: p.learnedAt, lastReviewedAt: p.lastRatedAt ?? p.learnedAt };
+    return p ? approximateEntryFromTermProgress(p) : null;
   }
+  return cardProgress.getProgress(id);
+}
+
+// The real, source-native snapshot for undo—deliberately NOT the composed
+// display shape above, which term cards can't be losslessly restored from.
+export type CardSnapshot = ReviewEntry | TermProgressEntry | null;
+
+export function getCardSnapshot(id: string): CardSnapshot {
+  if (id.startsWith("term:")) return getTermProgress(id.slice("term:".length));
   return cardProgress.getProgress(id);
 }
 
@@ -156,6 +184,14 @@ export function isCardStarted(id: string): boolean {
 export function isCardMastered(id: string): boolean {
   if (id.startsWith("term:")) return isTermMasteredReal(id.slice("term:".length));
   return cardProgress.isMastered(id);
+}
+
+// Real lifetime count of mastered cards across the whole library (terms,
+// lesson cards, and personal cards together)—not per-deck. Nothing like
+// this existed before; the Passport's "Master N Flashcards" achievements
+// need exactly this aggregate.
+export function getMasteredFlashcardsCount(): number {
+  return getAllLibraryCards().filter(c => isCardMastered(c.id)).length;
 }
 
 // One real status—New/Learning/Mastered/Due—for any card regardless of
@@ -179,12 +215,55 @@ export function reviewLibraryCard(id: string, rating: Rating): void {
   cardProgress.review(id, rating);
 }
 
-export function restoreLibraryCard(id: string, snapshot: ReviewEntry | null): void {
+export function restoreLibraryCard(id: string, snapshot: CardSnapshot): void {
   if (id.startsWith("term:")) {
-    restoreTermProgress(id.slice("term:".length), snapshot);
+    restoreTermProgress(id.slice("term:".length), snapshot as TermProgressEntry | null);
     return;
   }
-  cardProgress.restore(id, snapshot);
+  cardProgress.restore(id, snapshot as ReviewEntry | null);
+}
+
+// The binary correct/incorrect interface the Smart Review session
+// (components/smart-review-session.tsx, the Flashcards feature's own study
+// flow) calls—a thin translation over the same reviewLibraryCard path
+// every other flashcard surface already uses, so lesson/personal/term cards
+// all still funnel through the one real engine per keyspace rather than a
+// second, competing one. "again" == incorrect, anything else == correct is
+// spacedRepetitionCore.ts's own rule (see its file-top comment); "good" is
+// just an arbitrary pick among the "correct" values for the term-card path.
+// Also awards real KP through the existing lib/progress.ts ledger (spec's
+// reward table, via kpForReviewOutcome)—one call does the full "answer this
+// card" transaction so callers never have to remember the KP step.
+export type ReviewOutcome = { entry: ReviewEntry; kpAwarded: number; leveledUp: boolean; totalKP: number };
+
+export function reviewCardOutcome(id: string, correct: boolean): ReviewOutcome {
+  const priorStatus = getCardProgress(id)?.status ?? null;
+  reviewLibraryCard(id, correct ? "good" : "again");
+  const entry = getCardProgress(id)!;
+  const kp = kpForReviewOutcome(priorStatus, entry);
+  if (kp <= 0) return { entry, kpAwarded: 0, leveledUp: false, totalKP: getTotalKP() };
+  const result = awardFlashcardReviewKP(kp);
+  return { entry, kpAwarded: kp, leveledUp: result.leveledUp, totalKP: result.totalKP };
+}
+
+// ---- Today's Review (Simple Smart Flashcard Review System) ----
+// Real counts over whatever card set the caller hands in (the whole
+// library, or one deck's cards)—"due" splits into the same two buckets the
+// feature's own status colors already use: still-building-the-streak
+// ("learning," 🔴) vs. previously-mastered-and-now-due-again ("due," 🟢,
+// shown to the student as "ready for review"). New cards are deliberately
+// not part of "due"—they're their own separate count, per spec.
+export type DueTodaySummary = { due: number; learning: number; readyForReview: number; newCount: number };
+
+export function getDueTodaySummary(cards: LibraryCard[]): DueTodaySummary {
+  let learning = 0, readyForReview = 0, newCount = 0;
+  for (const c of cards) {
+    const status = getCardDisplayStatus(c.id);
+    if (status === "learning") learning++;
+    else if (status === "due") readyForReview++;
+    else if (status === "new") newCount++;
+  }
+  return { due: learning + readyForReview, learning, readyForReview, newCount };
 }
 
 // ---- Search / filter ----
@@ -271,9 +350,9 @@ export function sortLibraryCards(cards: LibraryCard[], sort: SortOption): Librar
         return (bt ? new Date(bt).getTime() : -Infinity) - (at ? new Date(at).getTime() : -Infinity);
       });
     case "leastMastered":
-      return sorted.sort((a, b) => (getCardProgress(a.id)?.box ?? 0) - (getCardProgress(b.id)?.box ?? 0));
+      return sorted.sort((a, b) => (getCardProgress(a.id)?.correctStreak ?? 0) - (getCardProgress(b.id)?.correctStreak ?? 0));
     case "mostMastered":
-      return sorted.sort((a, b) => (getCardProgress(b.id)?.box ?? 0) - (getCardProgress(a.id)?.box ?? 0));
+      return sorted.sort((a, b) => (getCardProgress(b.id)?.correctStreak ?? 0) - (getCardProgress(a.id)?.correctStreak ?? 0));
     case "alphabetical":
       return sorted.sort((a, b) => a.front.localeCompare(b.front));
     case "subject":

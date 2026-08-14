@@ -49,7 +49,7 @@ export default function CommunityLessonDetailPage({ params }: { params: { id: st
   const percent = getCommunityLessonPercent(lesson.id, lesson.concepts.length);
 
   return <section className="relative py-10 sm:py-14">
-    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)]" />
+    <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <Link href="/dashboard/library/community" className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to Community</Link>
 
     <div className="mx-auto max-w-2xl">
@@ -57,7 +57,7 @@ export default function CommunityLessonDetailPage({ params }: { params: { id: st
       <h1 className="display mt-5 text-3xl leading-tight sm:text-4xl">{lesson.title}</h1>
 
       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm font-bold text-slate-500">
-        <span className="flex items-center gap-1.5"><span className="grid h-6 w-6 place-items-center rounded-full bg-slate-100 text-slate-500"><User size={12} /></span>Created by {lesson.creatorName}</span>
+        <span className="flex items-center gap-1.5"><span className="grid h-6 w-6 place-items-center rounded-full bg-slate-100 dark:bg-white/10 text-slate-500"><User size={12} /></span>Created by {lesson.creatorName}</span>
         <span className="flex items-center gap-1.5"><Clock3 size={14} />{lesson.estimatedMinutes} minutes</span>
         <span>{lesson.concepts.length} concepts</span>
         <span>{lesson.difficulty}</span>
@@ -67,29 +67,29 @@ export default function CommunityLessonDetailPage({ params }: { params: { id: st
 
       <div className="mt-7 flex flex-wrap items-center gap-3">
         {saved
-          ? <button type="button" onClick={() => removeCommunityLessonFromLibrary(lesson.id)} className="inline-flex cursor-pointer items-center gap-2 rounded-full border-2 border-teal-500 bg-teal-50 px-6 py-3 text-sm font-bold text-teal-700"><Check size={16} />In My Library</button>
+          ? <button type="button" onClick={() => removeCommunityLessonFromLibrary(lesson.id)} className="inline-flex cursor-pointer items-center gap-2 rounded-full border-2 border-teal-500 bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 px-6 py-3 text-sm font-bold text-teal-700"><Check size={16} />In My Library</button>
           : <button type="button" onClick={() => addCommunityLessonToLibrary(lesson.id)} className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">+ Add to My Library</button>}
         {isMine && <button
           type="button"
           onClick={() => { if (confirm(`Delete "${lesson.title}"? This removes it for everyone who has it saved.`)) { deleteCommunityLesson(lesson.id); router.push("/dashboard/library/community"); } }}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-rose-200 px-5 py-3 text-sm font-bold text-rose-600 transition hover:bg-rose-50"
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-rose-200 px-5 py-3 text-sm font-bold text-rose-600 transition hover:bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300"
         ><Trash2 size={15} />Delete</button>}
       </div>
 
-      <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-7">
+      <div className="mt-10 rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold tracking-tight text-ink">Contents</h2>
+          <h2 className="text-base font-extrabold tracking-tight text-heading">Contents</h2>
           {saved && <p className="text-xs font-bold text-slate-400">{checked.size} / {lesson.concepts.length} · {percent}%</p>}
         </div>
-        {saved && <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500 transition-all" style={{ width: `${percent}%` }} /></div>}
+        {saved && <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><div className="h-full rounded-full bg-teal-500 transition-all" style={{ width: `${percent}%` }} /></div>}
 
         <div className="mt-4 space-y-1.5">
           {lesson.concepts.map((concept, i) => {
             const isChecked = checked.has(i);
-            if (!saved) return <div key={i} className="flex items-center gap-3 rounded-2xl px-3 py-2.5"><span className="w-5 shrink-0 text-xs font-extrabold text-slate-400">{i + 1}.</span><p className="text-sm font-semibold text-ink">{concept}</p></div>;
-            return <button key={i} type="button" onClick={() => toggleCommunityConcept(lesson.id, i)} className={`flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition ${isChecked ? "bg-teal-50" : "hover:bg-slate-50"}`}>
+            if (!saved) return <div key={i} className="flex items-center gap-3 rounded-2xl px-3 py-2.5"><span className="w-5 shrink-0 text-xs font-extrabold text-slate-400">{i + 1}.</span><p className="text-sm font-semibold text-heading">{concept}</p></div>;
+            return <button key={i} type="button" onClick={() => toggleCommunityConcept(lesson.id, i)} className={`flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition ${isChecked ? "bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300" : "hover:bg-slate-50 dark:bg-white/5"}`}>
               {isChecked ? <CheckSquare size={17} className="shrink-0 text-teal-600" /> : <Square size={17} className="shrink-0 text-slate-300" />}
-              <p className={`text-sm font-semibold ${isChecked ? "text-teal-800 line-through decoration-teal-300" : "text-ink"}`}>{concept}</p>
+              <p className={`text-sm font-semibold ${isChecked ? "text-teal-800 dark:text-teal-300 line-through decoration-teal-300" : "text-heading"}`}>{concept}</p>
             </button>;
           })}
         </div>
