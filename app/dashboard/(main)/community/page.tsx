@@ -4,7 +4,7 @@
 // public.community_posts, once supabase/migrations/0003_social.sql and
 // 0004_community.sql are applied. No fake posts, ever: signed-out, empty,
 // and not-yet-set-up states are all shown honestly instead.
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Bookmark, HelpCircle, MessageCircle, Sparkles, ThumbsUp } from "lucide-react";
@@ -15,7 +15,12 @@ import { formatRelativeTime } from "@/lib/notifications";
 
 const allCategories = Object.keys(categoryLabels) as CommunityCategory[];
 
+// useSearchParams() bails out of static rendering and needs a Suspense
+// boundary around it, or the production build fails.
 export default function CommunityFeedPage() {
+  return <Suspense fallback={null}><CommunityFeedContent /></Suspense>;
+}
+function CommunityFeedContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category") as CommunityCategory | null;
   const [category, setCategory] = useState<CommunityCategory | "all">(categoryParam && allCategories.includes(categoryParam) ? categoryParam : "all");

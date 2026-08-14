@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Bookmark, Check, Clock3, GraduationCap, Info, ListFilter, Shuffle, Sparkles, TriangleAlert, X, Zap
@@ -42,7 +42,12 @@ type Session = { questions: PracticeQuizItem[]; title: string; contextLabel?: st
 // budget confirmed yet—held here just long enough to show the setup screen.
 type PendingSession = { questions: PracticeQuizItem[]; title: string; contextLabel?: string } | null;
 
+// useSearchParams() bails out of static rendering and needs a Suspense
+// boundary around it, or the production build fails.
 export default function McatPracticePage() {
+  return <Suspense fallback={null}><McatPracticeContent /></Suspense>;
+}
+function McatPracticeContent() {
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
 

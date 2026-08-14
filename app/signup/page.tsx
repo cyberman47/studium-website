@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { ArrowLeft, MailCheck, Sparkles, UserPlus } from "lucide-react";
 import { LanguageBar, Logo } from "@/components/navigation";
 import { Field, inputClass, OAuthButtons } from "@/components/ui";
@@ -10,7 +10,12 @@ import { saveUser } from "@/lib/onboarding";
 import { createClient } from "@/lib/supabase/client";
 import { capturePendingReferralCode, clearPendingReferralCode, getPendingReferralCode } from "@/lib/referrals";
 
+// useSearchParams() bails out of static rendering and needs a Suspense
+// boundary around it, or the production build fails.
 export default function SignupPage() {
+  return <Suspense fallback={null}><SignupForm /></Suspense>;
+}
+function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [name, setName] = useState("");
