@@ -11,9 +11,13 @@ const THEME_KEY = "studium_theme";
 export const THEME_EVENT = "studium:themeChange";
 
 export function getThemeMode(): ThemeMode {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") return "light";
   const raw = localStorage.getItem(THEME_KEY);
-  return raw === "light" || raw === "dark" || raw === "system" ? raw : "system";
+  // Falls back to "light", not "system"—a visitor who has never touched
+  // the theme toggle always sees light mode, matching the anti-flash
+  // script in app/layout.tsx. "System" is still a real, selectable option;
+  // it just isn't the unstated default anymore.
+  return raw === "light" || raw === "dark" || raw === "system" ? raw : "light";
 }
 
 export function getSystemPrefersDark(): boolean {

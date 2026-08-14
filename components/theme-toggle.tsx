@@ -47,3 +47,53 @@ export function ThemeToggle() {
     })}
   </div>;
 }
+
+// Compact icon-button variant for tight spaces like the marketing nav bar—
+// same real Light/Dark/System control as above, just a single button that
+// opens a small dropdown instead of a 3-way segmented strip. Shows the
+// icon for the *currently selected mode* (not the resolved light/dark),
+// so picking "System" keeps showing the monitor icon even as the actual
+// palette follows the OS.
+export function ThemeToggleButton({ className = "" }: { className?: string }) {
+  const [mode, setMode] = useState<ThemeMode>("light");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setMode(getThemeMode());
+    return watchSystemTheme();
+  }, []);
+
+  function handleSelect(next: ThemeMode) {
+    setMode(next);
+    setThemeMode(next);
+    setOpen(false);
+  }
+
+  const current = options.find(o => o.mode === mode) ?? options[0];
+
+  return <div className={`relative ${className}`}>
+    <button
+      type="button"
+      onClick={() => setOpen(o => !o)}
+      aria-label={`Theme: ${current.label}. Change theme`}
+      aria-pressed={open}
+      title="Theme"
+      className="grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] text-slate-600 dark:text-slate-300 transition hover:border-teal-200 dark:hover:border-teal-500/30 hover:text-teal-600 dark:hover:text-teal-300"
+    >
+      <current.icon size={17} />
+    </button>
+    {open && <>
+      <button type="button" aria-hidden="true" tabIndex={-1} className="fixed inset-0 z-10 cursor-default" onClick={() => setOpen(false)} />
+      <div className="absolute right-0 top-full z-20 mt-2 w-36 overflow-hidden rounded-xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] py-1.5 shadow-lift">
+        {options.map(opt => <button
+          key={opt.mode}
+          type="button"
+          onClick={() => handleSelect(opt.mode)}
+          className={`flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-xs font-bold transition hover:bg-slate-50 dark:hover:bg-white/5 ${opt.mode === mode ? "text-teal-600 dark:text-teal-300" : "text-slate-600 dark:text-slate-300"}`}
+        >
+          <opt.icon size={14} />{opt.label}
+        </button>)}
+      </div>
+    </>}
+  </div>;
+}
