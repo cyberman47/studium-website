@@ -42,8 +42,29 @@ function applyResolvedTheme(resolved: "light" | "dark") {
 export function setThemeMode(mode: ThemeMode) {
   if (typeof window === "undefined") return;
   localStorage.setItem(THEME_KEY, mode);
-  applyResolvedTheme(resolveTheme(mode));
-  window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: mode }));
+  // The expensive part is deferred out of this call stack on purpose.
+  // Toggling the "dark" class on <html> forces the browser to recompute
+  // matched styles for every element on the page carrying a dark: variant—
+  // on a content-heavy screen (the dashboard especially) that's a real,
+  // sizeable chunk of synchronous work. Whoever called this (a theme
+  // dropdown, most likely) also just fired a React state update to close
+  // itself in the same click handler; if the expensive recalculation ran
+  // in that same synchronous tick, the browser can't paint *anything*—not
+  // even the dropdown closing—until it's done, which is what actually
+  // produces a "the whole page froze for a moment" feeling on a slower
+  // phone CPU, not the click handler itself being slow.
+  //
+  // setTimeout(fn, 0), not requestAnimationFrame: rAF callbacks are paused
+  // by the browser whenever the tab isn't the visible/foreground one, so a
+  // user who taps the toggle and immediately switches apps (extremely
+  // common on mobile) would come back to find the theme silently never
+  // applied until they reopen the tab. A macrotask still yields to paint
+  // first, without that visibility-linked stall risk—confirmed live: the
+  // rAF version never fired at all in a backgrounded-tab test.
+  setTimeout(() => {
+    applyResolvedTheme(resolveTheme(mode));
+    window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: mode }));
+  }, 0);
 }
 
 // Keeps the applied theme correct if the OS preference changes while

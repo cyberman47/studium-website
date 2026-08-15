@@ -6,6 +6,7 @@ import { Logo } from "@/components/navigation";
 import { LearningPathSwitcher, MobileNav, NotificationsBell, StudyStreak, UserMenu } from "@/components/dashboard-shell";
 import { CommandSearch } from "@/components/command-search";
 import { KnowledgeToastHost } from "@/components/knowledge-toast";
+import { EmailVerifyPrompt } from "@/components/email-verify-prompt";
 import { getUser } from "@/lib/onboarding";
 import { createClient } from "@/lib/supabase/client";
 
@@ -53,5 +54,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </header>
     {children}
     <KnowledgeToastHost />
+    <EmailVerifyPrompt />
   </div>;
 }
