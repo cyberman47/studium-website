@@ -61,7 +61,7 @@ export function TikTokIcon({ size = 18, className = "" }: { size?: number; class
 // own real "Unsupported provider" error instead of silently pretending to
 // work; the moment Google/Apple are turned on in the Supabase dashboard,
 // these buttons work with zero code changes.
-export function OAuthButtons({ actionLabel }: { actionLabel: string }) {
+export function OAuthButtons({ actionLabel, next }: { actionLabel: string; next?: string | null }) {
   const [error, setError] = useState("");
   const [loadingProvider, setLoadingProvider] = useState<"google" | "apple" | null>(null);
 
@@ -69,9 +69,13 @@ export function OAuthButtons({ actionLabel }: { actionLabel: string }) {
     setError("");
     setLoadingProvider(provider);
     const supabase = createClient();
+    // Carries the same middleware-set `next` destination through the OAuth
+    // round trip—app/auth/callback/route.ts already reads it once Google/
+    // Apple hand the browser back.
+    const callbackUrl = `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
+      options: { redirectTo: callbackUrl }
     });
     // On success Supabase immediately navigates the tab away to the
     // provider—there's no "success" state to handle here, only failure.

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/navigation";
-import { LearningPathSwitcher, NotificationsBell, StudyStreak, UserMenu } from "@/components/dashboard-shell";
+import { LearningPathSwitcher, MobileNav, NotificationsBell, StudyStreak, UserMenu } from "@/components/dashboard-shell";
 import { CommandSearch } from "@/components/command-search";
 import { KnowledgeToastHost } from "@/components/knowledge-toast";
 import { getUser } from "@/lib/onboarding";
@@ -49,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // nothing needs to be mounted at this shared layout level at all.
   return <div className="min-h-screen bg-[#fcfdfd] dark:bg-[#070d0c]">
     <header className="border-b border-slate-200 bg-slate-50 py-4 dark:border-transparent dark:bg-transparent">
-      <div className="dashboard-shell flex items-center justify-between gap-4"><Logo href="/dashboard" /><div className="flex flex-1 justify-center"><CommandSearch /></div><div className="flex items-center gap-3"><LearningPathSwitcher /><StudyStreak /><NotificationsBell /><UserMenu name={name} avatar={avatar} onLogOut={logOut} /></div></div>
+      <div className="dashboard-shell flex items-center justify-between gap-2 sm:gap-4"><div className="flex items-center gap-1 sm:gap-3"><MobileNav /><Logo href="/dashboard" /></div><div className="flex flex-1 justify-center"><CommandSearch /></div><div className="flex items-center gap-2 sm:gap-3"><div className="hidden sm:block"><LearningPathSwitcher /></div><StudyStreak /><NotificationsBell /><UserMenu name={name} avatar={avatar} onLogOut={logOut} /></div></div>
     </header>
     {children}
     <KnowledgeToastHost />

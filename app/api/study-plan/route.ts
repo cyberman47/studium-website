@@ -14,12 +14,16 @@
 
 import Anthropic, { APIError } from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
+import { checkAiRateLimit, rateLimitResponse } from "@/lib/aiRateLimit";
 
 export const runtime = "nodejs";
 
 const MODEL = "claude-sonnet-5";
 const MAX_TOKENS = 600;
 const MAX_SUBJECTS = 12;
+// A full plan regenerate is called far less often than a chat message, so
+// a tighter window than /api/tutor is appropriate here.
+const RATE_LIMIT = { windowMinutes: 15, maxRequests: 10 };
 
 type Stage = "early" | "middle" | "final";
 type Quadrant = "strength" | "lacksConfidence" | "overconfident" | "weakness" | "unrated";
@@ -178,6 +182,9 @@ function validateResponse(raw: unknown, req: PlanRequest): PlanResponse | null {
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimit = await checkAiRateLimit(req, RATE_LIMIT);
+  if (!rateLimit.allowed) return rateLimitResponse(rateLimit);
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return jsonError("The Study Planner AI isn't configured yet—no Anthropic API key is set on the server.", 500);

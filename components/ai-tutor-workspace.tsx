@@ -105,7 +105,7 @@ export function AiTutorWorkspace({ context, externalPrompt, onExternalPromptHand
           <button
             type="button" onClick={() => setModeMenuOpen(o => !o)}
             className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] px-2.5 py-1.5 text-xs font-bold text-heading transition hover:border-teal-200"
-          ><ModeIcon size={13} className="text-teal-600" />{modeLabels[mode]}<ChevronDown size={12} className="text-slate-400" /></button>
+          ><ModeIcon size={13} className="text-teal-600" /><span className="hidden md:inline">{modeLabels[mode]}</span><ChevronDown size={12} className="text-slate-400" /></button>
           {modeMenuOpen && <>
             <button type="button" aria-label="Close mode menu" onClick={() => setModeMenuOpen(false)} className="fixed inset-0 z-10 cursor-default" />
             <div className="absolute right-0 z-20 mt-1.5 w-40 overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-1 shadow-lg">

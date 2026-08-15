@@ -3,10 +3,11 @@
 // or a .txt file's actual contents). Non-streaming—callers need one
 // complete, valid JSON payload to parse, not a token stream—so this waits
 // for the full Anthropic response before returning. Same security posture
-// as /api/tutor (app/api/tutor/route.ts): key stays server-side only, no
-// auth/rate-limiting exists yet since none exists anywhere in this app.
+// as /api/tutor (app/api/tutor/route.ts): key stays server-side only,
+// protected by the same real per-user/per-IP rate limit (lib/aiRateLimit.ts).
 import Anthropic, { APIError } from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
+import { checkAiRateLimit, rateLimitResponse } from "@/lib/aiRateLimit";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,9 @@ const MAX_TOKENS = 4096;
 const MAX_TOPICS = 25;
 const MAX_TEXT_LENGTH = 20000;
 const MAX_COUNT = 30;
+// The most expensive of the three routes (largest MAX_TOKENS, can process
+// up to 20k characters of pasted text), so it gets the tightest window.
+const RATE_LIMIT = { windowMinutes: 15, maxRequests: 10 };
 
 function jsonError(message: string, status: number) {
   return new Response(JSON.stringify({ error: message }), { status, headers: { "Content-Type": "application/json" } });
@@ -113,6 +117,9 @@ function describeAnthropicError(err: APIError): string {
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimit = await checkAiRateLimit(req, RATE_LIMIT);
+  if (!rateLimit.allowed) return rateLimitResponse(rateLimit);
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return jsonError("AI generation isn't configured yet—no Anthropic API key is set on the server.", 500);
 

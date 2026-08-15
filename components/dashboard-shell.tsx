@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell, Check, ChevronDown, Compass, CreditCard, Flame, GraduationCap, HeartHandshake, LogOut, Map as MapIcon, ClipboardCheck,
-  FlaskConical, MessagesSquare, Pill, Settings, ShieldAlert, Smile, Snowflake, Sparkles, Trophy, User, X, Zap
+  FlaskConical, Menu, MessagesSquare, Pill, Settings, ShieldAlert, Smile, Snowflake, Sparkles, Trash2, Trophy, User, X, Zap
 } from "lucide-react";
+import { isNavItemActive, navGroups } from "@/lib/dashboardNav";
 import {
   ensureStreakFreezesGranted, ensureStreakGapsFrozen, getLongestStreak, getStreakFreezeCount, getWeekLog,
   PROGRESS_EVENT, WeekDay
@@ -15,7 +17,10 @@ import {
 import { STUDY_PLANNER_EVENT } from "@/lib/studyPlanner";
 import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
 import { currentPathOptions, CurrentPathId, findCurrentPathDef, getCurrentPathId, setCurrentPathId } from "@/lib/currentPath";
-import { formatRelativeTime, getNotifications, getUnreadCount, markAllNotificationsRead, markNotificationRead, NotificationItem } from "@/lib/notifications";
+import {
+  deleteNotification, formatRelativeTime, getNotifications, getUnreadCount, markAllNotificationsRead, NotificationItem,
+  toggleNotificationRead
+} from "@/lib/notifications";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { replayDashboardTour } from "@/lib/productTour";
 
@@ -89,7 +94,7 @@ export function UserMenu({ name, avatar, onLogOut }: { name: string; avatar?: st
       {avatar
         ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={avatar} alt="" className="h-9 w-9 rounded-full object-cover" />
         : <span className="grid h-9 w-9 place-items-center rounded-full bg-teal-100 text-sm font-extrabold text-teal-700 dark:bg-teal-500/20 dark:text-teal-300">{initial}</span>}
-      <span className="text-sm font-bold text-heading dark:text-white">{name}</span>
+      <span className="hidden text-sm font-bold text-heading dark:text-white sm:inline">{name}</span>
       <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
     </button>
     <AnimatePresence>
@@ -388,12 +393,22 @@ export function NotificationsBell() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [open]);
 
-  function toggleNotification(item: NotificationItem) {
-    if (!item.read) {
-      markNotificationRead(item.id);
-      refresh();
-    }
+  // Purely expand/collapse—no longer a side-channel for marking read, since
+  // that's now a real, explicit action (the button below), not something
+  // that quietly happens just from previewing a message.
+  function toggleExpand(item: NotificationItem) {
     setExpandedId(id => id === item.id ? null : item.id);
+  }
+
+  function handleToggleRead(id: string) {
+    toggleNotificationRead(id);
+    refresh();
+  }
+
+  function handleDelete(id: string) {
+    deleteNotification(id);
+    refresh();
+    setExpandedId(current => current === id ? null : current);
   }
 
   return <div ref={ref} className="relative">
@@ -438,7 +453,7 @@ export function NotificationsBell() {
                     which is also the real moment it gets marked read. */}
                 <button
                   type="button"
-                  onClick={() => toggleNotification(item)}
+                  onClick={() => toggleExpand(item)}
                   aria-expanded={isExpanded}
                   className="flex w-full cursor-pointer items-center gap-3.5 px-3.5 py-3.5 text-left transition hover:bg-[#f9fcfc]"
                 >
@@ -458,7 +473,17 @@ export function NotificationsBell() {
                     transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
                   >
-                    <p className="px-3.5 pb-3.5 pl-[3.75rem] text-sm leading-relaxed text-slate-500">{item.body}</p>
+                    <div className="px-3.5 pb-3.5 pl-[3.75rem]">
+                      <p className="text-sm leading-relaxed text-slate-500">{item.body}</p>
+                      <div className="mt-3 flex items-center gap-4">
+                        <button type="button" onClick={() => handleToggleRead(item.id)} className="flex cursor-pointer items-center gap-1.5 text-xs font-bold text-teal-600 transition hover:text-teal-700">
+                          <Check size={13} strokeWidth={3} />{item.read ? "Mark as unread" : "Mark as read"}
+                        </button>
+                        <button type="button" onClick={() => handleDelete(item.id)} className="flex cursor-pointer items-center gap-1.5 text-xs font-bold text-rose-500 transition hover:text-rose-600">
+                          <Trash2 size={13} />Delete
+                        </button>
+                      </div>
+                    </div>
                   </motion.div>}
                 </AnimatePresence>
               </div>;
@@ -467,4 +492,79 @@ export function NotificationsBell() {
       </motion.div>}
     </AnimatePresence>
   </div>;
+}
+
+// The dashboard's entire primary navigation (Learning Paths, Study Planner,
+// Flashcards, everything) lives in app/dashboard/(main)/layout.tsx's
+// <aside>, which is flatly `hidden` below the sm breakpoint with no
+// replacement—on a phone, every one of those sections was unreachable
+// except by typing a URL. This is that replacement: a slide-in drawer,
+// portaled to <body> so it can overlay the whole page regardless of where
+// it's mounted in the tree, built from the exact same navGroups data the
+// desktop sidebar uses (lib/dashboardNav.ts) so the two can't drift apart.
+export function MobileNav() {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Next.js <Link> navigations don't reload the page, so without this the
+  // drawer would still be sitting open over the new page after a tap.
+  useEffect(() => { setOpen(false); }, [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function onKeyDown(e: KeyboardEvent) { if (e.key === "Escape") setOpen(false); }
+    document.addEventListener("keydown", onKeyDown);
+    return () => { document.body.style.overflow = previousOverflow; document.removeEventListener("keydown", onKeyDown); };
+  }, [open]);
+
+  return <>
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      aria-label="Open navigation menu"
+      aria-expanded={open}
+      className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full text-slate-500 transition hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-teal-100 dark:text-slate-400 dark:hover:bg-white/5 sm:hidden"
+    >
+      <Menu size={20} />
+    </button>
+    {typeof document !== "undefined" && createPortal(
+      <AnimatePresence>
+        {open && <>
+          <motion.button
+            type="button"
+            aria-label="Close navigation menu"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-[70] cursor-default bg-black/40 sm:hidden"
+          />
+          <motion.div
+            initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-y-0 left-0 z-[71] flex w-[82vw] max-w-[320px] flex-col overflow-y-auto bg-white shadow-lift dark:bg-[#0d1917] sm:hidden"
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-white/10">
+              <p className="text-base font-extrabold text-heading dark:text-white">Menu</p>
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-50 hover:text-heading dark:hover:bg-white/5"><X size={18} /></button>
+            </div>
+            <nav className="flex-1 space-y-1 p-3">
+              {navGroups.map((group, i) => <div key={group.label ?? `ungrouped-${i}`} className={i > 0 ? "pt-3" : ""}>
+                {group.label && <p className="px-3 pb-1 pt-1 text-[10px] font-extrabold uppercase tracking-wide text-slate-400 dark:text-slate-500">{group.label}</p>}
+                <div className="space-y-1">
+                  {group.items.map(item => {
+                    const active = isNavItemActive(pathname ?? "", item.href);
+                    return <Link key={item.href} href={item.href} className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold transition ${active ? "bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300" : "text-slate-600 hover:bg-slate-50 hover:text-heading dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"}`}>
+                      <item.icon size={18} className={active ? "text-teal-600 dark:text-teal-300" : "text-slate-400 dark:text-slate-500"} />{item.label}
+                    </Link>;
+                  })}
+                </div>
+              </div>)}
+            </nav>
+          </motion.div>
+        </>}
+      </AnimatePresence>,
+      document.body
+    )}
+  </>;
 }

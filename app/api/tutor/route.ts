@@ -2,13 +2,20 @@
 // key server-side only (never sent to the client) and streams a genuine
 // model reply back to lib/tutorChat.ts's fetch call. No auth/session system
 // exists in this app yet, so this endpoint is honestly reachable by anyone
-// who can reach the server—mitigate via request validation here plus a
-// spend/rate limit set on the key itself in the Anthropic Console.
+// who can reach the server—mitigated by a real per-user/per-IP rate limit
+// (lib/aiRateLimit.ts, backed by Supabase) below, on top of request
+// validation and whatever spend cap is set on the key in the Anthropic
+// Console.
 
 import Anthropic, { APIError } from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
+import { checkAiRateLimit, rateLimitResponse } from "@/lib/aiRateLimit";
 
 export const runtime = "nodejs";
+
+// Chat is the most frequently-called of the three AI routes (a normal study
+// session sends many short messages), so its window is the most generous.
+const RATE_LIMIT = { windowMinutes: 15, maxRequests: 30 };
 
 type TutorMode = "tutor" | "deepdive" | "simplify";
 
@@ -126,6 +133,9 @@ function describeAnthropicError(err: APIError): string {
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimit = await checkAiRateLimit(req, RATE_LIMIT);
+  if (!rateLimit.allowed) return rateLimitResponse(rateLimit);
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return jsonError("The AI Tutor isn't configured yet—no Anthropic API key is set on the server.", 500);

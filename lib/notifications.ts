@@ -58,8 +58,18 @@ export function markNotificationRead(id: string) {
   saveList(readList().map(n => n.id === id ? { ...n, read: true } : n));
 }
 
+// Real bidirectional toggle (not just one-way mark-read)—lets a student
+// un-read something they opened by accident, same as any real inbox.
+export function toggleNotificationRead(id: string) {
+  saveList(readList().map(n => n.id === id ? { ...n, read: !n.read } : n));
+}
+
 export function markAllNotificationsRead() {
   saveList(readList().map(n => ({ ...n, read: true })));
+}
+
+export function deleteNotification(id: string) {
+  saveList(readList().filter(n => n.id !== id));
 }
 
 // For future real events (level-ups, achievements, streak milestones) to add
