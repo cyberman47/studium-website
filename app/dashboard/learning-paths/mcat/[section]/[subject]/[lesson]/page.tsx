@@ -29,6 +29,7 @@ import { getCardProgress, isCardStarted, reviewLibraryCard, restoreLibraryCard }
 import { getWeakConcepts, hasPracticed, logAttempt, WeakConcept } from "@/lib/practiceHistory";
 import { getTopicRecommendation, Recommendation, RecommendedAction } from "@/lib/recommendations";
 import { ScientificMethodLesson } from "@/components/scientific-method/scientific-method-lesson";
+import { documentLessonContentByLessonId } from "@/lib/documentLessons";
 
 // Matches the server-rendered pass exactly (localStorage doesn't exist on
 // the server, so every real signal below defaults to "nothing yet")—the
@@ -50,12 +51,13 @@ const stepLabels: Record<Step, string> = { hub: "Study Hub", learn: "Read", flas
 
 export default function MCATLessonPage({ params }: { params: { section: string; subject: string; lesson: string } }) {
   const lesson = getLessonContent(params.lesson);
-  // Prototype gate: ONLY the Scientific Method lesson gets the redesigned
-  // concept-based Learn experience (components/scientific-method/*). Every
-  // other lesson id falls through to the original hub/learn rendering
-  // below, completely unchanged. See components/scientific-method/
-  // scientific-method-lesson.tsx for the new experience itself.
-  const isScientificMethod = lesson?.id === "scientific-method";
+  // Document-lesson gate: every lesson id registered in
+  // lib/documentLessons/index.ts gets the redesigned concept-based Learn
+  // experience (components/scientific-method/scientific-method-lesson.tsx,
+  // exported as ScientificMethodLesson for historical reasons—it's generic
+  // now). Any lesson id not in that lookup falls through to the original
+  // hub/learn rendering below, completely unchanged.
+  const documentLessonContent = lesson ? documentLessonContentByLessonId[lesson.id] : undefined;
 
   const [step, setStep] = useState<Step>("hub");
   const [startedAt, setStartedAt] = useState<number | null>(null);
@@ -363,7 +365,7 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
   return <div className="relative flex bg-white dark:bg-[#0d1917]" style={{ minHeight: "calc(100vh - 89px)" }}>
     {/* LEFT — lesson content, ~65% width; widens to a genuinely full-width
         reading mode (not just empty space) once the AI panel is collapsed */}
-    <section className={`min-w-0 flex-1 px-6 py-10 transition-[max-width] duration-300 sm:px-10 sm:py-14 ${isScientificMethod && (step === "hub" || step === "learn") ? "lg:px-14" : `lg:mx-auto ${panelOpen ? "lg:max-w-3xl" : "lg:max-w-5xl"}`}`} onMouseUp={(step === "learn" || (isScientificMethod && step === "hub")) ? handleMouseUp : undefined}>
+    <section className={`min-w-0 flex-1 px-6 py-10 transition-[max-width] duration-300 sm:px-10 sm:py-14 ${documentLessonContent && (step === "hub" || step === "learn") ? "lg:px-14" : `lg:mx-auto ${panelOpen ? "lg:max-w-3xl" : "lg:max-w-5xl"}`}`} onMouseUp={(step === "learn" || (documentLessonContent && step === "hub")) ? handleMouseUp : undefined}>
       <div className="flex items-center justify-between gap-3">
         <Link href={`/dashboard/learning-paths/mcat/${params.section}/${params.subject}`} className="inline-flex cursor-pointer items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-teal-600"><ArrowLeft size={14} />Back to path</Link>
         <div className="flex items-center gap-2">
@@ -371,11 +373,11 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
         </div>
       </div>
 
-      {/* The Scientific Method prototype supplies its own title/meta/progress
-          header (see ScientificMethodLesson below), so the original header
-          block only renders for every other lesson, and for this lesson's
-          own flashcards/practice/review/complete steps where it's unchanged. */}
-      {!(isScientificMethod && (step === "hub" || step === "learn")) && <div className="max-w-none">
+      {/* Document lessons supply their own title/meta/progress header (see
+          ScientificMethodLesson below), so the original header block only
+          renders for every other lesson, and for a document lesson's own
+          flashcards/practice/review/complete steps where it's unchanged. */}
+      {!(documentLessonContent && (step === "hub" || step === "learn")) && <div className="max-w-none">
         <span className="eyebrow"><Sparkles size={13} />{lesson.difficulty}</span>
         <h1 className="display mt-5 text-3xl leading-tight sm:text-4xl">{lesson.title}</h1>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-bold text-slate-500">
@@ -387,13 +389,14 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
       </div>}
 
       <div className="mt-8 max-w-none">
-        {/* Scientific Method prototype: "hub" and "learn" merge into one
-            redesigned, concept-based experience—see the isolation note at
-            isScientificMethod's definition above. Every other lesson (and
-            this lesson's own flashcards/practice/review/complete steps)
-            renders exactly as before via the unchanged blocks below. */}
-        {isScientificMethod && (step === "hub" || step === "learn") && <ScientificMethodLesson
+        {/* Document lessons: "hub" and "learn" merge into one redesigned,
+            concept-based experience—see documentLessonContent's definition
+            above. Every other lesson (and a document lesson's own
+            flashcards/practice/review/complete steps) renders exactly as
+            before via the unchanged blocks below. */}
+        {documentLessonContent && (step === "hub" || step === "learn") && <ScientificMethodLesson
           lesson={lesson}
+          content={documentLessonContent}
           onOpenAI={openAIPanel}
           onContinueToFlashcards={() => setStep("flashcards")}
         />}
@@ -402,7 +405,7 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
             and lets the student jump into any mode directly—curriculum
             (this lesson, in this subject) stays structured, but the study
             method inside it is the student's choice, not a forced order. */}
-        {!isScientificMethod && step === "hub" && <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-7 shadow-soft sm:p-8">
+        {!documentLessonContent && step === "hub" && <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-7 shadow-soft sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-wide text-slate-400">Your progress on this topic</p>
@@ -454,7 +457,7 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
             instead of separate boxed cards, a real glossary (not click-to-
             reveal chips), and the lesson's real key takeaways folded in as
             a summary callout at the end instead of a separate step. */}
-        {!isScientificMethod && step === "learn" && <div>
+        {!documentLessonContent && step === "learn" && <div>
           <article className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-8 shadow-sm sm:p-12">
             {lesson.sections.map((sec, i) => <div key={sec.heading} className={i > 0 ? "mt-9 border-t border-slate-100 dark:border-white/10 pt-9" : ""}>
               <h2 className="font-display text-xl font-extrabold tracking-tight text-heading">{sec.heading}</h2>

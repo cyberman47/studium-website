@@ -8,21 +8,22 @@ import {
 import { InteractiveText } from "@/components/interactive-text";
 import { QuickCheck } from "@/components/scientific-method/quick-check";
 import { useLessonSpeech } from "@/components/scientific-method/use-lesson-speech";
-import { bigPicture, concepts, Concept, Difficulty, lessonIntro } from "@/lib/scientificMethodLesson";
+import { Concept, Difficulty, DocumentLessonContent } from "@/lib/documentLesson";
 import { isInLibrary, toggleLibrarySave } from "@/lib/myLibrary";
 import { LessonContent } from "@/lib/mcatPath";
 import { SectionTour } from "@/components/product-tour/SectionTour";
 import { lessonTourSteps } from "@/lib/productTour";
 
-const PROGRESS_KEY = "studium_sm_concepts_v1";
-
-function loadProgress(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try { return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) ?? "[]")); } catch { return new Set(); }
+function progressKey(lessonId: string): string {
+  return `studium_doclesson_${lessonId}_v1`;
 }
-function saveProgress(ids: Set<string>) {
+function loadProgress(lessonId: string): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(progressKey(lessonId)) ?? "[]")); } catch { return new Set(); }
+}
+function saveProgress(lessonId: string, ids: Set<string>) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(ids)));
+  localStorage.setItem(progressKey(lessonId), JSON.stringify(Array.from(ids)));
 }
 
 // Shared text-scale tokens so every "Learn"/"Core Idea"/etc. label reads as
@@ -38,27 +39,31 @@ const difficultyTone: Record<Difficulty, string> = {
   REASON: "text-amber-700 dark:text-amber-300"
 };
 
-// The Scientific Method lesson's own redesigned "Learn" experience: one
-// large document-styled container (premium-textbook aesthetic, not a
-// dashboard card) containing a lesson intro, a "Big Picture" overview, and
-// four concepts each following Core Idea → Learn → Visualize/Analyze →
-// MCAT Connection → Apply → Key Takeaway. Deliberately isolated here (not
-// folded into the shared lesson page's markup) so no other lesson's Learn
-// step is touched; see this component's call site in
+// The shared "document lesson" Learn experience: one large document-styled
+// container (premium-textbook aesthetic, not a dashboard card) containing a
+// lesson intro, a "Big Picture" overview, and each lesson's own concepts,
+// following Core Idea → Learn → Visualize/Analyze → MCAT Connection →
+// Apply → Key Takeaway. Originally built one-off for the Scientific Method
+// lesson; now generic and driven entirely by the `content` prop, so every
+// Biological & Biochemical Foundations lesson registered in
+// lib/documentLessons/index.ts renders through this exact same component.
+// See that file's call site in
 // app/dashboard/learning-paths/mcat/[section]/[subject]/[lesson]/page.tsx
-// for the exact one-lesson gate.
+// for the lesson-id → content lookup that gates which lessons use it.
 export function ScientificMethodLesson({
-  lesson, onOpenAI, onContinueToFlashcards
+  lesson, content, onOpenAI, onContinueToFlashcards
 }: {
   lesson: LessonContent;
+  content: DocumentLessonContent;
   onOpenAI: (prompt?: string) => void;
   onContinueToFlashcards: () => void;
 }) {
+  const { lessonIntro, bigPicture, concepts } = content;
   const [done, setDone] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    setDone(loadProgress());
+    setDone(loadProgress(lesson.id));
     setSaved(isInLibrary("lesson", lesson.id));
   }, [lesson.id]);
 
@@ -66,7 +71,7 @@ export function ScientificMethodLesson({
     setDone(prev => {
       if (prev.has(id)) return prev;
       const next = new Set(prev).add(id);
-      saveProgress(next);
+      saveProgress(lesson.id, next);
       return next;
     });
   }
@@ -75,7 +80,8 @@ export function ScientificMethodLesson({
     setSaved(toggleLibrarySave("lesson", lesson.id));
   }
 
-  const speechText = useMemo(() => concepts.map(c => `${c.title}. ${c.coreIdea} ${c.learn.join(" ")}`).join(" "), []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const speechText = useMemo(() => concepts.map(c => `${c.title}. ${c.coreIdea} ${c.learn.join(" ")}`).join(" "), [lesson.id]);
   const speech = useLessonSpeech(speechText);
 
   const percent = Math.round((done.size / concepts.length) * 100);
@@ -163,7 +169,7 @@ export function ScientificMethodLesson({
         key={c.id}
         concept={c}
         onAnswered={() => markDone(c.id)}
-        onTeachMe={() => onOpenAI(`Before we continue in the Scientific Method lesson, quiz me on "${c.title}"—ask me one question and evaluate my answer.`)}
+        onTeachMe={() => onOpenAI(`Before we continue in the ${lesson.title} lesson, quiz me on "${c.title}"—ask me one question and evaluate my answer.`)}
       />)}
     </div>
 
@@ -248,9 +254,9 @@ function ConceptSection({ concept: c, onAnswered, onTeachMe }: { concept: Concep
       </div>
     </div>}
 
-    {c.number === "01" && <div className="mt-8">
+    {c.flowDiagram && <div className="mt-8">
       <p className={sectionLabel}>Visualize</p>
-      <FlowDiagram steps={bigPicture.flow as unknown as string[]} />
+      <FlowDiagram steps={c.flowDiagram} />
     </div>}
 
     {c.dataTable && <div className="mt-8">

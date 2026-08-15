@@ -352,7 +352,7 @@ export function StatusContent() {
           <p className="dek">The shared shell every logged-in page lives inside, plus the home screen itself.</p>
           <h3>Shell</h3>
           <ul className="plain">
-            <li>Top header: logo, global command search (<code>⌘K</code>), current-path switcher, study-streak indicator, notifications bell, account menu.</li>
+            <li>Top header: logo, global command search, current-path switcher, study-streak indicator, notifications bell, account menu.</li>
             <li>Left sidebar: Home, Learning Paths, Library, Create, Terminology, Studium AI, Progress.</li>
             <li>Full Settings area on its own route: Account, Profile, General, Billing, Notifications, Languages, Reader, Points, Review, Invite.</li>
           </ul>

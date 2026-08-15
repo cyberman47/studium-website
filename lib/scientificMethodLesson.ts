@@ -1,30 +1,16 @@
-// Content/config for the Scientific Method lesson prototype ONLY (see
-// app/dashboard/learning-paths/mcat/[section]/[subject]/[lesson]/page.tsx's
-// scientific-method branch, and components/scientific-method/*). Every fact
-// here is drawn from the real lesson entry in lib/mcatPath.ts (same
-// sections, key terms, and the real ice-cream/drowning + fertilizer/
-// blood-pressure examples already used in that lesson's own practice
-// questions)—restructured into a document-style Core Idea → Learn →
-// Visualize → MCAT Connection → Apply → Key Takeaway progression instead of
-// one continuous article.
-//
-// This file is intentionally NOT imported by anything outside the
-// Scientific Method branch, so it can't affect any other lesson.
+// Content for the Scientific Method lesson. Every fact here is drawn from
+// the real lesson entry in lib/mcatPath.ts (same sections, key terms, and
+// the real ice-cream/drowning + fertilizer/blood-pressure examples already
+// used in that lesson's own practice questions)—restructured into the
+// document-style Core Idea → Learn → Visualize → MCAT Connection → Apply →
+// Key Takeaway progression shared by every lesson in lib/documentLessons/
+// (this was the original, one-off version of that now-generic shape; see
+// lib/documentLesson.ts for the shared types and lib/documentLessons/index.ts
+// for the full lookup all Biology lessons register into).
 
-export type Difficulty = "UNDERSTAND" | "IDENTIFY" | "INTERPRET" | "REASON";
+import { Concept, DataTable, Difficulty, QuickCheck } from "./documentLesson";
 
-export type QuickCheck = {
-  prompt: string;
-  scenario?: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-};
-
-// Concept 03 alone splits its dataset (shown plainly under "Analyze") from
-// the interpretation question (asked under "Apply"—reuses QuickCheck like
-// every other concept), rather than bundling both into one widget.
-export type DataTable = { caption: string; rows: { label: string; value: string }[] };
+export type { Concept, DataTable, Difficulty, QuickCheck };
 
 export const lessonIntro = {
   description: "Before you can analyze an MCAT experiment, you need a mental model for how real research actually works—and how to read it critically. This lesson builds that model from the ground up: what a hypothesis is, how a good experiment is built, how to read real data, and the single distinction the exam tests more than almost any other.",
@@ -41,21 +27,6 @@ export const bigPicture = {
   caption: "Every stage feeds the next, and \"Refine\" loops back to a sharper hypothesis rather than a dead end—real research revisits earlier stages constantly instead of moving through them once."
 };
 
-export type Concept = {
-  number: string;
-  id: string;
-  title: string;
-  difficulty: Difficulty;
-  coreIdea: string;
-  learn: string[];
-  variableFlow?: boolean;
-  correlationExample?: { relationship: string; confound: string };
-  dataTable?: DataTable;
-  mcatConnection: string;
-  quickCheck: QuickCheck;
-  keyTakeaway: string;
-};
-
 export const concepts: Concept[] = [
   {
     number: "01",
@@ -67,6 +38,7 @@ export const concepts: Concept[] = [
       "Real research rarely moves in a straight line. A result that doesn't match the prediction sends the researcher back to refine the hypothesis and test again, often several times before a conclusion holds up.",
       "The two terms students most often mix up are the hypothesis and the prediction. The hypothesis is the general, testable claim about how two things are related. The prediction is the specific, measurable outcome that claim implies—the thing an experiment can actually check."
     ],
+    flowDiagram: ["Question", "Hypothesis", "Prediction", "Experiment", "Data", "Conclusion", "Refine"],
     mcatConnection: "You're more likely to meet the scientific method inside an experiment or research passage than as a standalone definition question—the exam expects you to recognize a hypothesis, prediction, or conclusion embedded in a paragraph of methodology, not just recite what they mean.",
     quickCheck: {
       scenario: "A researcher believes that increased exercise reduces blood pressure.",
@@ -157,3 +129,5 @@ export const concepts: Concept[] = [
     keyTakeaway: "Correlation is a real pattern; causation is a claim about what produced it. Only a controlled experiment can bridge that gap."
   }
 ];
+
+export const scientificMethodContent = { lessonIntro, bigPicture, concepts };

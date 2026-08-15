@@ -412,7 +412,6 @@ export default function DashboardHomePage() {
       </div>
     </div>
 
-    <p className="mt-6 px-1 text-xs leading-relaxed text-slate-400">This is a demo dashboard—no real account or study data lives here yet.</p>
     <SectionTour id="dashboard" steps={tourSteps} enabled={isOnboardingComplete()} />
   </section>;
 }

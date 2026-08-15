@@ -176,7 +176,12 @@ export default function MCATSubjectPage({ params }: { params: { section: string;
               const locked = status === "locked" || !status;
               const completed = status === "completed";
               const hasContent = !!lesson.content;
-              const interactive = hasContent && !locked;
+              // Locked is a recommended-order signal, not an access gate—a
+              // student who wants to skip ahead can still open, read, and
+              // practice any lesson with real content. The card keeps its
+              // grayed-out, lock-icon styling either way, so "locked" stays
+              // visually meaningful without actually blocking anything.
+              const interactive = hasContent;
               const concepts = lessonConcepts(lesson);
               const cardCount = lesson.content?.flashcards.length ?? 0;
               const questionCount = lesson.content?.practiceQuestions.length ?? 0;
@@ -204,7 +209,7 @@ export default function MCATSubjectPage({ params }: { params: { section: string;
                     {lesson.title}
                     {upNext && <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-accent-700">Up next</span>}
                   </p>
-                  <p className="text-xs text-slate-500">{!hasContent ? "Content unavailable" : completed ? `Completed · ${lesson.content?.difficulty}` : locked ? "Locked" : `${lesson.content?.estimatedMinutes ?? 20} min · ${lesson.content?.difficulty ?? "Beginner"}`}</p>
+                  <p className="text-xs text-slate-500">{!hasContent ? "Content unavailable" : completed ? `Completed · ${lesson.content?.difficulty}` : locked ? "Locked · tap to skip ahead" : `${lesson.content?.estimatedMinutes ?? 20} min · ${lesson.content?.difficulty ?? "Beginner"}`}</p>
                   {interactive && concepts.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">
                     {concepts.map(tag => <span key={tag} className="rounded-full bg-white dark:bg-[#0d1917] px-2 py-0.5 text-[10px] font-bold text-slate-500 ring-1 ring-inset ring-slate-200">{tag}</span>)}
                   </div>}

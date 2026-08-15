@@ -43,13 +43,10 @@ export function CommandSearch() {
   }, []);
 
   useEffect(() => {
+    // Esc-to-close only—the Ctrl/Cmd+K global shortcut to open search was
+    // removed by request.
     function onKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setOpen(o => !o);
-      } else if (e.key === "Escape") {
-        setOpen(false);
-      }
+      if (e.key === "Escape") setOpen(false);
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -99,7 +96,6 @@ export function CommandSearch() {
     >
       <Search size={15} className="shrink-0" />
       <span className="flex-1 text-left">Search...</span>
-      <kbd className="hidden shrink-0 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-bold text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-500 md:block">⌘K</kbd>
     </button>
     <button type="button" onClick={() => setOpen(o => !o)} aria-label="Search" className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-slate-500 transition hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-white/5 sm:hidden"><Search size={18} /></button>
 
