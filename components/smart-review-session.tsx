@@ -100,8 +100,8 @@ export function SmartReviewSession({ deckTitle, cards, onExit }: { deckTitle: st
               direction={1}
               flipped={flipped}
               onFlip={() => !feedback && setFlipped(f => !f)}
-              front={<InteractiveText text={current.front} />}
-              back={<InteractiveText text={current.back} />}
+              front={<InteractiveText text={current.front} interactive={false} />}
+              back={<InteractiveText text={current.back} interactive={false} />}
               height="h-72 sm:h-80"
             />
 

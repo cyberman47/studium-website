@@ -32,6 +32,9 @@ export type TutorContext = {
   currentPracticeQuestion?: { question: string; studentAnswer: string | null } | null;
   recentMistakes: string[];
   studentLevel: string;
+  // The student's real "Currently Studying" track label (lib/currentPath.ts)
+  // at send-time—lets /api/tutor frame its answer for their actual field.
+  currentTrack?: string;
 };
 
 const CHAT_KEY_PREFIX = "studium_tutor_chat_";

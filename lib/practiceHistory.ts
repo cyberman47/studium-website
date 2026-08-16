@@ -44,6 +44,17 @@ export function hasPracticed(lessonId: string): boolean {
   return read().some(a => a.lessonId === lessonId);
 }
 
+// Real "did the student attempt practice questions today, in one of these
+// lessons" signal—used by the Study Planner (lib/studyPlanner.ts) to mark a
+// subject's practice task done only once a real attempt happened, never on
+// a manual click. lessonIds scopes it to one subject (a subject's practice
+// page logs attempts under the real lessonId each question belongs to).
+export function hasPracticedToday(lessonIds: string[]): boolean {
+  const today = new Date().toISOString().slice(0, 10);
+  const idSet = new Set(lessonIds);
+  return read().some(a => idSet.has(a.lessonId) && a.attemptedAt.slice(0, 10) === today);
+}
+
 // Only attempts that carried a real question id count—older attempts (or
 // ones logged without one) simply aren't part of this precise picture,
 // rather than guessed at.

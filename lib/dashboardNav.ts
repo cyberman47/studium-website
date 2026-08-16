@@ -2,9 +2,11 @@
 // the desktop sidebar (app/dashboard/(main)/layout.tsx) and the mobile nav
 // drawer (components/dashboard-shell.tsx's MobileNav), so the two surfaces
 // can never drift out of sync with each other.
-import { BookA, Bot, CalendarCheck, Home, IdCard, Layers, Library, ListChecks, Map, PenLine, TrendingUp, Users } from "lucide-react";
+import {
+  BookA, Bot, CalendarCheck, Home, IdCard, Layers, Library, ListChecks, Map, MessagesSquare, PenLine, Sparkles, Swords, TrendingUp, User, Users, UsersRound
+} from "lucide-react";
 
-export type NavItem = { label: string; href: string; icon: typeof Home; flag?: "ai_tutor_nav"; tourId?: string };
+export type NavItem = { label: string; href: string; icon: typeof Home; flag?: "ai_tutor_nav"; tourId?: string; children?: NavItem[] };
 export type NavGroup = { label: string | null; items: NavItem[] };
 
 // Grouped by what a student is doing, not alphabetically: Study (plan and
@@ -12,15 +14,18 @@ export type NavGroup = { label: string | null; items: NavItem[] };
 // Tools (make new material)—with Home standing alone above and
 // Progress/Passport/Community standing alone below, same
 // ungrouped-header/footer pattern as the Settings sidebar
-// (app/dashboard/settings/layout.tsx). Community now points at the real
-// Community section (app/dashboard/(main)/community—Feed/Discussions/Ask,
-// built on supabase/migrations/0004_community.sql), which is what
-// "the Studium Community" means given the full social-learning-layer spec.
-// The Community Library (lib/communityLessons.ts—students publishing/
-// discovering each other's lessons) is a smaller, different feature and
-// stays reachable from within Library instead of the top-level sidebar.
-// Forum (discussion posts, /forum) lives in the profile dropdown
-// (components/dashboard-shell.tsx).
+// (app/dashboard/settings/layout.tsx). Community is a real collapsible
+// section (see NavItem.children below), not a single link—its five
+// children live under app/dashboard/(main)/community/*, all real and
+// Supabase-backed: My Profile (identity/progress), Forum (the former
+// Feed/Discussions/Ask, now at .../community/forum), Challenges, Study
+// Groups, and Contribute (a hub into the existing Create system + Library's
+// community-publish flow, not a duplicate creation flow). The Community
+// Library (lib/communityLessons.ts—students publishing/discovering each
+// other's lessons) is a smaller, different feature and stays reachable from
+// within Library. The older local-only feedback/bug-report Forum (/forum)
+// is a different, smaller feature and still lives in the profile dropdown
+// (components/dashboard-shell.tsx)—not the same thing as Community's Forum.
 export const navGroups: NavGroup[] = [
   { label: null, items: [
     { label: "Home", href: "/dashboard", icon: Home }
@@ -33,7 +38,7 @@ export const navGroups: NavGroup[] = [
   { label: "Review", items: [
     { label: "Flashcards", href: "/dashboard/flashcards", icon: Layers, tourId: "nav-flashcards" },
     { label: "Quizzes", href: "/dashboard/quizzes", icon: ListChecks },
-    { label: "Terminology", href: "/dashboard/terminology", icon: BookA, tourId: "nav-terminology" }
+    { label: "My Terminology", href: "/dashboard/terminology", icon: BookA, tourId: "nav-terminology" }
   ] },
   { label: "Tools", items: [
     { label: "Create", href: "/dashboard/create", icon: PenLine },
@@ -42,7 +47,13 @@ export const navGroups: NavGroup[] = [
   { label: null, items: [
     { label: "Progress", href: "/dashboard/progress", icon: TrendingUp, tourId: "nav-progress" },
     { label: "Passport", href: "/dashboard/passport", icon: IdCard },
-    { label: "Community", href: "/dashboard/community", icon: Users }
+    { label: "Community", href: "/dashboard/community", icon: Users, tourId: "nav-community", children: [
+      { label: "My Profile", href: "/dashboard/community/profile", icon: User },
+      { label: "Forum", href: "/dashboard/community/forum", icon: MessagesSquare },
+      { label: "Challenges", href: "/dashboard/community/challenges", icon: Swords },
+      { label: "Study Groups", href: "/dashboard/community/study-groups", icon: UsersRound },
+      { label: "Contribute", href: "/dashboard/community/contribute", icon: Sparkles }
+    ] }
   ] }
 ];
 
@@ -54,4 +65,13 @@ export const navGroups: NavGroup[] = [
 export function isNavItemActive(pathname: string, href: string): boolean {
   if (href === "/dashboard") return pathname === "/dashboard";
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+// True when `item` is the parent of (or is itself) the active route—used to
+// auto-expand a collapsible nav section (Community) on load/refresh so
+// "browser refresh preserves the correct route/page" holds for the sidebar
+// too, not just the page content.
+export function hasActiveChild(pathname: string, item: NavItem): boolean {
+  if (!item.children) return false;
+  return item.children.some(child => isNavItemActive(pathname, child.href));
 }

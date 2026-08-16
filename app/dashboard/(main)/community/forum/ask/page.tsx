@@ -27,7 +27,7 @@ export default function AskCommunityPage() {
     const result = await createPost({ category, postType, title, body, attachmentUrl: attachmentUrl.trim() || null });
     setSubmitting(false);
     if (!result.ok) { setError(result.error); return; }
-    router.push(`/dashboard/community/${result.id}`);
+    router.push(`/dashboard/community/forum/${result.id}`);
   }
 
   return <div className="mx-auto max-w-xl">

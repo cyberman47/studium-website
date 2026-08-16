@@ -12,8 +12,18 @@ import { getAllSubjectSignals, getMasteryStatus, getSubjectMasteryScore, Mastery
 import { getMcatReadiness } from "./mcatConcepts";
 import { getOverallAccuracy } from "./practiceHistory";
 import { getKPGrowthSeries, getTotalKP } from "./progress";
-import { CurrentPathId, findCurrentPathDef, getCurrentPathId, pathEmoji } from "./currentPath";
+import { CurrentPathId, findCurrentPathDef, getCurrentPathId, hasRealCurriculum, pathEmoji } from "./currentPath";
 import { mcatSections } from "./mcatPath";
+
+// Every subject/section breakdown below is drawn from lib/mcatPath.ts's
+// real taxonomy—the only one Studium has authored real content and mastery
+// tracking for (see lib/currentPath.ts's hasRealCurriculum). A student on
+// any other track gets an honest reduced profile instead of MCAT subjects
+// silently relabeled as if they belonged to their real track.
+function trackHasCurriculum(): boolean {
+  const id = getCurrentPathId();
+  return id === null || hasRealCurriculum[id];
+}
 
 // Purely decorative per-subject glyphs for the real MCAT subject taxonomy—
 // no bearing on the mastery math, just a visual identity per subject id.
@@ -110,13 +120,22 @@ export type MedicalProfile = {
   currentPathEmoji: string;
   overallKnowledgeDevelopmentPercent: number;
   hasAnyRealData: boolean;
+  // False once a student is on a track without real authored content yet
+  // (see lib/currentPath.ts's hasRealCurriculum)—lets the Progress page
+  // show an honest "content for {track} is still being built" note instead
+  // of an empty subject grid that looks like a bug.
+  trackContentAvailable: boolean;
 };
 
 export function getMedicalProfile(): MedicalProfile {
-  const signals = getAllSubjectSignals();
+  const contentAvailable = trackHasCurriculum();
+  const signals = contentAvailable ? getAllSubjectSignals() : [];
   const allSubjects = signals.map(toSubjectMastery).sort((a, b) => (b.hasData ? b.score : -1) - (a.hasData ? a.score : -1));
   const withData = allSubjects.filter(s => s.hasData);
-  const readiness = getMcatReadiness();
+  const readiness = contentAvailable ? getMcatReadiness() : null;
+  // Overall question accuracy/count stay real and visible regardless of
+  // track—they're not MCAT-subject-labeled, just "how many questions has
+  // this student ever answered correctly," which is true on any track.
   const accuracy = getOverallAccuracy();
 
   return {
@@ -133,8 +152,9 @@ export function getMedicalProfile(): MedicalProfile {
     totalKP: getTotalKP(),
     currentPathLabel: getCurrentPathLabel(),
     currentPathEmoji: getCurrentPathEmoji(),
-    overallKnowledgeDevelopmentPercent: readiness.readinessPercent,
-    hasAnyRealData: withData.length > 0
+    overallKnowledgeDevelopmentPercent: readiness?.readinessPercent ?? 0,
+    hasAnyRealData: withData.length > 0,
+    trackContentAvailable: contentAvailable
   };
 }
 
@@ -147,6 +167,7 @@ export type StrengthsWeaknesses = {
 };
 
 export function getStrengthsWeaknesses(): StrengthsWeaknesses {
+  if (!trackHasCurriculum()) return { strengths: [], weaknesses: [], recommendation: null };
   const withData = getAllSubjectSignals().filter(s => s.masteryStatus !== "Unfamiliar");
   const byScoreDesc = [...withData].sort((a, b) => b.masteryScore - a.masteryScore);
   const byScoreAsc = [...withData].sort((a, b) => a.masteryScore - b.masteryScore);
@@ -180,6 +201,7 @@ export function getStrengthsWeaknesses(): StrengthsWeaknesses {
 export type JourneySection = { sectionId: string; sectionTitle: string; percent: number };
 
 export function getMedicalJourneySections(): JourneySection[] {
+  if (!trackHasCurriculum()) return [];
   const signals = getAllSubjectSignals();
   return mcatSections.map(section => {
     const inSection = signals.filter(s => s.subject.sectionId === section.id);
@@ -201,7 +223,11 @@ export type LearningInsight = { emoji: string; title: string; description: strin
 
 export function getLearningProfileInsights(): LearningInsight[] {
   const insights: LearningInsight[] = [];
-  const signals = getAllSubjectSignals();
+  const contentAvailable = trackHasCurriculum();
+  // Subject-level signals (per-MCAT-subject trends, confidence quadrants,
+  // "N of the MCAT's 4 sections") only mean something on the MCAT track—
+  // every other insight below is real regardless of track and stays.
+  const signals = contentAvailable ? getAllSubjectSignals() : [];
   const accuracy = getOverallAccuracy();
 
   const last7 = getKPGrowthSeries(7);
@@ -250,6 +276,7 @@ const EVOLVING_INSIGHT_MIN_ATTEMPTS = 20;
 export function getEvolvingInsight(): EvolvingInsight {
   const accuracy = getOverallAccuracy();
   if (accuracy.total < EVOLVING_INSIGHT_MIN_ATTEMPTS) return null;
+  if (!trackHasCurriculum()) return null;
   const withEnoughData = getAllSubjectSignals().filter(s => s.accuracy.total >= 5 && s.accuracy.percent !== null);
   if (withEnoughData.length === 0) return null;
   const best = [...withEnoughData].sort((a, b) => (b.accuracy.percent ?? 0) - (a.accuracy.percent ?? 0))[0];

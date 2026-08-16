@@ -10,9 +10,10 @@
 // combines their outputs into a daily plan and a single KP target.
 
 import { getLessonContent, getLessonEntry, mcatSections, SectionDef, SubjectDef } from "./mcatPath";
-import { getAttemptsForLesson, getWeakConcepts, PracticeAttempt, WeakConcept } from "./practiceHistory";
+import { getAttemptsForLesson, getWeakConcepts, hasPracticedToday, PracticeAttempt, WeakConcept } from "./practiceHistory";
 import { findBuiltInQuiz } from "./mcatConcepts";
 import { claimStudySession, getRecentDailyGoalHistory, getTodayActivity, getWeeklyActivity } from "./progress";
+import { hasReviewedTermsToday } from "./terminology";
 
 export const STUDY_PLANNER_EVENT = "studium:studyPlannerChange";
 
@@ -386,6 +387,10 @@ export type PlannedTask = {
   href: string;
   priorityReason: string;
   done: boolean;
+  // Only set for "lesson" tasks—the specific lesson this task points to, so
+  // done-ness can be checked against its real completion status. See
+  // computeTaskDone below.
+  lessonId?: string;
 };
 
 function nextIncompleteLessonId(subject: RealSubject): string | null {
@@ -405,23 +410,23 @@ function tasksForSubject(signals: SubjectSignals): PlannedTask[] {
   const tasks: PlannedTask[] = [];
   const nextLessonId = nextIncompleteLessonId(subject);
 
-  function push(activity: ActivityKind, href: string, reasonSuffix: string) {
+  function push(activity: ActivityKind, href: string, reasonSuffix: string, lessonId?: string) {
     tasks.push({
       id: `${subject.subjectId}:${activity}:${dateKey()}`,
       subjectId: subject.subjectId, sectionId: subject.sectionId, subjectName: subject.subjectName,
       activity, label: activityLabel[activity], kp: activityKp[activity], estimatedMinutes: activityMinutes[activity],
-      href, priorityReason: `${quadrant.insight}${reasonSuffix}`, done: false
+      href, priorityReason: `${quadrant.insight}${reasonSuffix}`, done: false, lessonId
     });
   }
 
   if (quadrant.label === "weakness" || quadrant.label === "overconfident") {
-    if (nextLessonId) push("lesson", `/dashboard/learning-paths/mcat/${subject.sectionId}/${subject.subjectId}/${nextLessonId}`, "");
+    if (nextLessonId) push("lesson", `/dashboard/learning-paths/mcat/${subject.sectionId}/${subject.subjectId}/${nextLessonId}`, "", nextLessonId);
     push("practice", practiceHref(subject), " Targeted practice to close the gap.");
   } else if (quadrant.label === "lacksConfidence") {
     push("flashcards", "/dashboard/flashcards", " Reinforcing what you already know.");
     push("practice", practiceHref(subject), "");
   } else if (quadrant.label === "unrated") {
-    if (nextLessonId) push("lesson", `/dashboard/learning-paths/mcat/${subject.sectionId}/${subject.subjectId}/${nextLessonId}`, "");
+    if (nextLessonId) push("lesson", `/dashboard/learning-paths/mcat/${subject.sectionId}/${subject.subjectId}/${nextLessonId}`, "", nextLessonId);
     else push("practice", practiceHref(subject), " Building a real performance signal for this topic.");
   } else {
     // strength → light maintenance only
@@ -462,10 +467,42 @@ function writeDailyMap(map: Record<string, DailyPlan>) {
   notify();
 }
 
-// Regenerates today's plan from current signals, preserving any tasks the
-// student has already marked done (by id) and any AI recommendation
-// already cached for today—so recomputing priorities mid-day doesn't wipe
-// real progress or force a redundant AI call.
+// Whether a planned task is actually done—checked against the same real
+// signal every other "completed" indicator in this app reads, never a
+// self-report. There is deliberately no way to mark a task done directly:
+// the only path is doing the real thing the task points to.
+//   - lesson:       the specific lesson's own real completion status
+//   - practice:     a real practice attempt logged today, in this subject
+//   - flashcards:   any real flashcard reviewed today (task links to the
+//                   general Flashcards hub, not one subject's deck)
+//   - terminology:  any real term reviewed today (same reasoning)
+function computeTaskDone(task: PlannedTask): boolean {
+  if (task.activity === "lesson") return !!task.lessonId && getLessonEntry(task.lessonId)?.status === "completed";
+  if (task.activity === "practice") {
+    const subject = getRealSubjects().find(s => s.subjectId === task.subjectId);
+    return !!subject && hasPracticedToday(subject.lessonIds);
+  }
+  if (task.activity === "flashcards") return getTodayActivity().flashcards > 0;
+  return hasReviewedTermsToday(); // terminology
+}
+
+// Recomputes every task's done status against real signals (never trusts
+// whatever was last stored) and, if the student has genuinely done at
+// least one of today's planned tasks, claims the same "complete a planned
+// study session" KP every other planned-session flow in this app already
+// uses (lib/progress.ts's claimStudySession). claimStudySession's own
+// once-per-day guard makes this safe to call on every read.
+function withLiveDone(tasks: PlannedTask[]): PlannedTask[] {
+  const live = tasks.map(t => ({ ...t, done: computeTaskDone(t) }));
+  if (live.some(t => t.done)) claimStudySession();
+  return live;
+}
+
+// Regenerates today's plan from current signals and any AI recommendation
+// already cached for today—so recomputing priorities mid-day doesn't force
+// a redundant AI call. Task done-ness is never preserved from the previous
+// plan; it's always recomputed live (see withLiveDone) against real
+// activity, so it can't go stale or be spoofed by a cached true.
 export function generateDailyPlan(): DailyPlan | null {
   const config = getExamConfig();
   if (!config) return null;
@@ -478,9 +515,8 @@ export function generateDailyPlan(): DailyPlan | null {
   // stated available hours.
   const focusSubjects = signals.slice(0, 4);
   const existing = readDailyMap()[dateKey()];
-  const doneMap = new Map((existing?.tasks ?? []).filter(t => t.done).map(t => [t.id, true]));
 
-  const tasks = focusSubjects.flatMap(tasksForSubject).map(t => doneMap.has(t.id) ? { ...t, done: true } : t);
+  const tasks = withLiveDone(focusSubjects.flatMap(tasksForSubject));
 
   // Real adaptive scheduling (spec §8): compare this recompute against the
   // snapshot from the last one and log a specific, human-readable note for
@@ -512,10 +548,12 @@ export function generateDailyPlan(): DailyPlan | null {
 
 // Returns today's cached plan if one already exists (so a page revisit
 // doesn't silently reshuffle tasks the student is mid-way through),
-// generating a fresh one only if today has none yet.
+// generating a fresh one only if today has none yet. Task done-ness is
+// still recomputed live on every call (withLiveDone)—only the task list
+// itself (which tasks exist) comes from the cache.
 export function getTodaysPlan(): DailyPlan | null {
   const cached = readDailyMap()[dateKey()];
-  if (cached) return cached;
+  if (cached) return { ...cached, tasks: withLiveDone(cached.tasks) };
   return generateDailyPlan();
 }
 
@@ -536,20 +574,6 @@ export function attachAIRecommendation(recommendation: string, adjustedKPTarget?
   if (!today) return;
   map[dateKey()] = { ...today, aiRecommendation: recommendation, kpTarget: adjustedKPTarget ?? today.kpTarget };
   writeDailyMap(map);
-}
-
-// Marking a task done awards the same real "complete a planned study
-// session" KP every other planned-session flow in this app already uses
-// (lib/progress.ts's claimStudySession, once/day)—no new reward path.
-export function markTaskDone(taskId: string) {
-  const map = readDailyMap();
-  const today = map[dateKey()];
-  if (!today) return;
-  const task = today.tasks.find(t => t.id === taskId);
-  if (!task || task.done) return;
-  map[dateKey()] = { ...today, tasks: today.tasks.map(t => t.id === taskId ? { ...t, done: true } : t) };
-  writeDailyMap(map);
-  claimStudySession();
 }
 
 export function getTodayPlannerKPProgress(): { earned: number; target: number; percent: number } {

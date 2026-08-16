@@ -14,23 +14,33 @@ export type CommunityCategory =
   | "anatomy" | "physiology" | "pharmacology" | "pathology" | "neuroscience"
   | "microbiology" | "biochemistry" | "clinical-medicine"
   | "mcat" | "study-strategies" | "med-school-prep" | "resources"
-  | "flashcards" | "productivity" | "learning-techniques" | "study-planning";
+  | "flashcards" | "productivity" | "learning-techniques" | "study-planning"
+  // Added by supabase/migrations/0009_community_profile.sql—covers the
+  // education tracks lib/currentPath.ts already knows about (Nursing,
+  // and Biology/Chemistry as their own MCAT-adjacent subjects) plus a
+  // General/Career/Research catch-all the original taxonomy didn't have.
+  | "general" | "medical-school" | "nursing" | "biology" | "chemistry" | "career" | "research";
 
 export const categoryLabels: Record<CommunityCategory, string> = {
   anatomy: "Anatomy", physiology: "Physiology", pharmacology: "Pharmacology", pathology: "Pathology",
   neuroscience: "Neuroscience", microbiology: "Microbiology", biochemistry: "Biochemistry", "clinical-medicine": "Clinical Medicine",
   mcat: "MCAT", "study-strategies": "Study Strategies", "med-school-prep": "Medical School Preparation", resources: "Resources",
-  flashcards: "Flashcards", productivity: "Productivity", "learning-techniques": "Learning Techniques", "study-planning": "Study Planning"
+  flashcards: "Flashcards", productivity: "Productivity", "learning-techniques": "Learning Techniques", "study-planning": "Study Planning",
+  general: "General", "medical-school": "Medical School", nursing: "Nursing", biology: "Biology", chemistry: "Chemistry",
+  career: "Career", research: "Research"
 };
 
 export type CategoryGroup = { label: string; categories: CommunityCategory[] };
 
-// The exact taxonomy from the product spec, grouped for browsing—the
-// grouping is a UI concern, not a schema concern (community_category stays
-// a flat enum in Supabase).
+// The product spec's taxonomy, grouped for browsing—the grouping is a UI
+// concern, not a schema concern (community_category stays a flat enum in
+// Supabase). "General" leads since it's the default landing group for
+// posts that don't fit a specific subject/track.
 export const categoryGroups: CategoryGroup[] = [
-  { label: "Medical School", categories: ["anatomy", "physiology", "pharmacology", "pathology", "neuroscience", "microbiology", "biochemistry", "clinical-medicine"] },
-  { label: "Pre-med", categories: ["mcat", "study-strategies", "med-school-prep", "resources"] },
+  { label: "General", categories: ["general", "study-strategies", "career", "research"] },
+  { label: "Medical School", categories: ["medical-school", "anatomy", "physiology", "pharmacology", "pathology", "neuroscience", "microbiology", "biochemistry", "clinical-medicine"] },
+  { label: "Pre-med", categories: ["mcat", "biology", "chemistry", "med-school-prep", "resources"] },
+  { label: "Nursing", categories: ["nursing"] },
   { label: "Studying", categories: ["flashcards", "productivity", "learning-techniques", "study-planning"] }
 ];
 
@@ -47,6 +57,11 @@ export type CommunityPost = {
   body: string;
   attachmentUrl: string | null;
   acceptedCommentId: string | null;
+  // Set when this post was made inside a Study Group (supabase/migrations/
+  // 0011_study_groups.sql's community_posts.group_id)—null for a normal
+  // Forum post. Same table, same RLS, same reaction/comment machinery;
+  // groups don't get a second, parallel posts system.
+  groupId: string | null;
   createdAt: string;
   commentCount: number;
   reactionCount: number;
@@ -106,7 +121,7 @@ function rowToPost(row: any, commentCounts: Map<string, number>, reactionCounts:
   return {
     id: row.id, authorId: row.author_id, authorName: row.author?.name || "Student",
     category: row.category, postType: row.post_type, title: row.title, body: row.body,
-    attachmentUrl: row.attachment_url, acceptedCommentId: row.accepted_comment_id, createdAt: row.created_at,
+    attachmentUrl: row.attachment_url, acceptedCommentId: row.accepted_comment_id, groupId: row.group_id ?? null, createdAt: row.created_at,
     commentCount: commentCounts.get(row.id) ?? 0, reactionCount: reactionCounts.get(row.id) ?? 0,
     reactedByMe: myReactions.has(row.id), savedByMe: mySaves.has(row.id)
   };
@@ -114,17 +129,22 @@ function rowToPost(row: any, commentCounts: Map<string, number>, reactionCounts:
 
 export type FeedResult = { signedIn: boolean; posts: CommunityPost[]; error: string | null };
 
-export async function fetchFeed(opts?: { category?: CommunityCategory; limit?: number }): Promise<FeedResult> {
+// groupId omitted (default): the main Forum feed—ungrouped posts only, so a
+// Study Group's discussions don't flood the general feed without their
+// group context. Pass a real group id to get that group's Discussions tab
+// instead (see lib/studyGroups.ts).
+export async function fetchFeed(opts?: { category?: CommunityCategory; limit?: number; groupId?: string }): Promise<FeedResult> {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { signedIn: false, posts: [], error: null };
 
   let query = supabase
     .from("community_posts")
-    .select("id, author_id, category, post_type, title, body, attachment_url, accepted_comment_id, created_at, author:profiles(name)")
+    .select("id, author_id, category, post_type, title, body, attachment_url, accepted_comment_id, group_id, created_at, author:profiles(name)")
     .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(opts?.limit ?? 30);
+  query = opts?.groupId ? query.eq("group_id", opts.groupId) : query.is("group_id", null);
   if (opts?.category) query = query.eq("category", opts.category);
 
   const { data, error } = await query;
@@ -140,6 +160,27 @@ export async function fetchFeed(opts?: { category?: CommunityCategory; limit?: n
   ]);
 
   return { signedIn: true, posts: rows.map(r => rowToPost(r, commentCounts, reactionCounts, myReactions, mySaves)), error: null };
+}
+
+// A specific student's own real posts (My Profile's "Recent posts"/"My
+// Contributions")—same shape/pattern as fetchFeed, just filtered to one
+// author instead of everyone.
+export async function fetchMyPosts(userId: string, limit = 10): Promise<CommunityPost[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("community_posts")
+    .select("id, author_id, category, post_type, title, body, attachment_url, accepted_comment_id, created_at, author:profiles(name)")
+    .eq("author_id", userId)
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error || !data) return [];
+  const postIds = data.map(r => r.id);
+  const [commentCounts, reactionCounts] = await Promise.all([
+    fetchCommentCounts(supabase, postIds),
+    fetchReactionCounts(supabase, "post", postIds)
+  ]);
+  return data.map(r => rowToPost(r, commentCounts, reactionCounts, new Set(), new Set()));
 }
 
 // Real per-category post counts for the Discussions browse page—one row
@@ -202,7 +243,7 @@ export async function fetchComments(postId: string): Promise<CommunityComment[]>
   }));
 }
 
-export type CreatePostInput = { category: CommunityCategory; postType: PostType; title: string; body: string; attachmentUrl?: string | null };
+export type CreatePostInput = { category: CommunityCategory; postType: PostType; title: string; body: string; attachmentUrl?: string | null; groupId?: string | null };
 export type ActionResult<T = undefined> = { ok: true } & (T extends undefined ? {} : T) | { ok: false; error: string };
 
 export async function createPost(input: CreatePostInput): Promise<ActionResult<{ id: string }>> {
@@ -215,7 +256,8 @@ export async function createPost(input: CreatePostInput): Promise<ActionResult<{
 
   const { data, error } = await supabase.from("community_posts").insert({
     author_id: user.id, category: input.category, post_type: input.postType,
-    title: input.title.trim(), body: input.body.trim(), attachment_url: input.attachmentUrl ?? null
+    title: input.title.trim(), body: input.body.trim(), attachment_url: input.attachmentUrl ?? null,
+    group_id: input.groupId ?? null
   }).select("id").single();
   if (error || !data) return { ok: false, error: error?.message ?? "Couldn't post right now." };
   return { ok: true, id: data.id };

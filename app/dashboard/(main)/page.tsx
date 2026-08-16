@@ -3,42 +3,21 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowUpRight, Calendar, ChevronRight, Clock, Dna, Flame, FlaskConical, Medal, Play, Stethoscope, Target, Trophy, Zap } from "lucide-react";
+import { ArrowUpRight, Calendar, ChevronRight, Clock, Dna, Flame, FlaskConical, Medal, Play, Stethoscope, Swords, Target, Trophy, Zap } from "lucide-react";
 import { getUser, isOnboardingComplete } from "@/lib/onboarding";
 import { DailyActivityPoint, getLevelInfo, getStreak, getTodayActivity, getTotalKP, getWeeklyActivity, getWeeklyActivityByDay, LevelInfo, recordVisit } from "@/lib/progress";
 import { CaseAttempt, ClinicalCase, getCaseOfTheDay, getTodayCaseAttempt } from "@/lib/clinicalCases";
-import { CURRENT_PATH_EVENT, CurrentPathId, findCurrentPathDef, getCurrentPathId, pathEmoji } from "@/lib/currentPath";
+import { CURRENT_PATH_EVENT, CurrentPathId, findCurrentPathDef, getCurrentPathId, hasRealCurriculum, pathEmoji, pathRecommendations } from "@/lib/currentPath";
 import { findSubject, getLessonStatus } from "@/lib/mcatPath";
 import { getMcatReadiness, McatReadiness } from "@/lib/mcatConcepts";
 import { PRACTICE_HISTORY_EVENT } from "@/lib/practiceHistory";
 import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
 import { DailyPlan, getDaysRemaining, getExamConfig, getRealSubjects, getSubjectAccuracy, getTodaysPlan, getWeeklyKPProgress } from "@/lib/studyPlanner";
-import { fetchRealLeaderboard, LeaderboardResult } from "@/lib/leaderboardSync";
+import { fetchRealLeaderboard, fetchWeeklyLeaderboard, getMyStanding, LeaderboardResult, LeaderboardStanding } from "@/lib/leaderboardSync";
+import { challengeToBattle } from "@/lib/battles";
 import { ReferEarnCard } from "@/components/refer-earn-card";
 import { SectionTour } from "@/components/product-tour/SectionTour";
 import { dashboardTourSteps, getRecommendedLearningHref } from "@/lib/productTour";
-
-const pathRecommendations: Record<CurrentPathId, { label: string; href: string }[]> = {
-  "medical-school": [
-    { label: "Cardiovascular Physiology", href: "/dashboard/learning-paths/medical-school/physiology" },
-    { label: "Pharmacology Review", href: "/dashboard/learning-paths/medical-school/pharmacology" },
-    { label: "Clinical Case: Heart Failure", href: "/dashboard/case-of-the-day" }
-  ],
-  mcat: [
-    { label: "Cell Biology", href: "/dashboard/learning-paths/mcat/bio-biochem/biology" },
-    { label: "Organic Chemistry", href: "/dashboard/learning-paths/mcat/chem-phys" },
-    { label: "CARS Practice", href: "/dashboard/learning-paths/mcat/cars" }
-  ],
-  nursing: [
-    { label: "Clinical Skills", href: "/dashboard/learning-paths/nursing/clinical-skills" },
-    { label: "Pharmacology", href: "/dashboard/learning-paths/nursing/pharmacology" },
-    { label: "NCLEX Preparation", href: "/dashboard/learning-paths/nursing/nclex-preparation" }
-  ],
-  dentistry: [{ label: "Browse Learning Paths", href: "/dashboard/learning-paths" }],
-  pharmacy: [{ label: "Browse Learning Paths", href: "/dashboard/learning-paths" }],
-  "biomedical-sciences": [{ label: "Browse Learning Paths", href: "/dashboard/learning-paths" }],
-  other: [{ label: "Browse Learning Paths", href: "/dashboard/learning-paths" }]
-};
 
 const difficultyClasses: Record<string, string> = {
   Beginner: "bg-emerald-500/15 text-emerald-300",
@@ -167,12 +146,19 @@ export default function DashboardHomePage() {
       setTodaysPlan(getTodaysPlan());
     }
 
-    const biology = findSubject("bio-biochem", "biology");
+    // MCAT → Biology is the only track with real, completable lesson
+    // progress today (see lib/currentPath.ts's hasRealCurriculum)—showing
+    // this card for a Nursing/Dentistry/... student would silently pass off
+    // an MCAT lesson as if it belonged to their track, so it's only ever
+    // computed when that's actually the student's selected path.
+    const biology = currentPath && hasRealCurriculum[currentPath] ? findSubject("bio-biochem", "biology") : null;
     if (biology) {
       const ids = biology.lessons.map(l => l.id);
       const completedCount = ids.filter(id => getLessonStatus(ids, id) === "completed").length;
       const next = biology.lessons.find(l => getLessonStatus(ids, l.id) !== "locked" && getLessonStatus(ids, l.id) !== "completed");
       setNextLesson(next ? { id: next.id, title: next.title, completedCount, total: ids.length } : { id: "", title: "", completedCount, total: ids.length });
+    } else {
+      setNextLesson(null);
     }
   }
 
@@ -195,11 +181,15 @@ export default function DashboardHomePage() {
   const currentPathDef = findCurrentPathDef(pathId);
   const recommendations = pathId ? pathRecommendations[pathId] : null;
 
-  return <section data-tour="dashboard-main" className="relative bg-[#F8FAFC] py-8 dark:bg-[#070d0c] sm:py-10">
+  return <section className="relative bg-[#F8FAFC] py-8 dark:bg-[#070d0c] sm:py-10">
     <div className="absolute inset-x-0 top-0 -z-10 h-[220px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.15),transparent_65%)]" />
 
-    {/* Compact greeting */}
-    <div className="flex flex-wrap items-center justify-between gap-3">
+    {/* Compact greeting. Tour anchor lives here, not on the whole
+        <section>—a spotlight target that size ends up dimming almost
+        nothing and visibly resizing as the page's content streams in,
+        which reads as a laggy, screen-covering outline instead of a real
+        highlight. */}
+    <div data-tour="dashboard-main" className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <span className="eyebrow">YOUR DASHBOARD</span>
         <h1 className="display mt-2 text-[22px] leading-tight text-heading dark:text-white sm:text-2xl">{getGreeting()}, {name} 👋</h1>
@@ -435,12 +425,43 @@ const rankMedalClasses: Record<number, string> = {
   3: "bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300"
 };
 
+// Tier pill colors, keyed by lib/leaderboardSync.ts's own LeaderboardTier
+// values—kept here (not in that lib) since it's purely a display concern.
+const tierClasses: Record<LeaderboardStanding["tier"], string> = {
+  Diamond: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300",
+  Platinum: "bg-slate-200 text-slate-700 dark:bg-white/15 dark:text-slate-200",
+  Gold: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300",
+  Silver: "bg-zinc-100 text-zinc-600 dark:bg-white/10 dark:text-zinc-300",
+  Bronze: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300"
+};
+
 function LeaderboardCard({ name, totalKP, streak }: { name: string; totalKP: number; streak: number }) {
+  const [view, setView] = useState<"allTime" | "weekly">("allTime");
   const [result, setResult] = useState<LeaderboardResult | null>(null);
+  const [standing, setStanding] = useState<LeaderboardStanding | null>(null);
+  // Real challenge state per opponent row—no separate "Battles" section to
+  // visit first; challenging happens straight from this list. challenging
+  // tracks the one in-flight request; challengedIds marks rows with a real
+  // active battle (from this session's challenge, so the badge shows
+  // immediately without waiting on a refetch).
+  const [challenging, setChallenging] = useState<string | null>(null);
+  const [challengedIds, setChallengedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
-    fetchRealLeaderboard(5).then(r => { if (!cancelled) setResult(r); });
+    setResult(null);
+    const fetcher = view === "weekly" ? fetchWeeklyLeaderboard : fetchRealLeaderboard;
+    fetcher(5).then(r => { if (!cancelled) setResult(r); });
+    return () => { cancelled = true; };
+  }, [view]);
+
+  // Real rank/percentile/tier—independent of the top-5 list above, and
+  // fetched once regardless of which view is showing (it's always
+  // all-time; a "this week's percentile" isn't a number that means
+  // anything stable enough to show).
+  useEffect(() => {
+    let cancelled = false;
+    getMyStanding().then(s => { if (!cancelled) setStanding(s); });
     return () => { cancelled = true; };
   }, []);
 
@@ -458,14 +479,32 @@ function LeaderboardCard({ name, totalKP, streak }: { name: string; totalKP: num
     : !result.signedIn
       ? "Log in to see other real students on the leaderboard."
       : rows.length <= 1
-        ? "You're the first one here—invite classmates to join you."
-        : "Real student rankings.";
+        ? view === "weekly" ? "Nobody's earned KP this week yet—be the first." : "You're the first one here—invite classmates to join you."
+        : view === "weekly" ? "Real KP earned this week." : "Real student rankings.";
+
+  async function handleChallenge(opponentId: string) {
+    setChallenging(opponentId);
+    const outcome = await challengeToBattle(opponentId);
+    setChallenging(null);
+    if (outcome) setChallengedIds(s => new Set(s).add(opponentId));
+  }
 
   return <div className={`${cardClass} p-5`}>
     <div className="flex items-center justify-between gap-3">
       <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400"><Trophy size={13} className="text-amber-500" />Leaderboard</span>
-      <button type="button" className="flex cursor-pointer items-center gap-0.5 text-xs font-bold text-slate-400 transition hover:text-heading dark:hover:text-white">Weekly<ChevronRight size={13} /></button>
+      <button type="button" onClick={() => setView(v => v === "allTime" ? "weekly" : "allTime")} className="flex cursor-pointer items-center gap-0.5 text-xs font-bold text-slate-400 transition hover:text-heading dark:hover:text-white">{view === "weekly" ? "Weekly" : "All-time"}<ChevronRight size={13} /></button>
     </div>
+
+    {/* Real tier + percentile—never a bare "#34,835 of 50,000" ordinal as
+        the headline number. The exact rank is still shown, just as quiet
+        supporting detail underneath, for anyone who wants it. */}
+    {standing && <div className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-slate-50 dark:bg-white/5 px-3 py-2.5">
+      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${tierClasses[standing.tier]}`}><Medal size={11} />{standing.tier}</span>
+      <span className="text-right">
+        <span className="block text-xs font-extrabold text-heading dark:text-white">Top {Math.max(1, Math.round(100 - standing.percentile))}%</span>
+        <span className="block text-[10px] font-bold text-slate-400">#{standing.rank.toLocaleString()} of {standing.totalStudents.toLocaleString()}</span>
+      </span>
+    </div>}
 
     <div className="mt-3 space-y-1">
       {rows.map(row => <div
@@ -480,11 +519,27 @@ function LeaderboardCard({ name, totalKP, streak }: { name: string; totalKP: num
         </span>
         <span className="min-w-0 flex-1">
           <span className={`block truncate text-sm ${row.isYou ? "font-extrabold text-teal-900 dark:text-teal-100" : "font-bold text-heading dark:text-white"}`}>{row.name}{row.isYou && <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-teal-500">You</span>}</span>
-          <span className="flex items-center gap-1 text-[11px] font-bold text-slate-400"><Flame size={11} className="text-amber-500" fill="currentColor" />{row.streak}d</span>
+          {view === "allTime" && <span className="flex items-center gap-1 text-[11px] font-bold text-slate-400"><Flame size={11} className="text-amber-500" fill="currentColor" />{row.streak}d</span>}
         </span>
         <span className={`shrink-0 text-xs font-extrabold ${row.isYou ? "text-teal-700 dark:text-teal-300" : "text-slate-500 dark:text-slate-400"}`}>{row.totalKP.toLocaleString()} KP</span>
+
+        {/* Challenge a specific real student straight from their row—no
+            queue, no separate section. row.id is only a real Supabase user
+            id when signedIn && real rows are showing (the "you" fallback
+            row uses the literal id "you", excluded by !row.isYou already). */}
+        {!row.isYou && result?.signedIn && (
+          challengedIds.has(row.id)
+            ? <span className="flex shrink-0 items-center gap-1 rounded-full bg-teal-50 dark:bg-teal-500/15 px-2.5 py-1 text-[10px] font-extrabold text-teal-700 dark:text-teal-300"><Swords size={11} />Battling</span>
+            : <button
+                type="button" onClick={() => handleChallenge(row.id)} disabled={challenging === row.id}
+                title={`Challenge ${row.name} to a 24-hour KP battle`}
+                aria-label={`Challenge ${row.name}`}
+                className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-teal-700 dark:hover:bg-white/10 dark:hover:text-teal-300 disabled:cursor-not-allowed disabled:opacity-50"
+              ><Swords size={13} /></button>
+        )}
       </div>)}
     </div>
     <p className="mt-3 border-t border-slate-100 pt-3 text-[11px] leading-relaxed text-slate-400 dark:border-white/10">{footnote}</p>
+    {result?.signedIn && <Link href="/dashboard/battles" className="mt-2 flex cursor-pointer items-center gap-1 text-[11px] font-bold text-slate-400 transition hover:text-teal-700 dark:hover:text-teal-300"><Swords size={11} />My Battles<ArrowUpRight size={11} /></Link>}
   </div>;
 }

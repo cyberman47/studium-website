@@ -91,7 +91,12 @@ export type GeneratedLesson = {
   mainConcepts: { heading: string; body: string }[];
   examples: string[];
   keyTakeaways: string[];
-  practiceQuestions: GeneratedQuestion[];
+  // Lighter than the full GeneratedQuestion shape—the lesson page only
+  // ever renders these two fields for its practice questions, so that's
+  // all the real AI generator (app/api/generate/route.ts's "lesson" mode)
+  // is asked to produce, rather than padding the response with unused
+  // type/options/explanation/difficulty fields.
+  practiceQuestions: { question: string; correctAnswer: string }[];
   summary: string;
   flashcards: GeneratedFlashcard[];
 };
@@ -119,8 +124,8 @@ export const sampleLesson: GeneratedLesson = {
   flashcards: sampleFlashcards.slice(0, 6)
 };
 
-export function saveLesson(title: string): SavedLesson {
-  const lesson: SavedLesson = { id: `lesson-${Date.now()}`, title, createdAt: new Date().toISOString() };
+export function saveLesson(title: string, content: GeneratedLesson): SavedLesson {
+  const lesson: SavedLesson = { id: `lesson-${Date.now()}`, title, content, createdAt: new Date().toISOString() };
   const lessons = getLessons();
   lessons.push(lesson);
   saveLessons(lessons);
@@ -160,10 +165,25 @@ export const sampleSummary: GeneratedSummary = {
   ]
 };
 
-export type SavedSummaryEntry = { id: string; title: string; createdAt: string };
+// ---- Extracted terminology ----
+// The AI generator ("terms" mode) extracts real terms straight out of the
+// student's own material—these aren't necessarily terms already in
+// Studium's built-in glossary (lib/terminology.ts), so they're their own
+// standalone shape. See app/dashboard/(main)/create/terminology/page.tsx
+// for how a given extracted term gets matched to an existing built-in term
+// by name, or added as a new custom term (lib/terminology.ts's
+// addCustomTerm) when it isn't one.
+export type GeneratedExtractedTerm = {
+  name: string;
+  definition: string;
+  categoryId: string;
+  wordBreakdown: { part: string; meaning: string }[];
+};
 
-export function saveSummary(title: string): SavedSummaryEntry {
-  const entry: SavedSummaryEntry = { id: `summary-${Date.now()}`, title, createdAt: new Date().toISOString() };
+export type SavedSummaryEntry = { id: string; title: string; content: GeneratedSummary; createdAt: string };
+
+export function saveSummary(title: string, content: GeneratedSummary): SavedSummaryEntry {
+  const entry: SavedSummaryEntry = { id: `summary-${Date.now()}`, title, content, createdAt: new Date().toISOString() };
   const summaries = getSummaries();
   summaries.push(entry);
   saveSummaries(summaries);
@@ -179,7 +199,7 @@ const SUMMARIES_KEY = "studium_create_summaries";
 
 export type SavedDeck = { id: string; title: string; cards: GeneratedFlashcard[]; createdAt: string };
 export type SavedQuiz = { id: string; title: string; questions: GeneratedQuestion[]; createdAt: string };
-export type SavedLesson = { id: string; title: string; createdAt: string };
+export type SavedLesson = { id: string; title: string; content: GeneratedLesson; createdAt: string };
 
 function readList<T>(key: string): T[] {
   if (typeof window === "undefined") return [];

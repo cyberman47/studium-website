@@ -93,7 +93,7 @@ export default function CommunityThreadPage() {
   if (!post) return <EmptyBlock title="Post not found" body="This post may have been removed." />;
 
   return <div className="mx-auto max-w-2xl">
-    <Link href="/dashboard/community" className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 transition hover:text-heading"><ChevronLeft size={14} />Back to Feed</Link>
+    <Link href="/dashboard/community/forum" className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 transition hover:text-heading"><ChevronLeft size={14} />Back to Feed</Link>
 
     <div className="mt-4 rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
       <div className="flex flex-wrap items-center gap-2">
@@ -153,7 +153,7 @@ function EmptyBlock({ title, body }: { title: string; body: string }) {
     <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-slate-100 dark:bg-white/10 text-slate-400"><MessageCircle size={20} /></span>
     <p className="mt-3 text-sm font-bold text-heading">{title}</p>
     <p className="mt-1 text-xs leading-relaxed text-slate-500">{body}</p>
-    <Link href="/dashboard/community" className="mt-4 inline-block text-xs font-bold text-teal-700 hover:underline">← Back to Feed</Link>
+    <Link href="/dashboard/community/forum" className="mt-4 inline-block text-xs font-bold text-teal-700 hover:underline">← Back to Feed</Link>
   </div>;
 }
 

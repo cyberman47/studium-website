@@ -17,6 +17,7 @@ import { getCommunityLessons } from "@/lib/communityLessons";
 import { getArticles } from "@/lib/articles";
 import { getResources } from "@/lib/resources";
 import { getLibrarySaveCount } from "@/lib/myLibrary";
+import { CURRENT_PATH_EVENT, findCurrentPathDef, getCurrentPathId, hasRealCurriculum } from "@/lib/currentPath";
 
 function toDateKey(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -37,6 +38,7 @@ export default function LibraryPage() {
 
   const [loaded, setLoaded] = useState(false);
   const [counts, setCounts] = useState({ lessons: 0, saved: 0, community: 0, articles: 0, resources: 0, decks: 0, missed: 0, flagged: 0, highlights: 0 });
+  const [trackLabel, setTrackLabel] = useState<string | null>(null);
 
   function refresh() {
     setTodaysCase(getCaseOfTheDay());
@@ -57,10 +59,17 @@ export default function LibraryPage() {
       flagged: getSavedQuestionIds().length,
       highlights: getSavedHighlights().length
     });
+    const pathId = getCurrentPathId();
+    setTrackLabel(pathId && !hasRealCurriculum[pathId] ? findCurrentPathDef(pathId)?.label ?? null : null);
     setLoaded(true);
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+    function onPathChange() { refresh(); }
+    window.addEventListener(CURRENT_PATH_EVENT, onPathChange);
+    return () => window.removeEventListener(CURRENT_PATH_EVENT, onPathChange);
+  }, []);
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -96,6 +105,8 @@ export default function LibraryPage() {
         className="w-full rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-3.5 pl-11 pr-4 text-sm font-semibold text-heading outline-none focus:border-teal-400"
       />
     </form>
+
+    {trackLabel && <p className="mt-4 max-w-xl text-xs leading-relaxed text-slate-400">Today, the Library's lessons are all MCAT-authored—{trackLabel} content is still being written. Articles, Resources, and Community are still worth a browse either way.</p>}
 
     {/* Daily Case—kept as a compact real widget, not one of the 6 main
         categories (it's clinical-case practice, not lesson/article/resource

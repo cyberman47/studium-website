@@ -109,7 +109,15 @@ export default function CaseOfTheDayPage() {
       {solved && <span className="flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-xs font-extrabold text-teal-700 dark:bg-teal-500/15 dark:text-teal-300"><CheckCircle2 size={13} />Solved today</span>}
     </div>
 
-    <div className="mt-8 max-w-2xl space-y-5">
+    <div className="mt-8 max-w-5xl">
+      {/* Story and diagnosis side by side on larger screens (the diagnosis
+          column stays pinned in view while the story scrolls past it), so
+          answering never means scrolling down past the narrative first—
+          only the post-answer result panel below is expected to need a
+          scroll, same as any results reveal. Stacks to one column on
+          mobile, where side-by-side wouldn't fit anyway. */}
+      <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+        <div className="space-y-5">
       {/* The patient's story—one continuous card. The opening line is
           always visible; every beat after it (symptom, exam finding,
           treatment response, history, a lab result, whatever actually
@@ -126,13 +134,14 @@ export default function CaseOfTheDayPage() {
             {progressive.narrative.map((beat, i) => {
               const revealed = i < beatsRevealed;
               return <AnimatePresence key={i} mode="wait" initial={false}>
-                {revealed ? <motion.p
+                {revealed ? <motion.div
                   key="revealed"
                   initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}
-                  className="text-sm leading-relaxed text-heading dark:text-white"
+                  className="flex items-start gap-2.5 rounded-2xl border border-slate-100 bg-[#f9fcfc] px-4 py-3 dark:border-white/10 dark:bg-white/5"
                 >
-                  <InteractiveText text={beat} />
-                </motion.p> : <div
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
+                  <p className="text-sm leading-relaxed text-heading dark:text-white"><InteractiveText text={beat} /></p>
+                </motion.div> : <div
                   key="locked"
                   className="flex items-center gap-2.5 rounded-2xl border border-dashed border-slate-200 px-4 py-3 text-sm font-bold text-slate-300 dark:border-white/10 dark:text-slate-600"
                 >
@@ -150,7 +159,9 @@ export default function CaseOfTheDayPage() {
           </div>
         </>}
       </div>
+        </div>
 
+        <div className="space-y-5 lg:sticky lg:top-24">
       {/* Live reward stakes—makes the reveal/diagnose tradeoff visible */}
       {!solved && totalBeats > 0 && <div className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 ${tierClasses[tier]}`}>
         <span className="flex items-center gap-1.5 text-xs font-extrabold"><Zap size={13} fill="currentColor" />{getCaseRewardLabel(tier)}</span>
@@ -182,7 +193,10 @@ export default function CaseOfTheDayPage() {
 
         {!solved && <button type="button" onClick={handleDiagnose} disabled={selected === null} className="mt-5 cursor-pointer rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">Make Diagnosis</button>}
       </div>
+        </div>
+      </div>
 
+      <div className="mt-5 space-y-5">
       {/* Result */}
       {attempt && <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft dark:border-white/[0.08] dark:bg-[#0d1917] dark:shadow-none sm:p-7">
         <p className={`text-base font-extrabold ${attempt.correct ? "text-teal-700 dark:text-teal-300" : "text-rose-600 dark:text-rose-300"}`}>{attempt.correct ? "Correct diagnosis!" : "Not quite."}</p>
@@ -224,6 +238,7 @@ export default function CaseOfTheDayPage() {
       <button type="button" onClick={() => setReportOpen(true)} className="flex cursor-pointer items-center gap-1.5 px-1 text-xs font-bold text-slate-400 transition hover:text-rose-500"><Flag size={12} />Something wrong with this case? Report it</button>
 
       <p className="px-1 text-[11px] leading-relaxed text-slate-300 dark:text-slate-600">Studium Daily Diagnosis cases are for educational and entertainment purposes only and do not constitute medical advice. All cases are fictional. For any health concerns, please consult a qualified healthcare professional.</p>
+      </div>
     </div>
 
     <AnimatePresence>

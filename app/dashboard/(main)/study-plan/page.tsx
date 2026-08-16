@@ -21,7 +21,7 @@ import { TERM_PROGRESS_EVENT } from "@/lib/terminology";
 import {
   ActivityKind, Adjustment, ConfidenceLevel, ExamConfig, generateDailyPlan, getAdjustments, getAllSubjectSignals,
   getDaysRemaining, getExamConfig, getRealSubjects, getTodayPlannerKPProgress, getTodaysPlan, getWeeklyKPProgress,
-  intensityMeta, markTaskDone, PlannedTask, RealSubject, refreshTodaysPlan, setExamConfig, setTopicConfidence,
+  intensityMeta, PlannedTask, RealSubject, refreshTodaysPlan, setExamConfig, setTopicConfidence,
   STUDY_PLANNER_EVENT, SubjectSignals, Weekday, weekdayOptions
 } from "@/lib/studyPlanner";
 import { getAICallsRemainingToday, refreshAIRecommendation } from "@/lib/studyPlannerAI";
@@ -242,7 +242,7 @@ export default function StudyPlanPage() {
     {/* Today's Plan tasks */}
     {plan && plan.tasks.length > 0 && <div className="mt-6 space-y-2.5">
       <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">Today's Plan</p>
-      {plan.tasks.map(task => <TaskCard key={task.id} task={task} onComplete={() => markTaskDone(task.id)} />)}
+      {plan.tasks.map(task => <TaskCard key={task.id} task={task} />)}
     </div>}
 
     {/* Weaknesses */}
@@ -288,14 +288,17 @@ function HeaderStat({ icon: Icon, label, value, sub }: { icon: typeof Target; la
   </div>;
 }
 
-function TaskCard({ task, onComplete }: { task: PlannedTask; onComplete: () => void }) {
+function TaskCard({ task }: { task: PlannedTask }) {
   const Icon = activityIcon[task.activity];
+  // Real completion only—this circle is a status indicator, not a button.
+  // It reflects lib/studyPlanner.ts's live done-computation (the specific
+  // lesson finished, a real practice attempt logged today, a real
+  // flashcard/term reviewed today), never a manual self-report.
   return <div className={`${cardClass} flex items-center gap-4 p-4 sm:p-5`}>
-    <button
-      type="button" onClick={onComplete} disabled={task.done}
-      aria-label={task.done ? "Completed" : "Mark complete"}
-      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition ${task.done ? "bg-[#0F8B8D] text-white" : "cursor-pointer border-2 border-slate-200 dark:border-white/10 text-transparent hover:border-[#0F8B8D]/40"}`}
-    >{task.done && <Check size={14} strokeWidth={3} />}</button>
+    <span
+      aria-label={task.done ? "Completed" : "Not yet completed"}
+      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition ${task.done ? "bg-[#0F8B8D] text-white" : "border-2 border-slate-200 dark:border-white/10 text-transparent"}`}
+    >{task.done && <Check size={14} strokeWidth={3} />}</span>
     <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#effbfa] dark:bg-teal-500/15 text-[#0F8B8D]"><Icon size={18} /></span>
     <span className="min-w-0 flex-1">
       <span className={`block truncate text-sm font-extrabold ${task.done ? "text-slate-400 line-through" : "text-heading"}`}>{task.subjectName} — {task.label}</span>

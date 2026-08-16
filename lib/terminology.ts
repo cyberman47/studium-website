@@ -1265,6 +1265,22 @@ export function getAllTerms(): Term[] {
   return [...terms, ...getCustomTermsRaw()];
 }
 
+// "My Terminology" (app/dashboard/(main)/terminology/page.tsx) is a
+// personal vocabulary list, not a copy of Studium's entire built-in
+// glossary—it only ever shows a term the student has genuinely encountered:
+// clicked while reading a lesson or a flashcard (components/interactive-
+// text.tsx's HighlightedTerm calls both learnTerm and recordTermView on
+// click), or rated directly in a terminology review session. The union of
+// "has a real progress entry" and "has a real view entry" covers every one
+// of those real paths—every other consumer of terms (search, category
+// browse, Word Builder, admin) keeps reading the full getAllTerms() above,
+// unaffected.
+export function getMyTerms(): Term[] {
+  const learned = getProgressMap();
+  const viewed = getViewsMap();
+  return getAllTerms().filter(t => !!learned[t.id] || !!viewed[t.id]);
+}
+
 export function getTermsByCategory(categoryId: string): Term[] {
   return getAllTerms().filter(t => t.categoryId === categoryId);
 }
@@ -1364,6 +1380,16 @@ export function getTermProgress(termId: string): TermProgressEntry | null {
 
 export function isTermLearned(termId: string): boolean {
   return !!getProgressMap()[termId];
+}
+
+// Real "did the student review any term today" signal—used by the Study
+// Planner (lib/studyPlanner.ts) to mark a terminology task done only once
+// real review activity happened, not on a manual click. learnedAt is
+// already a date-key ("YYYY-MM-DD"); lastRatedAt is a full ISO timestamp,
+// so slicing its first 10 chars gives the same comparable format.
+export function hasReviewedTermsToday(): boolean {
+  const today = toDateKey(new Date());
+  return Object.values(getProgressMap()).some(p => (p.lastRatedAt ?? p.learnedAt).slice(0, 10) === today);
 }
 
 export function isTermMastered(termId: string): boolean {

@@ -29,6 +29,10 @@ type TutorContext = {
   currentPracticeQuestion: { question: string; studentAnswer: string | null } | null;
   recentMistakes: string[];
   studentLevel: string;
+  // The student's real "Currently Studying" track label (lib/currentPath.ts)
+  // at the time they sent this message—optional since not every existing
+  // caller has been updated, and older cached clients shouldn't 400.
+  currentTrack?: string;
 };
 
 type HistoryTurn = { role: "user" | "assistant"; text: string };
@@ -86,7 +90,8 @@ function sanitizeContext(raw: unknown): TutorContext | null {
       ? { question: practice.question, studentAnswer: typeof practice.studentAnswer === "string" ? practice.studentAnswer : null }
       : null,
     recentMistakes: Array.isArray(c.recentMistakes) ? c.recentMistakes.filter((m): m is string => typeof m === "string").slice(0, MAX_MISTAKES) : [],
-    studentLevel: typeof c.studentLevel === "string" ? c.studentLevel : ""
+    studentLevel: typeof c.studentLevel === "string" ? c.studentLevel : "",
+    currentTrack: typeof c.currentTrack === "string" ? c.currentTrack : undefined
   };
 }
 
@@ -100,7 +105,9 @@ function sanitizeHistory(raw: unknown): HistoryTurn[] {
 
 function buildSystemPrompt(mode: TutorMode, context: TutorContext): string {
   const lines = [
-    "You are Studium AI, an in-lesson study tutor for a medical/MCAT-prep student.",
+    context.currentTrack
+      ? `You are Studium AI, an in-lesson study tutor. This student is currently studying: ${context.currentTrack}. Frame explanations, examples, and terminology for that field where relevant.`
+      : "You are Studium AI, an in-lesson study tutor for a medical/MCAT-prep student.",
     modeInstructions[mode],
     "",
     "Current context:",

@@ -229,7 +229,7 @@ export function SectionTour({ id, steps, enabled = true, autoStartDelay = 350 }:
           blocking, leaving the hole itself genuinely, natively clickable. */}
       {step.target && hasSpotlight && rect && <>
         <div
-          className="pointer-events-none fixed z-[100] transition-all duration-300"
+          className="pointer-events-none fixed z-[100] transition-[top,left,width,height] duration-200"
           style={{
             top: rect.top - PAD, left: rect.left - PAD, width: rect.width + PAD * 2, height: rect.height + PAD * 2,
             borderRadius: radius + PAD,

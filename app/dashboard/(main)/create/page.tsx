@@ -23,15 +23,10 @@ type Step = "idle" | "analyzing" | "analyzed";
 
 const acceptedTypes = ".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.txt";
 
-// Only these two are wired to real AI generation today (see lib/aiGenerate.ts
-// + app/api/generate/route.ts)—shown for the real-text path. The other
-// generate options still exist for the sample-document walkthrough below.
+// All five are wired to real AI generation now (see lib/aiGenerate.ts +
+// app/api/generate/route.ts)—every one of these reads the real captured
+// text from this page's upload/paste flow and grounds its output in it.
 const realGenerateOptions = [
-  { id: "flashcards", label: "Generate Flashcards", icon: Brain, href: "/dashboard/create/flashcards", color: "bg-indigo-100 dark:bg-indigo-500/20 dark:text-indigo-300 text-indigo-600" },
-  { id: "quiz", label: "Create Quiz", icon: HelpCircle, href: "/dashboard/create/quiz", color: "bg-amber-100 dark:bg-amber-500/20 dark:text-amber-300 text-amber-600" }
-];
-
-const sampleGenerateOptions = [
   { id: "flashcards", label: "Generate Flashcards", icon: Brain, href: "/dashboard/create/flashcards", color: "bg-indigo-100 dark:bg-indigo-500/20 dark:text-indigo-300 text-indigo-600" },
   { id: "quiz", label: "Create Quiz", icon: HelpCircle, href: "/dashboard/create/quiz", color: "bg-amber-100 dark:bg-amber-500/20 dark:text-amber-300 text-amber-600" },
   { id: "lesson", label: "Build Lesson", icon: BookOpen, href: "/dashboard/create/lesson", color: "bg-teal-100 dark:bg-teal-500/20 dark:text-teal-300 text-teal-700" },
@@ -146,7 +141,7 @@ export default function CreatePage() {
 
   const wordCount = realText ? realText.trim().split(/\s+/).filter(Boolean).length : 0;
 
-  return <section data-tour="create-main" className="relative py-10 sm:py-14">
+  return <section className="relative py-10 sm:py-14">
     <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <span className="eyebrow"><Sparkles size={13} />Create</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Create Your Own Learning Materials.</h1>
@@ -154,7 +149,9 @@ export default function CreatePage() {
 
     <CreateHub />
 
-    <div id="upload-files" className="mt-10 max-w-3xl scroll-mt-24">
+    {/* Tour anchor lives here, not on the whole <section>—see the same note
+        on app/dashboard/(main)/flashcards/page.tsx. */}
+    <div id="upload-files" data-tour="create-main" className="mt-10 max-w-3xl scroll-mt-24">
       <div
         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
@@ -192,13 +189,12 @@ export default function CreatePage() {
           <p className="text-sm font-extrabold text-teal-700">✓ Real text captured from "{uploadedFileName}".</p>
           <p className="mt-1 text-xs text-slate-400">{wordCount.toLocaleString()} words · ~{estimateReadMinutes(wordCount)} min read. This is your actual content—generation below is a real AI call grounded in it, not a sample.</p>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {realGenerateOptions.map(opt => <Link key={opt.id} href={opt.href} onClick={() => goGenerate(opt.href)} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-100 dark:border-white/10 p-3.5 transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5">
               <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${opt.color}`}><opt.icon size={18} /></span>
               <span className="text-sm font-bold text-heading">{opt.label}</span>
             </Link>)}
           </div>
-          <p className="mt-4 text-[11px] text-slate-400">Lesson, Summary, and Terminology generation from your own text aren't wired up yet—only Flashcards and Quiz.</p>
         </motion.div>}
 
         {step === "analyzed" && realText === null && <motion.div key="analyzed-sample" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-6 rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft sm:p-7">
@@ -212,7 +208,7 @@ export default function CreatePage() {
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sampleGenerateOptions.map(opt => <Link key={opt.id} href={opt.href} onClick={() => goGenerate(opt.href)} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-100 dark:border-white/10 p-3.5 transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5">
+            {realGenerateOptions.map(opt => <Link key={opt.id} href={opt.href} onClick={() => goGenerate(opt.href)} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-100 dark:border-white/10 p-3.5 transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5">
               <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${opt.color}`}><opt.icon size={18} /></span>
               <span className="text-sm font-bold text-heading">{opt.label}</span>
             </Link>)}

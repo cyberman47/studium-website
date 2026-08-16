@@ -16,6 +16,7 @@ import {
 import { InteractiveText } from "@/components/interactive-text";
 import { AiTutorPanel, ProactiveTip } from "@/components/ai-tutor-panel";
 import { getTutorMode, sendMessage, TutorContext } from "@/lib/tutorChat";
+import { findCurrentPathDef, getCurrentPathId } from "@/lib/currentPath";
 import { addPersonalFlashcard } from "@/lib/personalFlashcards";
 import { addSavedHighlight } from "@/lib/savedHighlights";
 import { detectTerms } from "@/lib/termDetection";
@@ -184,6 +185,7 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
     currentPracticeQuestion: step === "practice" && practiceState
       ? { question: practiceState.question.question, studentAnswer: practiceState.answered && practiceState.selectedOption !== null ? practiceState.question.options[practiceState.selectedOption] : null }
       : null,
+    currentTrack: findCurrentPathDef(getCurrentPathId())?.label,
     recentMistakes: missedConcepts,
     studentLevel: `Level ${level.level} · ${level.name}`
   };

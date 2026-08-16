@@ -175,7 +175,7 @@ export default function FlashcardsPage() {
     />;
   }
 
-  return <section data-tour="flashcards-main" className="relative py-10 sm:py-14">
+  return <section className="relative py-10 sm:py-14">
     <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
@@ -202,8 +202,12 @@ export default function FlashcardsPage() {
       <button type="button" onClick={() => setStudyQueue({ title: "Today's Review", cards: dueCards })} className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-teal-600 px-5 py-2.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0d9488] transition hover:-translate-y-0.5 hover:bg-teal-700"><RotateCcw size={15} />Study Due Cards</button>
     </div>}
 
-    {/* 5 real overview stats: what do I have / what do I know / what's left */}
-    <div className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    {/* 5 real overview stats: what do I have / what do I know / what's left.
+        Tour anchor lives here, not on the whole <section>—a spotlight target
+        that size ends up dimming almost nothing and visibly resizing as the
+        page's content streams in, which reads as a laggy, screen-covering
+        outline instead of a real highlight. */}
+    <div data-tour="flashcards-main" className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {[
         { key: "total" as const, label: "Total Cards", value: overview.total, icon: Layers, classes: "text-heading" },
         { key: "mastered" as const, label: "Mastered", value: overview.mastered, icon: CheckCircle2, classes: statusStyles.mastered.text },

@@ -9,14 +9,14 @@ import {
   Bell, Check, ChevronDown, Compass, CreditCard, Flame, GraduationCap, HeartHandshake, LogOut, Map as MapIcon, ClipboardCheck,
   FlaskConical, Menu, MessagesSquare, Pill, Settings, ShieldAlert, Smile, Snowflake, Sparkles, Trash2, Trophy, User, X, Zap
 } from "lucide-react";
-import { isNavItemActive, navGroups } from "@/lib/dashboardNav";
+import { hasActiveChild, isNavItemActive, navGroups } from "@/lib/dashboardNav";
 import {
   ensureStreakFreezesGranted, ensureStreakGapsFrozen, getLongestStreak, getStreakFreezeCount, getWeekLog,
   PROGRESS_EVENT, WeekDay
 } from "@/lib/progress";
 import { STUDY_PLANNER_EVENT } from "@/lib/studyPlanner";
 import { ensureShieldSecured, getTodayShieldProgress, ShieldProgress } from "@/lib/studyShield";
-import { currentPathOptions, CurrentPathId, findCurrentPathDef, getCurrentPathId, setCurrentPathId } from "@/lib/currentPath";
+import { CURRENT_PATH_EVENT, currentPathOptions, CurrentPathId, findCurrentPathDef, getCurrentPathId, setCurrentPathId, syncCurrentPathOnLoad } from "@/lib/currentPath";
 import {
   deleteNotification, formatRelativeTime, getNotifications, getUnreadCount, markAllNotificationsRead, NotificationItem,
   toggleNotificationRead
@@ -319,7 +319,21 @@ export function LearningPathSwitcher() {
   const [pathId, setPathId] = useState<CurrentPathId | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setPathId(getCurrentPathId()); }, []);
+  useEffect(() => {
+    setPathId(getCurrentPathId());
+    // Real cross-device persistence: hydrates from the signed-in student's
+    // actual profiles.education_track row once per app load, then keeps this
+    // switcher (and every other listener—Dashboard, Learning Paths, Progress)
+    // reactive to it via the same CURRENT_PATH_EVENT a manual switch fires,
+    // with no page reload involved.
+    void syncCurrentPathOnLoad();
+    function onPathChange(e: Event) {
+      const detail = (e as CustomEvent<CurrentPathId>).detail;
+      if (detail) setPathId(detail);
+    }
+    window.addEventListener(CURRENT_PATH_EVENT, onPathChange);
+    return () => window.removeEventListener(CURRENT_PATH_EVENT, onPathChange);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -505,6 +519,10 @@ export function NotificationsBell() {
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  // Same manual-override-over-active-child pattern as the desktop sidebar
+  // (app/dashboard/(main)/layout.tsx)—kept as separate state since this is a
+  // genuinely separate component instance, not shared UI.
+  const [expandOverride, setExpandOverride] = useState<Record<string, boolean>>({});
 
   // Next.js <Link> navigations don't reload the page, so without this the
   // drawer would still be sitting open over the new page after a tap.
@@ -553,6 +571,31 @@ export function MobileNav() {
                 {group.label && <p className="px-3 pb-1 pt-1 text-[10px] font-extrabold uppercase tracking-wide text-slate-400 dark:text-slate-500">{group.label}</p>}
                 <div className="space-y-1">
                   {group.items.map(item => {
+                    if (item.children) {
+                      const activeChild = hasActiveChild(pathname ?? "", item);
+                      const expanded = expandOverride[item.href] ?? activeChild;
+                      return <div key={item.href}>
+                        <button
+                          type="button"
+                          onClick={() => setExpandOverride(prev => ({ ...prev, [item.href]: !expanded }))}
+                          aria-expanded={expanded}
+                          className={`flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-bold transition ${activeChild ? "text-teal-700 dark:text-teal-300" : "text-slate-600 hover:bg-slate-50 hover:text-heading dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"}`}
+                        >
+                          <item.icon size={18} className={activeChild ? "text-teal-600 dark:text-teal-300" : "text-slate-400 dark:text-slate-500"} />
+                          <span className="flex-1">{item.label}</span>
+                          <ChevronDown size={15} className={`shrink-0 text-slate-400 transition-transform dark:text-slate-500 ${expanded ? "rotate-180" : ""}`} />
+                        </button>
+                        {expanded && <div className="ml-4 mt-0.5 space-y-0.5 border-l border-slate-200 pl-3 dark:border-white/10">
+                          {item.children.map(child => {
+                            const childActive = isNavItemActive(pathname ?? "", child.href);
+                            return <Link key={child.href} href={child.href} className={`flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-bold transition ${childActive ? "bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300" : "text-slate-500 hover:bg-slate-50 hover:text-heading dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"}`}>
+                              <child.icon size={16} className={childActive ? "text-teal-600 dark:text-teal-300" : "text-slate-400 dark:text-slate-500"} />{child.label}
+                            </Link>;
+                          })}
+                        </div>}
+                      </div>;
+                    }
+
                     const active = isNavItemActive(pathname ?? "", item.href);
                     return <Link key={item.href} href={item.href} className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold transition ${active ? "bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300" : "text-slate-600 hover:bg-slate-50 hover:text-heading dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"}`}>
                       <item.icon size={18} className={active ? "text-teal-600 dark:text-teal-300" : "text-slate-400 dark:text-slate-500"} />{item.label}

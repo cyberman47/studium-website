@@ -44,8 +44,15 @@ function speakTerm(text: string) {
 // Mastered (no highlight at all, blends into normal text). Two readers with
 // different learning histories see different words highlighted for the
 // exact same lesson.
-export function InteractiveText({ text }: { text: string }) {
+//
+// `interactive` (default true) turns this off entirely, rendering plain,
+// unstyled text instead—used by flashcard review (components/flashcard-
+// focus-mode.tsx, components/smart-review-session.tsx), where hovering a
+// term to reveal its definition would let a student see the answer without
+// actually recalling it, defeating the point of the review.
+export function InteractiveText({ text, interactive = true }: { text: string; interactive?: boolean }) {
   const segments = detectTerms(text);
+  if (!interactive) return <>{segments.map((seg, i) => <span key={i}>{seg.value}</span>)}</>;
   return <>{segments.map((seg, i) => seg.type === "term"
     ? <HighlightedTerm key={`${seg.term.id}-${i}`} term={seg.term} matchedText={seg.value} />
     : <span key={i}>{seg.value}</span>)}</>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Check, Lightbulb, MoreVertical, PartyPopper,
@@ -67,6 +67,15 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+  // Non-blocking "you got it" confirmation—fires only for the two ratings
+  // that actually mean the student knew the card (good/easy), never for
+  // again/hard. Doesn't delay the card-advance below it on purpose: this
+  // scale is also driven by fast keyboard shortcuts (1/2/3/4, arrows), and
+  // holding navigation hostage for a toast would fight that.
+  const [rightAnswerToast, setRightAnswerToast] = useState(false);
+  const rightAnswerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (rightAnswerTimer.current) clearTimeout(rightAnswerTimer.current); }, []);
 
   const current = cards[index];
   const done = index >= cards.length;
@@ -106,6 +115,11 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
     onRate(current, rating);
     setHistory(h => [...h, { card: current, rating }]);
     setCounts(c => ({ ...c, [rating]: c[rating] + 1 }));
+    if (rating === "good" || rating === "easy") {
+      if (rightAnswerTimer.current) clearTimeout(rightAnswerTimer.current);
+      setRightAnswerToast(true);
+      rightAnswerTimer.current = setTimeout(() => setRightAnswerToast(false), 1200);
+    }
     resetCardView();
     setDirection(1);
     setIndex(i => i + 1);
@@ -202,8 +216,8 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
             direction={direction}
             flipped={flipped}
             onFlip={flip}
-            front={<InteractiveText text={current.front} />}
-            back={<InteractiveText text={current.back} />}
+            front={<InteractiveText text={current.front} interactive={false} />}
+            back={<InteractiveText text={current.back} interactive={false} />}
             height="h-72 sm:h-80"
             frontExtra={current.hint ? <div onClick={e => e.stopPropagation()} className="mt-5">
               {showHint ? <p className="mx-auto max-w-sm rounded-xl bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 px-4 py-2.5 text-xs leading-relaxed text-teal-800">{current.hint}</p>
@@ -222,6 +236,23 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
         <FlashcardRatingRow onRate={rate} />
       </div>
     </footer>}
+
+    {/* "You knew it" confirmation—small and non-blocking, sits just above
+        the rating row rather than covering the card. */}
+    <div className="pointer-events-none fixed inset-x-0 bottom-28 z-[105] flex justify-center px-5">
+      <AnimatePresence>
+        {rightAnswerToast && <motion.div
+          initial={{ opacity: 0, y: 10, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 6, scale: 0.98, transition: { duration: 0.15 } }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center gap-2 rounded-full border border-teal-100 dark:border-teal-500/20 bg-white/95 dark:bg-[#0d1917]/95 px-4 py-2.5 shadow-lift backdrop-blur"
+        >
+          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-teal-600 text-white"><Check size={13} strokeWidth={3} /></span>
+          <span className="text-sm font-extrabold text-heading dark:text-white">Correct!</span>
+        </motion.div>}
+      </AnimatePresence>
+    </div>
 
     <AnimatePresence>
       {aiOpen && liveTutorContext && <motion.aside

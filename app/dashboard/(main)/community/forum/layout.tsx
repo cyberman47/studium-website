@@ -8,12 +8,12 @@ import { usePathname } from "next/navigation";
 import { ListTree, MessagesSquare, Plus } from "lucide-react";
 
 const tabs = [
-  { label: "Feed", href: "/dashboard/community", icon: MessagesSquare },
-  { label: "Discussions", href: "/dashboard/community/discussions", icon: ListTree }
+  { label: "Feed", href: "/dashboard/community/forum", icon: MessagesSquare },
+  { label: "Discussions", href: "/dashboard/community/forum/discussions", icon: ListTree }
 ];
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === "/dashboard/community") return pathname === href;
+  if (href === "/dashboard/community/forum") return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -31,7 +31,7 @@ export default function CommunityLayout({ children }: { children: React.ReactNod
           </Link>;
         })}
       </div>
-      <Link href="/dashboard/community/ask" className="flex cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">
+      <Link href="/dashboard/community/forum/ask" className="flex cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">
         <Plus size={16} />Ask the Community
       </Link>
     </div>

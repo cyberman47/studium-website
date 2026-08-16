@@ -53,7 +53,8 @@ const emptyTermStats: TerminologyStats = { totalLearned: 0, masteredCount: 0, du
 const emptyMedicalProfile: MedicalProfile = {
   subjects: [], subjectsMasteredCount: 0, strongestSubject: null, weakestSubject: null,
   learningConsistencyPercent: 0, questionAccuracyPercent: null, questionsAnswered: 0, totalKP: 0,
-  currentPathLabel: "Your Learning Journey", currentPathEmoji: "🗺️", overallKnowledgeDevelopmentPercent: 0, hasAnyRealData: false
+  currentPathLabel: "Your Learning Journey", currentPathEmoji: "🗺️", overallKnowledgeDevelopmentPercent: 0, hasAnyRealData: false,
+  trackContentAvailable: true
 };
 const emptyStrengthsWeaknesses: StrengthsWeaknesses = { strengths: [], weaknesses: [], recommendation: null };
 
@@ -216,15 +217,17 @@ export default function ProgressPage() {
     { label: "Longest Streak", value: `${longestStreak} days` }
   ];
 
-  return <section data-tour="progress-main" className="relative py-10 sm:py-14">
+  return <section className="relative py-10 sm:py-14">
     <div className="absolute inset-x-0 top-0 -z-10 h-[300px] bg-[radial-gradient(circle_at_50%_0%,#d7f3f1,transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,139,141,0.12),transparent_65%)]" />
     <span className="eyebrow"><Sparkles size={13} />Progress</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Who you're becoming.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Studium doesn't just track hours—it learns what kind of student you are from what you actually study, answer, and improve at.</p>
 
-    {/* Your Medical Profile—the page's visual centerpiece */}
+    {/* Your Medical Profile—the page's visual centerpiece. Tour anchor lives
+        here, not on the whole <section>—see the same note on
+        app/dashboard/(main)/flashcards/page.tsx. */}
     <Reveal>
-      <div className="relative mt-10 overflow-hidden rounded-3xl border border-teal-100 dark:border-teal-500/20 bg-gradient-to-br from-teal-50 via-white to-white dark:from-[#0d2b29] dark:via-[#0d1917] dark:to-[#0d1917] p-7 shadow-soft dark:shadow-none sm:p-9">
+      <div data-tour="progress-main" className="relative mt-10 overflow-hidden rounded-3xl border border-teal-100 dark:border-teal-500/20 bg-gradient-to-br from-teal-50 via-white to-white dark:from-[#0d2b29] dark:via-[#0d1917] dark:to-[#0d1917] p-7 shadow-soft dark:shadow-none sm:p-9">
         <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-teal-200/40 dark:bg-teal-500/10 blur-3xl" />
         <div className="relative flex flex-wrap items-start justify-between gap-6">
           <div>
@@ -257,8 +260,13 @@ export default function ProgressPage() {
             <ProfileStat label="Knowledge Points" value={profile.totalKP.toLocaleString()} />
           </div>
         </> : <div className="relative mt-7 rounded-2xl border border-dashed border-teal-200 bg-white/70 dark:bg-[#0d1917]/70 p-6 text-center">
-          <p className="text-sm font-bold text-heading">Your profile is still forming.</p>
-          <p className="mt-1 text-xs text-slate-500">Complete a lesson, a practice quiz, or a flashcard session—this fills in with your real subject-by-subject mastery.</p>
+          {profile.trackContentAvailable ? <>
+            <p className="text-sm font-bold text-heading">Your profile is still forming.</p>
+            <p className="mt-1 text-xs text-slate-500">Complete a lesson, a practice quiz, or a flashcard session—this fills in with your real subject-by-subject mastery.</p>
+          </> : <>
+            <p className="text-sm font-bold text-heading">{profile.currentPathEmoji} {profile.currentPathLabel} content is still being built.</p>
+            <p className="mt-1 text-xs text-slate-500">Subject-by-subject mastery is only tracked for MCAT Preparation today. Switch tracks from the menu above, or keep an eye out as {profile.currentPathLabel} content lands.</p>
+          </>}
         </div>}
       </div>
     </Reveal>
@@ -350,13 +358,15 @@ export default function ProgressPage() {
         </div>
         <MapIcon size={20} className="shrink-0 text-teal-500" />
       </div>
-      <div className="mt-5 space-y-4">
-        {journey.map(section => <div key={section.sectionId}>
-          <div className="flex items-center justify-between text-xs font-bold text-slate-500"><span>{section.sectionTitle}</span><span>{section.percent}%</span></div>
-          <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><motion.div className="h-full rounded-full bg-teal-500" initial={{ width: 0 }} animate={{ width: `${section.percent}%` }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} /></div>
-        </div>)}
-      </div>
-      <p className="mt-5 text-[11px] leading-relaxed text-slate-400">This reflects your developing knowledge across foundational science areas—not a prediction of what medical specialty you'll pursue.</p>
+      {journey.length > 0 ? <>
+        <div className="mt-5 space-y-4">
+          {journey.map(section => <div key={section.sectionId}>
+            <div className="flex items-center justify-between text-xs font-bold text-slate-500"><span>{section.sectionTitle}</span><span>{section.percent}%</span></div>
+            <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><motion.div className="h-full rounded-full bg-teal-500" initial={{ width: 0 }} animate={{ width: `${section.percent}%` }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} /></div>
+          </div>)}
+        </div>
+        <p className="mt-5 text-[11px] leading-relaxed text-slate-400">This reflects your developing knowledge across foundational science areas—not a prediction of what medical specialty you'll pursue.</p>
+      </> : <EmptyNote text={`Foundational-area tracking isn't built for ${profile.currentPathLabel} yet—this fills in on the MCAT Preparation track today.`} />}
     </div>
 
     {/* Evolving Student Insights—only appears once there's real volume behind it */}

@@ -23,7 +23,7 @@ export default function DiscussionsPage() {
       {categoryGroups.map(group => <div key={group.label}>
         <p className="text-xs font-extrabold uppercase tracking-wide text-teal-700">{group.label}</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {group.categories.map(c => <Link key={c} href={`/dashboard/community?category=${c}`} className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 shadow-soft transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lift">
+          {group.categories.map(c => <Link key={c} href={`/dashboard/community/forum?category=${c}`} className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-4 shadow-soft transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lift">
             <div>
               <p className="text-sm font-extrabold text-heading">{categoryLabels[c]}</p>
               <p className="mt-0.5 text-xs text-slate-400">{counts ? `${counts.get(c) ?? 0} post${(counts.get(c) ?? 0) === 1 ? "" : "s"}` : "…"}</p>

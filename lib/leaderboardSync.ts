@@ -27,11 +27,37 @@ export type LeaderboardRow = { id: string; name: string; totalKP: number; streak
 
 let syncTimer: ReturnType<typeof setTimeout> | null = null;
 
+// Postgres's date_trunc('week', now())::date—Monday of the ISO week
+// containing `d`, as a YYYY-MM-DD string. Kept local to this file (not
+// imported from lib/progress.ts's own private mondayOf) since the two
+// don't need to share an implementation, just agree on the definition.
+function mondayKey(d: Date): string {
+  const day = d.getUTCDay(); // 0=Sun..6=Sat
+  const diffToMonday = (day + 6) % 7;
+  const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - diffToMonday));
+  return monday.toISOString().slice(0, 10);
+}
+
 async function syncProfileStatsNow(): Promise<void> {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return; // signed out—nothing shared to sync, local play stays local
-  await supabase.from("profiles").update({ total_kp: getTotalKP(), current_streak: getStreak() }).eq("id", user.id);
+  const totalKP = getTotalKP();
+
+  // Lazy weekly reset (matches supabase/migrations/0003_social.sql's
+  // weekly_leaderboard comment: "no cron dependency")—if this is the first
+  // sync of a new ISO week, snapshot today's total_kp as the new baseline
+  // so (total_kp - kp_at_week_start) means "earned this week" starting now,
+  // not since whenever week_start last happened to be set.
+  const thisMonday = mondayKey(new Date());
+  const { data: current } = await supabase.from("profiles").select("week_start").eq("id", user.id).maybeSingle();
+  const needsWeeklyReset = !current || current.week_start !== thisMonday;
+
+  await supabase.from("profiles").update({
+    total_kp: totalKP,
+    current_streak: getStreak(),
+    ...(needsWeeklyReset ? { week_start: thisMonday, kp_at_week_start: totalKP } : {})
+  }).eq("id", user.id);
 }
 
 // Debounced so a burst of local KP claims (several in a row) doesn't fire a
@@ -88,4 +114,70 @@ export async function fetchRealLeaderboard(limit = 5): Promise<LeaderboardResult
     signedIn: true,
     rows: rows.map(r => ({ id: r.id, name: r.name || "Student", totalKP: r.total_kp, streak: r.current_streak, isYou: r.id === user.id }))
   };
+}
+
+// Same shape and rules as fetchRealLeaderboard, sourced from
+// supabase/migrations/0003_social.sql's weekly_leaderboard view instead
+// (weekly_kp = total_kp - kp_at_week_start, reset lazily on sync above).
+// Rows simply stop appearing here once their own next sync rolls week_start
+// forward—no cleanup job needed.
+export async function fetchWeeklyLeaderboard(limit = 5): Promise<LeaderboardResult> {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { signedIn: false, rows: [] };
+
+  const { data: top } = await supabase.from("weekly_leaderboard").select("id, name, weekly_kp").order("weekly_kp", { ascending: false }).limit(limit);
+  let rows = top ?? [];
+  if (!rows.some(r => r.id === user.id)) {
+    const { data: mine } = await supabase.from("weekly_leaderboard").select("id, name, weekly_kp").eq("id", user.id).maybeSingle();
+    if (mine) rows = [...rows, mine].sort((a, b) => b.weekly_kp - a.weekly_kp);
+  }
+  return {
+    signedIn: true,
+    // Streak isn't part of the weekly view (it's not a weekly concept)—0
+    // here just means "not shown", the UI only renders streak for the
+    // all-time list.
+    rows: rows.map(r => ({ id: r.id, name: r.name || "Student", totalKP: r.weekly_kp, streak: 0, isYou: r.id === user.id }))
+  };
+}
+
+export type LeaderboardTier = "Diamond" | "Platinum" | "Gold" | "Silver" | "Bronze";
+
+// Named brackets instead of a raw ordinal—so nobody ever sees "you're
+// #34,835 of 50,000," which is true but useless. Boundaries are picked so
+// each tier is a real, meaningful "top X%" claim.
+const tierBounds: { min: number; tier: LeaderboardTier }[] = [
+  { min: 99, tier: "Diamond" },
+  { min: 95, tier: "Platinum" },
+  { min: 85, tier: "Gold" },
+  { min: 60, tier: "Silver" },
+  { min: 0, tier: "Bronze" }
+];
+
+export function tierForPercentile(percentile: number): LeaderboardTier {
+  return (tierBounds.find(b => percentile >= b.min) ?? tierBounds[tierBounds.length - 1]).tier;
+}
+
+export type LeaderboardStanding = { rank: number; totalStudents: number; percentile: number; tier: LeaderboardTier };
+
+// The real "97th percentile, top 3%" number—computed entirely server-side
+// (supabase/migrations/0007's get_my_leaderboard_standing RPC) so it's
+// always a true rank among every real onboarded student, without ever
+// pulling another student's row to the client to compute it. Null when
+// signed out, or when there's no real standing yet (e.g. this student
+// hasn't set a name), matching this file's existing fail-silent pattern
+// for a migration that hasn't landed yet.
+export async function getMyStanding(): Promise<LeaderboardStanding | null> {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data, error } = await supabase.rpc("get_my_leaderboard_standing").maybeSingle();
+  if (error || !data) return null;
+  // The Supabase client here isn't generated against a Database type (see
+  // lib/supabase/client.ts), so a not-yet-generated RPC's row shape comes
+  // back as {}—this cast just names the real columns the SQL function
+  // (supabase/migrations/0007) actually returns.
+  const row = data as { rank: number; total_students: number; percentile: number };
+  const percentile = Number(row.percentile);
+  return { rank: Number(row.rank), totalStudents: Number(row.total_students), percentile, tier: tierForPercentile(percentile) };
 }

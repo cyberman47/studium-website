@@ -10,6 +10,7 @@
 import { useMemo, useState } from "react";
 import { AiTutorWorkspace } from "@/components/ai-tutor-workspace";
 import { TutorContext } from "@/lib/tutorChat";
+import { findCurrentPathDef, getCurrentPathId } from "@/lib/currentPath";
 import { getLevelInfo, getTotalKP } from "@/lib/progress";
 import { SectionTour } from "@/components/product-tour/SectionTour";
 import { studiumAiTourSteps } from "@/lib/productTour";
@@ -25,7 +26,8 @@ export default function AiTutorPage() {
     currentFlashcard: null,
     currentPracticeQuestion: null,
     recentMistakes: [],
-    studentLevel: `Level ${level.level} · ${level.name}`
+    studentLevel: `Level ${level.level} · ${level.name}`,
+    currentTrack: findCurrentPathDef(getCurrentPathId())?.label
   };
 
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
