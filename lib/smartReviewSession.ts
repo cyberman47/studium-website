@@ -7,6 +7,7 @@
 // unit-test each of the scenarios this feature was built against.
 
 import { LibraryCard } from "./flashcardLibrary";
+import { Rating } from "./spacedRepetitionCore";
 
 // A wrong card is reinserted this many positions later, never immediately—
 // "Ideally place 2–5 other cards between the failed card and its retry."
@@ -18,15 +19,22 @@ const MAX_REQUEUE_GAP = 5;
 // one stubborn card can never turn into an infinite loop.
 const MAX_ATTEMPTS_PER_CARD = 5;
 
+// Three real self-assessment levels, not a binary correct/incorrect—same
+// labels/intent as My Terminology's own Unfamiliar/Learning/Know scale
+// (lib/terminology.ts's ConfidenceLevel), mapped onto the shared review
+// engines' existing again/hard/good rating scale rather than inventing a
+// second one. "easy" is deliberately unused here: three buttons, not four.
+export type SessionRating = Extract<Rating, "again" | "hard" | "good">;
+
 type QueueItem = { card: LibraryCard; attempts: number };
 
 export type ReviewSessionState = {
   queue: QueueItem[];
-  answered: { card: LibraryCard; correct: boolean }[];
-  // Cards that hit MAX_ATTEMPTS_PER_CARD without ever landing a correct
-  // answer this session—still genuinely due (their persisted nextReviewAt
-  // was already set to "now" by the first wrong answer), just not shown
-  // again *today*, so the student isn't stuck repeating one card forever.
+  answered: { card: LibraryCard; rating: SessionRating }[];
+  // Cards that hit MAX_ATTEMPTS_PER_CARD without ever landing a non-"again"
+  // rating this session—still genuinely due (their persisted nextReviewAt
+  // was already set to "now" by the first "again"), just not shown again
+  // *today*, so the student isn't stuck repeating one card forever.
   setAside: LibraryCard[];
 };
 
@@ -47,19 +55,23 @@ export function sessionTotalRemaining(state: ReviewSessionState): number {
 }
 
 // Applies one answer for whichever card is currently at the front of the
-// queue. Correct → the card leaves the session for good (spec: it "does
-// NOT need to appear again during the current session"). Incorrect → it's
-// reinserted MIN_REQUEUE_GAP–MAX_REQUEUE_GAP cards later, clamped to
-// however many cards are actually left so a 3-5 card deck never tries to
-// insert past the end of the queue (it just goes to the back in that case,
-// which still satisfies "only retried after other available cards have
-// been shown" as long as there *is* at least one other card left).
-export function answerSessionCard(state: ReviewSessionState, correct: boolean): ReviewSessionState {
+// queue. "again" (Unfamiliar) is the only rating that requeues the card for
+// another look later this same session—"hard" (Learning) and "good" (Known)
+// both leave it for good (spec: a card that's actually been seen and rated
+// "does NOT need to appear again during the current session"), same as
+// every other rating scale in this app (the 4-point Again/Hard/Good/Easy row
+// elsewhere only ever repeats on "Again" too). "again" is reinserted
+// MIN_REQUEUE_GAP–MAX_REQUEUE_GAP cards later, clamped to however many cards
+// are actually left so a 3-5 card deck never tries to insert past the end of
+// the queue (it just goes to the back in that case, which still satisfies
+// "only retried after other available cards have been shown" as long as
+// there *is* at least one other card left).
+export function answerSessionCard(state: ReviewSessionState, rating: SessionRating): ReviewSessionState {
   const [item, ...rest] = state.queue;
   if (!item) return state;
-  const answered = [...state.answered, { card: item.card, correct }];
+  const answered = [...state.answered, { card: item.card, rating }];
 
-  if (correct) return { ...state, queue: rest, answered };
+  if (rating !== "again") return { ...state, queue: rest, answered };
 
   const attempts = item.attempts + 1;
   if (attempts >= MAX_ATTEMPTS_PER_CARD) {

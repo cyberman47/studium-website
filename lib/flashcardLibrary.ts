@@ -19,7 +19,7 @@
 import { mcatSections } from "./mcatPath";
 import { getLessonContent } from "./mcatPath";
 import {
-  getAllTerms, getTerm, getTermProgress, reviewTerm, restoreTermProgress,
+  getMyTerms, getTerm, getTermProgress, reviewTerm, restoreTermProgress,
   isTermMastered as isTermMasteredReal, isCustomTerm, findTermCategory, Rating as TermRating, TermProgressEntry
 } from "./terminology";
 import { getPersonalFlashcards } from "./personalFlashcards";
@@ -116,8 +116,15 @@ function personalCards(): LibraryCard[] {
   }));
 }
 
+// Terminology cards are scoped to getMyTerms()—the student's own personal
+// vocabulary list (a term they've actually clicked while reading a lesson
+// or a flashcard, or rated in a review session; see lib/terminology.ts)—
+// not Studium's entire built-in glossary. The Flashcard Library is meant to
+// be "what you're actually studying," and dumping every term Studium knows
+// (most of which the student has never even seen) defeated that; lesson and
+// personal cards were never the problem, so they're untouched.
 export function getAllLibraryCards(): LibraryCard[] {
-  return [...getAllTerms().map(t => termCard(t.id)).filter((c): c is LibraryCard => !!c), ...lessonCards(), ...personalCards()];
+  return [...getMyTerms().map(t => termCard(t.id)).filter((c): c is LibraryCard => !!c), ...lessonCards(), ...personalCards()];
 }
 
 export function getLibraryCard(id: string): LibraryCard | undefined {
@@ -223,22 +230,25 @@ export function restoreLibraryCard(id: string, snapshot: CardSnapshot): void {
   cardProgress.restore(id, snapshot as ReviewEntry | null);
 }
 
-// The binary correct/incorrect interface the Smart Review session
-// (components/smart-review-session.tsx, the Flashcards feature's own study
-// flow) calls—a thin translation over the same reviewLibraryCard path
+// The three-level Unfamiliar/Learning/Known interface the Smart Review
+// session (components/smart-review-session.tsx, the Flashcards feature's own
+// study flow) calls—a thin translation over the same reviewLibraryCard path
 // every other flashcard surface already uses, so lesson/personal/term cards
 // all still funnel through the one real engine per keyspace rather than a
-// second, competing one. "again" == incorrect, anything else == correct is
-// spacedRepetitionCore.ts's own rule (see its file-top comment); "good" is
-// just an arbitrary pick among the "correct" values for the term-card path.
-// Also awards real KP through the existing lib/progress.ts ledger (spec's
-// reward table, via kpForReviewOutcome)—one call does the full "answer this
-// card" transaction so callers never have to remember the KP step.
+// second, competing one. The rating (again/hard/good) passes straight
+// through: "again" (Unfamiliar) is the only one spacedRepetitionCore.ts
+// treats as incorrect (see its file-top comment), while for term cards
+// specifically, "hard" (Learning) genuinely steps the Leitner box back a
+// level rather than being treated the same as "good" (Known)—see
+// lib/terminology.ts's nextBox. Also awards real KP through the existing
+// lib/progress.ts ledger (spec's reward table, via kpForReviewOutcome)—one
+// call does the full "answer this card" transaction so callers never have
+// to remember the KP step.
 export type ReviewOutcome = { entry: ReviewEntry; kpAwarded: number; leveledUp: boolean; totalKP: number };
 
-export function reviewCardOutcome(id: string, correct: boolean): ReviewOutcome {
+export function reviewCardOutcome(id: string, rating: Rating): ReviewOutcome {
   const priorStatus = getCardProgress(id)?.status ?? null;
-  reviewLibraryCard(id, correct ? "good" : "again");
+  reviewLibraryCard(id, rating);
   const entry = getCardProgress(id)!;
   const kp = kpForReviewOutcome(priorStatus, entry);
   if (kp <= 0) return { entry, kpAwarded: 0, leveledUp: false, totalKP: getTotalKP() };

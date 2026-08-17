@@ -91,7 +91,8 @@ export function FlashcardFocusMode({ deckTitle, cards: initialCards, onExit, onR
     currentStep: "Flashcard Review",
     currentFlashcard: { front: current.front, back: current.back },
     recentMistakes: [],
-    studentLevel: (() => { const l = getLevelInfo(getTotalKP()); return `Level ${l.level} · ${l.name}`; })()
+    studentLevel: (() => { const l = getLevelInfo(getTotalKP()); return `Level ${l.level} · ${l.name}`; })(),
+    currentOnScreenText: `Front: ${current.front}\nBack: ${current.back}`
   } : null;
 
   // Lock page scroll while the overlay is open, restore on exit.
