@@ -2,22 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight, Bot, Bookmark, Check, HelpCircle, Layers, PartyPopper, PenLine, Stethoscope, Volume2, Wand2, X
 } from "lucide-react";
+import { AiTutorPanel } from "@/components/ai-tutor-panel";
 import { DeckPicker } from "@/components/deck-picker";
 import { addCardsToDeck } from "@/lib/flashcardDecks";
 import { showKnowledgeToast } from "@/lib/kpToast";
-import { ClaimResult, getLevelInfo } from "@/lib/progress";
+import { ClaimResult, getLevelInfo, getTotalKP } from "@/lib/progress";
 import { detectTerms } from "@/lib/termDetection";
 import { getConditionsForTerm } from "@/lib/termConditions";
 import {
-  awardTermClickKP, ConfidenceLevel, getTerm, getTermConfidence, getTermMasteryState, getTermNote, isTermFavorited,
-  learnTerm, MasteryState, recordTermView, saveTermNote, setTermConfidence, Term, TERM_PROGRESS_EVENT, toggleTermFavorite
+  awardTermClickKP, ConfidenceLevel, findTermCategory, getTerm, getTermConfidence, getTermMasteryState, getTermNote,
+  isTermFavorited, learnTerm, MasteryState, recordTermView, saveTermNote, setTermConfidence, Term, TERM_PROGRESS_EVENT,
+  toggleTermFavorite
 } from "@/lib/terminology";
+import { TutorContext } from "@/lib/tutorChat";
 
 // Same three real states everywhere a familiarity control appears—labels and
 // colors match the Terminology homepage exactly, no separate vocabulary.
@@ -306,6 +308,15 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
   const [noteSaved, setNoteSaved] = useState(false);
   const [deckPickerOpen, setDeckPickerOpen] = useState(false);
   const [addedToDeck, setAddedToDeck] = useState(false);
+  // "Ask Studium AI" used to navigate to the standalone /dashboard/ai-tutor
+  // page—a real chat, but a generic one with no idea which term you'd
+  // opened it from. This docks the same real AiTutorPanel on the right of
+  // the screen instead, scoped to this exact term, so asking about it
+  // doesn't mean losing your place. Left open (not reset) across "Related
+  // concepts" clicks—liveTutorContext below is rebuilt from whatever term
+  // is current on every render, same live-context pattern as the flashcard
+  // Focus Mode's own docked panel.
+  const [aiOpen, setAiOpen] = useState(false);
 
   useEffect(() => {
     if (!term) return;
@@ -319,6 +330,24 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
   }, [term?.id]);
 
   if (!term) return null;
+
+  const liveTutorContext: TutorContext = {
+    sectionName: findTermCategory(term.categoryId)?.name ?? "",
+    subjectName: "Terminology",
+    lessonTitle: term.name,
+    lessonId: `term:${term.id}`,
+    currentStep: "Term Lookup",
+    currentFlashcard: null,
+    currentPracticeQuestion: null,
+    recentMistakes: [],
+    studentLevel: (() => { const l = getLevelInfo(getTotalKP()); return `Level ${l.level} · ${l.name}`; })(),
+    currentOnScreenText: [
+      `Term: ${term.name}`,
+      `Definition: ${term.definition}`,
+      term.aiExplanation && `Simple explanation: ${term.aiExplanation}`,
+      term.clinicalRelevance && `Clinical relevance: ${term.clinicalRelevance}`
+    ].filter(Boolean).join("\n")
+  };
 
   const relatedTerms = term.relatedTermIds.map(id => getTerm(id)).filter((t): t is Term => !!t);
   const conditions = getConditionsForTerm(term.id);
@@ -363,13 +392,20 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
       <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Definition</span>
       <span className="mt-2 block text-sm leading-relaxed text-heading dark:text-white">{term.definition}</span>
 
-      <span className="mt-4 block rounded-2xl bg-[#f9fcfc] p-4 dark:bg-white/5">
+      {/* Both optional in practice, even though the Term type requires a
+          string—a student's own custom term (components/add-term-modal.tsx)
+          saves these empty rather than fabricating filler text, so both
+          sections just don't render for one instead of showing an
+          awkward blank line under a bold label. */}
+      {term.aiExplanation && <span className="mt-4 block rounded-2xl bg-[#f9fcfc] p-4 dark:bg-white/5">
         <span className="flex items-center gap-1.5 text-xs font-extrabold text-teal-700 dark:text-teal-300"><Wand2 size={13} />Simple Explanation</span>
         <span className="mt-1.5 block text-sm leading-relaxed text-slate-600 dark:text-slate-300">{term.aiExplanation}</span>
-      </span>
+      </span>}
 
-      <span className="mt-5 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400"><Stethoscope size={13} />Why This Matters Clinically</span>
-      <span className="mt-2 block text-sm leading-relaxed text-slate-600 dark:text-slate-300">{term.clinicalRelevance}</span>
+      {term.clinicalRelevance && <>
+        <span className="mt-5 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400"><Stethoscope size={13} />Why This Matters Clinically</span>
+        <span className="mt-2 block text-sm leading-relaxed text-slate-600 dark:text-slate-300">{term.clinicalRelevance}</span>
+      </>}
 
       <span className="mt-5 block text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400">Common Conditions</span>
       {conditions.length > 0
@@ -408,7 +444,7 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
         </button>
         <button type="button" onClick={() => setDeckPickerOpen(true)} className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"><Layers size={14} className="shrink-0 text-teal-600 dark:text-teal-300" />Create flashcard</button>
         <button type="button" onClick={() => router.push(`/dashboard/terminology/quiz-me/${term.id}`)} className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"><HelpCircle size={14} className="shrink-0 text-teal-600 dark:text-teal-300" />Quiz me on this</button>
-        <Link href="/dashboard/ai-tutor" className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"><Bot size={14} className="shrink-0 text-teal-600 dark:text-teal-300" />Ask Studium AI</Link>
+        <button type="button" onClick={() => setAiOpen(o => !o)} aria-pressed={aiOpen} className={`flex cursor-pointer items-center gap-1.5 rounded-xl border px-3 py-2.5 text-left text-xs font-bold transition ${aiOpen ? "border-teal-200 bg-[#f9fcfc] text-heading dark:border-teal-500/30 dark:bg-white/5 dark:text-white" : "border-slate-200 text-slate-600 hover:border-teal-200 hover:bg-[#f9fcfc] hover:text-heading dark:border-white/10 dark:text-slate-300 dark:hover:border-teal-500/30 dark:hover:bg-white/5 dark:hover:text-white"}`}><Bot size={14} className="shrink-0 text-teal-600 dark:text-teal-300" />Ask Studium AI</button>
       </span>
 
       {deckPickerOpen && typeof document !== "undefined" && createPortal(
@@ -445,6 +481,22 @@ export function ExpandedTermPanel({ initialTermId, onClose }: { initialTermId: s
             </span>
           </span>}
       </span>
+
+      {/* Docked Studium AI, scoped to this exact term—portaled straight to
+          <body> for the same reason DeckPicker's portal above is: this
+          whole panel is span-only so it can be embedded inside a lesson
+          <p>, and a fixed-position <aside> wouldn't be valid nested there. */}
+      {typeof document !== "undefined" && createPortal(
+        <AnimatePresence>
+          {aiOpen && <motion.aside
+            initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="fixed right-0 top-0 z-[110] h-full w-full max-w-[400px] border-l border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] shadow-lift"
+          >
+            <AiTutorPanel context={liveTutorContext} proactiveTip={null} onDismissTip={() => {}} onCollapse={() => setAiOpen(false)} />
+          </motion.aside>}
+        </AnimatePresence>,
+        document.body
+      )}
     </motion.span>
   </motion.span>;
 }

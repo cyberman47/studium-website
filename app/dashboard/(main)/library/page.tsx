@@ -2,11 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, BookOpen, Calendar, Check, ChevronLeft, ChevronRight, Clock3, FileText, Flame,
-  Globe, Layers, Link2, Search, Sparkles, Stethoscope, TriangleAlert, X
+  Globe, Layers, Link2, Sparkles, Stethoscope, TriangleAlert, X
 } from "lucide-react";
 import { CaseAttempt, ClinicalCase, getAllCaseAttempts, getCaseAttemptsByDate, getCaseOfTheDay, getCaseStreak, getTodayCaseAttempt } from "@/lib/clinicalCases";
 import { getDecks } from "@/lib/flashcardDecks";
@@ -24,9 +23,6 @@ function toDateKey(d: Date): string {
 }
 
 export default function LibraryPage() {
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-
   const [todaysCase, setTodaysCase] = useState<ClinicalCase | null>(null);
   const [todayAttempt, setTodayAttempt] = useState<CaseAttempt | null>(null);
   const [caseAccuracy, setCaseAccuracy] = useState({ correct: 0, total: 0 });
@@ -71,12 +67,6 @@ export default function LibraryPage() {
     return () => window.removeEventListener(CURRENT_PATH_EVENT, onPathChange);
   }, []);
 
-  function submitSearch(e: React.FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    if (q) router.push(`/dashboard/library/search?q=${encodeURIComponent(q)}`);
-  }
-
   if (!loaded) return null;
 
   const todayKey = toDateKey(new Date());
@@ -95,16 +85,6 @@ export default function LibraryPage() {
     <span className="eyebrow"><Sparkles size={13} />Library</span>
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Library.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Explore lessons, articles, resources, and community content.</p>
-
-    <form onSubmit={submitSearch} className="relative mt-6 max-w-xl">
-      <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-      <input
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        placeholder="Search the library…"
-        className="w-full rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] py-3.5 pl-11 pr-4 text-sm font-semibold text-heading outline-none focus:border-teal-400"
-      />
-    </form>
 
     {trackLabel && <p className="mt-4 max-w-xl text-xs leading-relaxed text-slate-400">Today, the Library's lessons are all MCAT-authored—{trackLabel} content is still being written. Articles, Resources, and Community are still worth a browse either way.</p>}
 

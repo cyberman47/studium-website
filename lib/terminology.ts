@@ -1193,13 +1193,15 @@ export const terms: Term[] = [
   }
 ];
 
-// ---- Custom terms (Admin) ----
+// ---- Custom terms ----
 // Studium has no real backend—terms above are static code, not database
-// rows. Admin-added terms live in their own localStorage layer instead of
-// pretending to write back to the source file, but they're genuinely
-// merged into every real consumer (detection/highlighting, category
-// browsing, term lookup, learned/mastery counts), so adding one from the
-// admin panel actually makes it highlightable across the whole app.
+// rows. Custom terms (added from the admin Vocabulary editor, or from a
+// student's own "Create your own" flow in components/add-term-modal.tsx)
+// live in this same shared localStorage layer instead of pretending to
+// write back to the source file, but they're genuinely merged into every
+// real consumer (detection/highlighting, category browsing, term lookup,
+// learned/mastery counts), so adding one from either surface actually makes
+// it highlightable, learnable, and flashcard-able across the whole app.
 
 export type CustomTerm = Term & { createdAt: string };
 

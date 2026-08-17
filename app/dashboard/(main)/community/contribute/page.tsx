@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowUpRight, Brain, FileText, Globe, HelpCircle, MessagesSquare, PenLine, Sparkles, Stethoscope, Type
+  ArrowUpRight, Brain, Globe, HelpCircle, MessagesSquare, PenLine, Sparkles, Stethoscope, Type
 } from "lucide-react";
 import { getDecks, getLessons, getQuizzes, getSummaries } from "@/lib/create";
 import { getMyCommunityLessons } from "@/lib/communityLessons";
@@ -20,7 +20,6 @@ const cardClass = "rounded-3xl border border-black/[0.06] dark:border-white/10 b
 const createOptions = [
   { label: "Generate Flashcards", desc: "AI-generated cards from a topic or your own notes.", href: "/dashboard/create/flashcards", icon: Brain, color: "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300" },
   { label: "Create a Quiz", desc: "Real practice questions on any topic.", href: "/dashboard/create/quiz", icon: HelpCircle, color: "bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300" },
-  { label: "Build a Lesson", desc: "A full structured lesson, ready to study.", href: "/dashboard/create/lesson", icon: FileText, color: "bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300" },
   { label: "Write a Summary", desc: "High-yield notes and key definitions.", href: "/dashboard/create/summary", icon: PenLine, color: "bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-300" },
   { label: "Extract Terminology", desc: "Pull real terms and definitions from any material.", href: "/dashboard/create/terminology", icon: Type, color: "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-300" }
 ];

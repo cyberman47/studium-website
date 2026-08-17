@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  AlertTriangle, BookA, Bookmark, Clock3, Eye, Puzzle, RotateCcw, Search, Sparkles, TrendingUp
+  AlertTriangle, BookA, Bookmark, Clock3, Eye, Plus, Puzzle, RotateCcw, Search, Sparkles, TrendingUp
 } from "lucide-react";
+import { AddTermModal } from "@/components/add-term-modal";
 import { ExpandedTermPanel } from "@/components/interactive-text";
 import { FEATURE_FLAGS_EVENT, isFlagEnabled } from "@/lib/featureFlags";
 import {
@@ -12,6 +13,8 @@ import {
   getTermConfidence, getTerminologyStats, getWeakCategories, isTermFavorited, Term, TERM_PROGRESS_EVENT, TerminologyStats,
   WeakCategory
 } from "@/lib/terminology";
+import { SectionTour } from "@/components/product-tour/SectionTour";
+import { terminologyTourSteps } from "@/lib/productTour";
 
 type StatusFilter = "all" | ConfidenceLevel | "saved";
 
@@ -38,6 +41,7 @@ export default function TerminologyPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [openTermId, setOpenTermId] = useState<string | null>(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   // This is a personal list, not a copy of Studium's whole glossary—
   // getMyTerms() only returns terms the student has genuinely encountered
@@ -123,7 +127,10 @@ export default function TerminologyPage() {
       <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 dark:bg-teal-500/15 text-teal-600 dark:text-teal-300"><BookA size={26} /></span>
       <h2 className="mt-4 text-lg font-extrabold text-heading dark:text-white">Nothing here yet.</h2>
       <p className="mt-1.5 text-sm leading-relaxed text-slate-500">Studium highlights real medical terms as you read a lesson or flip through a flashcard—click one, and it gets added here. This list is built entirely from what you actually study, not a copy of every term Studium knows.</p>
-      <Link href="/dashboard/learning-paths" className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Go study a lesson</Link>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <Link href="/dashboard/learning-paths" className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">Go study a lesson</Link>
+        <button type="button" onClick={() => setAddModalOpen(true)} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 px-6 py-3 text-sm font-bold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5"><Plus size={16} />Add a term</button>
+      </div>
     </div> : <>
       <div className="relative mt-6 max-w-2xl">
         <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -136,7 +143,7 @@ export default function TerminologyPage() {
       </div>
 
       {/* Vocabulary overview */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="term-overview" className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {(["dont-know", "somewhat", "know-well"] as ConfidenceLevel[]).map(level => {
           const meta = statusMeta[level];
           const active = statusFilter === level;
@@ -153,9 +160,10 @@ export default function TerminologyPage() {
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div data-tour="term-actions" className="mt-6 flex flex-wrap gap-3">
         <Link href="/dashboard/terminology/review" className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600"><RotateCcw size={16} />Review Due Terms{stats.dueForReview > 0 && ` (${stats.dueForReview})`}</Link>
         <Link href="/dashboard/terminology/word-builder" className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 px-6 py-3 text-sm font-bold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5"><Puzzle size={16} />Word Builder{wordBuilderBeta && <span className="rounded-full bg-violet-100 dark:bg-violet-500/20 dark:text-violet-300 px-2 py-0.5 text-[10px] font-extrabold text-violet-600">BETA</span>}</Link>
+        <button type="button" onClick={() => setAddModalOpen(true)} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 px-6 py-3 text-sm font-bold text-heading transition hover:border-teal-200 hover:bg-[#f9fcfc] dark:bg-white/5"><Plus size={16} />Add a Term</button>
         <span className="ml-auto hidden items-center gap-2 text-xs font-bold text-slate-400 sm:flex">{stats.todayCount} / {stats.dailyGoal} today's goal ({goalPercent}%)</span>
       </div>
 
@@ -163,7 +171,7 @@ export default function TerminologyPage() {
           real, personal signals (viewed/rated terms), so no separate
           "Recommended" rail pulling in the wider, not-yet-encountered
           glossary belongs here anymore. */}
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-tour="term-discovery" className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <DiscoveryRail icon={Eye} title="Recently viewed" terms={recentlyViewed} emptyText="Open a term to start building this list." onOpen={setOpenTermId} />
         <DiscoveryRail icon={TrendingUp} title="Recently learned" terms={recentlyLearned} emptyText="Terms you rate “Know” will show up here." onOpen={setOpenTermId} />
         <DiscoveryRail icon={AlertTriangle} title="Needs attention" terms={allTerms.filter(t => confidenceMap[t.id] === "dont-know" || confidenceMap[t.id] == null).slice(0, 6)} emptyText="Nothing marked “Unfamiliar” right now." onOpen={setOpenTermId} />
@@ -178,7 +186,7 @@ export default function TerminologyPage() {
       </div>}
 
       {/* Term list */}
-    <div className="mt-10">
+    <div data-tour="term-list" className="mt-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-extrabold tracking-tight">All Terms</h2>
         <div className="flex flex-wrap gap-2">
@@ -216,6 +224,8 @@ export default function TerminologyPage() {
     </>}
 
     {openTermId && <ExpandedTermPanel initialTermId={openTermId} onClose={() => setOpenTermId(null)} />}
+    {addModalOpen && <AddTermModal onClose={() => setAddModalOpen(false)} onAdded={refresh} />}
+    <SectionTour id="terminology" steps={terminologyTourSteps} />
   </section>;
 }
 
