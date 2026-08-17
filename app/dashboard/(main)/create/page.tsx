@@ -16,8 +16,6 @@ import {
 } from "@/lib/create";
 import { getLearnedTerms } from "@/lib/terminology";
 import { setPendingSource } from "@/lib/aiGenerate";
-import { SectionTour } from "@/components/product-tour/SectionTour";
-import { createTourSteps } from "@/lib/productTour";
 
 type Step = "idle" | "analyzing" | "analyzed";
 
@@ -149,9 +147,7 @@ export default function CreatePage() {
 
     <CreateHub />
 
-    {/* Tour anchor lives here, not on the whole <section>—see the same note
-        on app/dashboard/(main)/flashcards/page.tsx. */}
-    <div id="upload-files" data-tour="create-main" className="mt-10 max-w-3xl scroll-mt-24">
+    <div id="upload-files" className="mt-10 max-w-3xl scroll-mt-24">
       <div
         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
@@ -245,6 +241,5 @@ export default function CreatePage() {
           </div>)}
         </div>}
     </div>
-    <SectionTour id="create" steps={createTourSteps} />
   </section>;
 }

@@ -23,14 +23,7 @@ const tabDefs: { id: Tab; label: string; icon: typeof Bot }[] = [
   { id: "cards", label: "My Cards", icon: Layers }
 ];
 
-export function AiTutorWorkspace({ context, externalPrompt, onExternalPromptHandled }: {
-  context: TutorContext;
-  // The Studium AI SectionTour's "Try it →" step sets this on the same page
-  // (app/dashboard/(main)/ai-tutor/page.tsx)—no navigation involved, so a
-  // real reply appears immediately instead of waiting on a page transition.
-  externalPrompt?: string | null;
-  onExternalPromptHandled?: () => void;
-}) {
+export function AiTutorWorkspace({ context }: { context: TutorContext }) {
   const [mode, setMode] = useState<TutorMode>("tutor");
   const [modeMenuOpen, setModeMenuOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -69,13 +62,6 @@ export function AiTutorWorkspace({ context, externalPrompt, onExternalPromptHand
     setMessages(next);
     setInput("");
   }
-
-  useEffect(() => {
-    if (!externalPrompt) return;
-    handleSend(externalPrompt);
-    onExternalPromptHandled?.();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [externalPrompt]);
 
   const ModeIcon = modeIcons[mode];
 
@@ -153,7 +139,7 @@ export function AiTutorWorkspace({ context, externalPrompt, onExternalPromptHand
       </div>
 
       {/* Input bar — anchored to the bottom of the workspace */}
-      <div data-tour="ai-composer" className="shrink-0 border-t border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] px-5 py-4 sm:px-10">
+      <div className="shrink-0 border-t border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] px-5 py-4 sm:px-10">
         <div className="mx-auto max-w-3xl">
           <form onSubmit={e => { e.preventDefault(); handleSend(input); }} className="flex items-end gap-2 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] p-2 shadow-[0_8px_24px_-12px_rgba(15,23,42,0.12)] transition focus-within:border-teal-300">
             <input

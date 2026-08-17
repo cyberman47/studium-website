@@ -3,7 +3,7 @@
 // drawer (components/dashboard-shell.tsx's MobileNav), so the two surfaces
 // can never drift out of sync with each other.
 import {
-  BookA, Bot, CalendarCheck, Home, IdCard, Layers, Library, ListChecks, Map, MessagesSquare, PenLine, Sparkles, Swords, TrendingUp, User, Users, UsersRound
+  BookA, Bot, CalendarCheck, Home, Layers, Library, ListChecks, Map, MessagesSquare, PenLine, Sparkles, Swords, TrendingUp, User, Users, UsersRound
 } from "lucide-react";
 
 export type NavItem = { label: string; href: string; icon: typeof Home; flag?: "ai_tutor_nav"; tourId?: string; children?: NavItem[] };
@@ -12,7 +12,7 @@ export type NavGroup = { label: string | null; items: NavItem[] };
 // Grouped by what a student is doing, not alphabetically: Study (plan and
 // consume material) → Review (reinforce what you've already learned) →
 // Tools (make new material)—with Home standing alone above and
-// Progress/Passport/Community standing alone below, same
+// Progress/Community standing alone below, same
 // ungrouped-header/footer pattern as the Settings sidebar
 // (app/dashboard/settings/layout.tsx). Community is a real collapsible
 // section (see NavItem.children below), not a single link—its five
@@ -33,21 +33,23 @@ export const navGroups: NavGroup[] = [
   { label: "Study", items: [
     { label: "Learning Paths", href: "/dashboard/learning-paths", icon: Map, tourId: "nav-learning-paths" },
     { label: "Study Planner", href: "/dashboard/study-plan", icon: CalendarCheck },
-    { label: "Library", href: "/dashboard/library", icon: Library }
+    { label: "Library", href: "/dashboard/library", icon: Library, tourId: "nav-library" }
   ] },
   { label: "Review", items: [
-    { label: "Flashcards", href: "/dashboard/flashcards", icon: Layers, tourId: "nav-flashcards" },
+    { label: "Flashcards", href: "/dashboard/flashcards", icon: Layers },
     { label: "Quizzes", href: "/dashboard/quizzes", icon: ListChecks },
-    { label: "My Terminology", href: "/dashboard/terminology", icon: BookA, tourId: "nav-terminology" }
+    { label: "My Terminology", href: "/dashboard/terminology", icon: BookA }
   ] },
   { label: "Tools", items: [
-    { label: "Create", href: "/dashboard/create", icon: PenLine },
-    { label: "Studium AI", href: "/dashboard/ai-tutor", icon: Bot, flag: "ai_tutor_nav", tourId: "nav-studium-ai" }
+    { label: "Create", href: "/dashboard/create", icon: PenLine, tourId: "nav-create" },
+    { label: "Studium AI", href: "/dashboard/ai-tutor", icon: Bot, flag: "ai_tutor_nav" }
   ] },
   { label: null, items: [
-    { label: "Progress", href: "/dashboard/progress", icon: TrendingUp, tourId: "nav-progress" },
-    { label: "Passport", href: "/dashboard/passport", icon: IdCard },
-    { label: "Community", href: "/dashboard/community", icon: Users, tourId: "nav-community", children: [
+    { label: "Progress", href: "/dashboard/progress", icon: TrendingUp },
+    // Passport was removed from here—its content already lives on My
+    // Profile below (a real Supabase-backed page), so this was a second,
+    // redundant entry point to the same thing rather than distinct content.
+    { label: "Community", href: "/dashboard/community", icon: Users, children: [
       { label: "My Profile", href: "/dashboard/community/profile", icon: User },
       { label: "Forum", href: "/dashboard/community/forum", icon: MessagesSquare },
       { label: "Challenges", href: "/dashboard/community/challenges", icon: Swords },

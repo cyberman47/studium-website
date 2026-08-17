@@ -21,8 +21,6 @@ import {
   EvolvingInsight, getEvolvingInsight, getLearningProfileInsights, getMedicalJourneySections, getMedicalProfile,
   getStrengthsWeaknesses, JourneySection, LearningInsight, MedicalProfile, StrengthsWeaknesses
 } from "@/lib/medicalProfile";
-import { SectionTour } from "@/components/product-tour/SectionTour";
-import { progressTourSteps } from "@/lib/productTour";
 
 const rewardIcons: Record<string, typeof Flame> = {
   dailyLogin: Flame,
@@ -223,11 +221,9 @@ export default function ProgressPage() {
     <h1 className="display mt-5 text-4xl leading-tight sm:text-5xl">Who you're becoming.</h1>
     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-500">Studium doesn't just track hours—it learns what kind of student you are from what you actually study, answer, and improve at.</p>
 
-    {/* Your Medical Profile—the page's visual centerpiece. Tour anchor lives
-        here, not on the whole <section>—see the same note on
-        app/dashboard/(main)/flashcards/page.tsx. */}
+    {/* Your Medical Profile—the page's visual centerpiece. */}
     <Reveal>
-      <div data-tour="progress-main" className="relative mt-10 overflow-hidden rounded-3xl border border-teal-100 dark:border-teal-500/20 bg-gradient-to-br from-teal-50 via-white to-white dark:from-[#0d2b29] dark:via-[#0d1917] dark:to-[#0d1917] p-7 shadow-soft dark:shadow-none sm:p-9">
+      <div className="relative mt-10 overflow-hidden rounded-3xl border border-teal-100 dark:border-teal-500/20 bg-gradient-to-br from-teal-50 via-white to-white dark:from-[#0d2b29] dark:via-[#0d1917] dark:to-[#0d1917] p-7 shadow-soft dark:shadow-none sm:p-9">
         <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-teal-200/40 dark:bg-teal-500/10 blur-3xl" />
         <div className="relative flex flex-wrap items-start justify-between gap-6">
           <div>
@@ -510,6 +506,5 @@ export default function ProgressPage() {
         </motion.div>
       </motion.div>}
     </AnimatePresence>
-    <SectionTour id="progress" steps={progressTourSteps} />
   </section>;
 }

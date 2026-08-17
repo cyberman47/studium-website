@@ -20,8 +20,6 @@ import {
 } from "@/lib/flashcardDecks";
 import { PERSONAL_FLASHCARDS_EVENT } from "@/lib/personalFlashcards";
 import { TERM_PROGRESS_EVENT } from "@/lib/terminology";
-import { SectionTour } from "@/components/product-tour/SectionTour";
-import { flashcardsTourSteps } from "@/lib/productTour";
 
 const sourceLabels: Record<CardSource, string> = { terminology: "Terminology", lesson: "Lesson", personal: "My Cards" };
 const sourceIcons: Record<CardSource, typeof BookA> = { terminology: BookA, lesson: Layers, personal: Star };
@@ -202,12 +200,8 @@ export default function FlashcardsPage() {
       <button type="button" onClick={() => setStudyQueue({ title: "Today's Review", cards: dueCards })} className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-teal-600 px-5 py-2.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#0d9488] transition hover:-translate-y-0.5 hover:bg-teal-700"><RotateCcw size={15} />Study Due Cards</button>
     </div>}
 
-    {/* 5 real overview stats: what do I have / what do I know / what's left.
-        Tour anchor lives here, not on the whole <section>—a spotlight target
-        that size ends up dimming almost nothing and visibly resizing as the
-        page's content streams in, which reads as a laggy, screen-covering
-        outline instead of a real highlight. */}
-    <div data-tour="flashcards-main" className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    {/* 5 real overview stats: what do I have / what do I know / what's left. */}
+    <div className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {[
         { key: "total" as const, label: "Total Cards", value: overview.total, icon: Layers, classes: "text-heading" },
         { key: "mastered" as const, label: "Mastered", value: overview.mastered, icon: CheckCircle2, classes: statusStyles.mastered.text },
@@ -423,7 +417,6 @@ export default function FlashcardsPage() {
         />
       </div>
     </div>}
-    <SectionTour id="flashcards" steps={flashcardsTourSteps} />
   </section>;
 }
 

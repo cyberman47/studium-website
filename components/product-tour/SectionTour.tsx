@@ -3,14 +3,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowRight, Bot, BookA, Calendar, ChevronDown, Layers, Map as MapIcon, RotateCcw, Sparkles, TrendingUp, X
-} from "lucide-react";
-import { hasSeenSectionTour, LoopStage, markSectionTourSeen, SectionId, TourStep } from "@/lib/productTour";
-
-const loopIcons: Record<LoopStage["icon"], typeof Calendar> = {
-  calendar: Calendar, map: MapIcon, layers: Layers, bookA: BookA, trendingUp: TrendingUp, bot: Bot
-};
+import { ArrowRight, Sparkles, X } from "lucide-react";
+import { hasSeenSectionTour, markSectionTourSeen, SectionId, TourStep } from "@/lib/productTour";
 
 // Tracks the on-screen rect (+ the target's own corner radius, so the
 // spotlight ring can genuinely match its shape instead of guessing) of
@@ -94,7 +88,16 @@ function usePopoverStyle(rect: DOMRect | null, tooltipRef: React.RefObject<HTMLD
   useLayoutEffect(() => {
     if (!rect || !tooltipRef.current) return;
     const el = tooltipRef.current;
-    const w = el.offsetWidth || 340;
+    // Fixed, not measured: the wrapper div carries an explicit CSS width
+    // (see TOOLTIP_WIDTH/its className below), so it never needs to be read
+    // back off the DOM for its width. Measuring el.offsetWidth here used to
+    // be the bug—on the very first spotlighted step, this effect can run
+    // before the wrapper has ever actually been laid out with a real width,
+    // so it read back the full, unconstrained container width (nearly the
+    // whole viewport) and then baked that huge number in permanently as
+    // this step's popover width. Height still genuinely varies by step
+    // content, so it's still measured live.
+    const w = TOOLTIP_WIDTH;
     const h = el.offsetHeight || 160;
     const gap = 16;
     const vw = window.innerWidth;
@@ -115,6 +118,11 @@ function usePopoverStyle(rect: DOMRect | null, tooltipRef: React.RefObject<HTMLD
 
 const PAD = 8;
 const DIM = "rgba(8,20,19,0.6)";
+// Fixed width for the anchored (non-mobile, non-modal) tooltip. Also applied
+// directly as a CSS class on the wrapper div below, so its intrinsic size is
+// always this—never dependent on how it happens to be styled at the moment
+// something measures it (see the comment in usePopoverStyle above).
+const TOOLTIP_WIDTH = 340;
 
 export function SectionTour({ id, steps, enabled = true, autoStartDelay = 350 }: { id: SectionId; steps: TourStep[]; enabled?: boolean; autoStartDelay?: number }) {
   const [mounted, setMounted] = useState(false);
@@ -167,10 +175,10 @@ export function SectionTour({ id, steps, enabled = true, autoStartDelay = 350 }:
 
   const isLastStep = stepIndex === steps.length - 1;
   const hasSpotlight = !!step.target && settled && !!rect;
-  // Progress dots only ever count real spotlight steps—Welcome/Loop/Finish
+  // Progress bar/counter only ever counts real spotlight steps—Welcome/Finish
   // are bookends, not "tour content" a step counter should include, so a
-  // 12-step dashboard tour with 3 modal bookends still shows "3 of 9", not
-  // a confusing "5 of 12".
+  // 7-step dashboard tour with 2 modal bookends still shows "2 of 5", not a
+  // confusing "3 of 7".
   const spotlightSteps = steps.filter(s => !!s.target);
   const spotlightPosition = spotlightSteps.findIndex(s => s.id === step.id);
 
@@ -190,32 +198,30 @@ export function SectionTour({ id, steps, enabled = true, autoStartDelay = 350 }:
 
   return createPortal(
     <div className="fixed inset-0 z-[100]" aria-live="polite">
-      {/* Centered modal treatment: dashboard's Welcome/Finish only. No
-          mode="wait" here—that would hold the incoming step hidden behind
-          the outgoing one's exit animation, which stalls if the tab is ever
-          backgrounded mid-transition (requestAnimationFrame just pauses).
-          Letting both render simultaneously means the new step is always
-          immediately correct regardless of animation timing. */}
+      {/* Centered modal treatment: Welcome/Finish only. No mode="wait"
+          here—that would hold the incoming step hidden behind the outgoing
+          one's exit animation, which stalls if the tab is ever backgrounded
+          mid-transition (requestAnimationFrame just pauses). Letting both
+          render simultaneously means the new step is always immediately
+          correct regardless of animation timing. */}
       {!step.target && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-4 backdrop-blur-[2px]">
         <AnimatePresence>
           <motion.div
             key={step.id}
             initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: -6 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className={`relative max-h-[85vh] w-full overflow-y-auto rounded-3xl border border-black/[0.06] bg-white p-8 shadow-lift dark:border-white/10 dark:bg-[#0d1917] dark:shadow-none ${step.isLoop ? "max-w-md text-center sm:max-w-lg" : "max-w-sm text-center"}`}
+            className="relative max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-3xl border border-black/[0.06] bg-white p-8 text-center shadow-lift dark:border-white/10 dark:bg-[#0d1917] dark:shadow-none"
           >
             <button type="button" onClick={close} aria-label="Skip tour" className="absolute right-4 top-4 cursor-pointer text-slate-300 transition hover:text-slate-500 dark:text-slate-600 dark:hover:text-slate-400"><X size={16} /></button>
 
-            {step.isLoop ? <LoopDiagram step={step} /> : <>
-              <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-300"><Sparkles size={24} /></span>
-              <h2 className="display mt-5 text-2xl text-heading dark:text-white">{step.title}</h2>
-              <div className="mt-3 space-y-2.5">
-                {bodyParagraphs.map(p => <p key={p} className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">{p}</p>)}
-              </div>
-            </>}
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-300"><Sparkles size={24} /></span>
+            <h2 className="display mt-5 text-2xl text-heading dark:text-white">{step.title}</h2>
+            <div className="mt-3 space-y-2.5">
+              {bodyParagraphs.map(p => <p key={p} className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">{p}</p>)}
+            </div>
 
             <button type="button" onClick={handlePrimary} className="mt-7 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">{step.nextLabel}</button>
-            <button type="button" onClick={close} className="mt-4 cursor-pointer text-xs font-bold text-slate-400 transition hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">{step.isFinish ? "Explore Dashboard" : "Skip tutorial"}</button>
+            {!step.isFinish && <button type="button" onClick={close} className="mt-4 cursor-pointer text-xs font-bold text-slate-400 transition hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">Skip tour</button>}
           </motion.div>
         </AnimatePresence>
       </div>}
@@ -242,7 +248,14 @@ export function SectionTour({ id, steps, enabled = true, autoStartDelay = 350 }:
         <div className="fixed z-[100] pointer-events-auto" style={{ top: rect.top - PAD, left: rect.right + PAD, right: 0, height: rect.height + PAD * 2 }} />
       </>}
 
-      {step.target && !isMobile && <div ref={tooltipRef} style={hasSpotlight ? popoverStyle : { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 340 }} className="z-[101] pointer-events-auto">
+      {step.target && !isMobile && <div
+        ref={tooltipRef}
+        style={hasSpotlight ? popoverStyle : { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)" }}
+        // w-[340px] lives here, as a real CSS class, not just inline
+        // style—so the box is always this compact size, even for the one
+        // frame before popoverStyle's own effect has run.
+        className="z-[101] w-[340px] max-w-[calc(100vw-2rem)] pointer-events-auto"
+      >
         <TourCard step={step} isLastStep={isLastStep} stepIndex={spotlightPosition} totalSteps={spotlightSteps.length} back={back} skip={close} onPrimary={handlePrimary} />
       </div>}
 
@@ -257,8 +270,9 @@ export function SectionTour({ id, steps, enabled = true, autoStartDelay = 350 }:
   );
 }
 
-// Only ever rendered for a spotlighted (non-modal) step, so a step count >
-// 1 always means Back is meaningful from the second step on.
+// Only ever rendered for a spotlighted (non-modal) step, so a step count > 1
+// always means Back is meaningful from the second step on, and totalSteps
+// (spotlightSteps.length) always counts >= 1.
 function TourCard({
   step, isLastStep, stepIndex, totalSteps, back, skip, onPrimary, sheet
 }: {
@@ -266,6 +280,9 @@ function TourCard({
   back: () => void; skip: () => void; onPrimary: () => void; sheet?: boolean;
 }) {
   const bodyParagraphs = step.body.split("\n\n");
+  const current = stepIndex + 1;
+  const remaining = Math.max(0, totalSteps - current);
+  const progressPercent = totalSteps > 0 ? Math.round((current / totalSteps) * 100) : 100;
   // See the modal's identical note above on why this isn't mode="wait":
   // Next/Back must always show the correct step immediately, never held
   // behind an outgoing card's exit animation.
@@ -280,7 +297,12 @@ function TourCard({
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-[15px] font-extrabold leading-snug text-heading dark:text-white">{step.title}</h3>
-        <button type="button" onClick={skip} aria-label="Skip tour" className="shrink-0 cursor-pointer text-slate-300 transition hover:text-slate-500 dark:text-slate-600 dark:hover:text-slate-400"><X size={15} /></button>
+        {/* A clear, labeled skip control—not just a bare icon tucked in the
+            corner—so ending the tour early is always obviously available,
+            on every single spotlighted step. */}
+        <button type="button" onClick={skip} className="flex shrink-0 cursor-pointer items-center gap-1 rounded-full px-2 py-1 text-[11px] font-bold text-slate-400 transition hover:bg-slate-50 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-white/5 dark:hover:text-slate-300">
+          Skip<X size={12} />
+        </button>
       </div>
 
       <div className="mt-2 space-y-2">
@@ -294,58 +316,23 @@ function TourCard({
         </span>)}
       </div>}
 
-      {step.groups && <div className="mt-3 grid grid-cols-2 gap-2">
-        {step.groups.map(g => <div key={g.label} className="rounded-xl border border-slate-100 dark:border-white/10 bg-[#f9fcfc] dark:bg-white/[0.03] px-2.5 py-2">
-          <p className="text-[10px] font-extrabold uppercase tracking-wide text-teal-600 dark:text-teal-300">{g.label}</p>
-          <p className="mt-0.5 text-[11px] leading-snug text-slate-500 dark:text-slate-400">{g.items.join(" · ")}</p>
-        </div>)}
+      {/* Real progress bar, not dots—shows exactly how far through the tour
+          this step is and how many are left, per the explicit requirement
+          this replaces a small dot row for. */}
+      {totalSteps > 1 && <div className="mt-4">
+        <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+          <span>Step {current} of {totalSteps}</span>
+          <span>{remaining > 0 ? `${remaining} left` : "Last step"}</span>
+        </div>
+        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
+          <div className="h-full rounded-full bg-teal-500 transition-[width] duration-300" style={{ width: `${progressPercent}%` }} />
+        </div>
       </div>}
 
-      <div className="mt-4 flex items-center justify-between gap-3">
-        {totalSteps > 1
-          ? <div className="flex items-center gap-1" aria-label={`Step ${stepIndex + 1} of ${totalSteps}`}>
-            {Array.from({ length: totalSteps }, (_, i) => i + 1).map(n => <span key={n} className={`h-1.5 w-1.5 rounded-full transition-colors ${n <= stepIndex + 1 ? "bg-teal-500" : "bg-slate-200 dark:bg-white/15"}`} />)}
-          </div>
-          : <span />}
-        <div className="flex items-center gap-2.5">
-          {stepIndex > 0 && <button type="button" onClick={back} className="cursor-pointer text-xs font-bold text-slate-400 transition hover:text-heading dark:text-slate-500 dark:hover:text-white">Back</button>}
-          <button type="button" onClick={onPrimary} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_20px_-10px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">{step.nextLabel}</button>
-        </div>
+      <div className="mt-4 flex items-center justify-end gap-2.5">
+        {stepIndex > 0 && <button type="button" onClick={back} className="cursor-pointer text-xs font-bold text-slate-400 transition hover:text-heading dark:text-slate-500 dark:hover:text-white">Back</button>}
+        <button type="button" onClick={onPrimary} className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-accent-500 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_20px_-10px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600">{step.nextLabel}</button>
       </div>
     </motion.div>
   </AnimatePresence>;
-}
-
-// The dashboard tour's "How it all connects" step—the one deliberately
-// non-tooltip moment in the whole flow. A vertical run of the real study
-// loop (Plan → Learn → Practice → Review → Track → Improve), each stage
-// paired with the one real feature that actually does that job, closing
-// with a "repeat" note rather than a seventh box—this is a loop, not a
-// checklist with an end.
-function LoopDiagram({ step }: { step: TourStep }) {
-  const bodyParagraphs = step.body.split("\n\n");
-  return <>
-    <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-300"><RotateCcw size={22} /></span>
-    <h2 className="display mt-4 text-2xl text-heading dark:text-white">{step.title}</h2>
-    <div className="mt-2 space-y-1.5">
-      {bodyParagraphs.map(p => <p key={p} className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">{p}</p>)}
-    </div>
-
-    <div className="mt-6 text-left">
-      {step.loopStages?.map((s, i) => {
-        const Icon = loopIcons[s.icon];
-        return <div key={s.stage}>
-          <div className="flex items-center gap-3 rounded-2xl border border-slate-100 dark:border-white/10 bg-[#f9fcfc] dark:bg-white/[0.03] px-4 py-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-300"><Icon size={16} /></span>
-            <div className="min-w-0">
-              <p className="text-sm font-extrabold text-heading dark:text-white">{s.stage}</p>
-              <p className="text-xs font-bold text-teal-600 dark:text-teal-300">{s.feature}</p>
-            </div>
-          </div>
-          {i < step.loopStages!.length - 1 && <div className="flex justify-center py-1"><ChevronDown size={14} className="text-slate-300 dark:text-slate-600" /></div>}
-        </div>;
-      })}
-      <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-400"><RotateCcw size={12} />Then repeat, as often as you need.</div>
-    </div>
-  </>;
 }

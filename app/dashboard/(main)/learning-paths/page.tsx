@@ -146,7 +146,7 @@ export default function LearningPathsPage() {
           </div>
         </div>
 
-        <div>
+        <div data-tour="browse-paths">
           <h2 className="text-lg font-extrabold tracking-tight">Browse Paths</h2>
           <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
             {orderedTracks.map(track => {
@@ -168,7 +168,7 @@ export default function LearningPathsPage() {
 
       {/* Sidebar column (~30%) */}
       <div className="space-y-6">
-        <div className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft">
+        <div data-tour="paths-progress" className="rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft">
           <h2 className="text-lg font-extrabold tracking-tight">Your Progress</h2>
           {currentPathDef && <p className="mt-1 flex items-center gap-1.5 text-xs font-bold text-slate-500">{pathId && pathEmoji[pathId]} Currently studying {currentPathDef.label}</p>}
           <div className="mt-4 grid grid-cols-2 gap-3">
@@ -189,7 +189,7 @@ export default function LearningPathsPage() {
           </div>
         </div>
 
-        <Link href="/dashboard/terminology" className="block rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
+        <Link href="/dashboard/terminology" data-tour="paths-terminology-link" className="block rounded-3xl border border-slate-100 dark:border-white/10 bg-white dark:bg-[#0d1917] p-6 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-extrabold tracking-tight">Terminology Track</h2>
             <ArrowUpRight size={15} className="shrink-0 text-slate-300" />

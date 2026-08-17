@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowUpRight, Calendar, ChevronRight, Clock, Dna, Flame, FlaskConical, Medal, Play, Stethoscope, Swords, Target, Trophy, Zap } from "lucide-react";
 import { getUser, isOnboardingComplete } from "@/lib/onboarding";
 import { DailyActivityPoint, getLevelInfo, getStreak, getTodayActivity, getTotalKP, getWeeklyActivity, getWeeklyActivityByDay, LevelInfo, recordVisit } from "@/lib/progress";
@@ -17,7 +16,7 @@ import { fetchRealLeaderboard, fetchWeeklyLeaderboard, getMyStanding, Leaderboar
 import { challengeToBattle } from "@/lib/battles";
 import { ReferEarnCard } from "@/components/refer-earn-card";
 import { SectionTour } from "@/components/product-tour/SectionTour";
-import { dashboardTourSteps, getRecommendedLearningHref } from "@/lib/productTour";
+import { dashboardTourSteps } from "@/lib/productTour";
 
 const difficultyClasses: Record<string, string> = {
   Beginner: "bg-emerald-500/15 text-emerald-300",
@@ -86,15 +85,6 @@ function formatStudyMinutes(totalMinutes: number): string {
 }
 
 export default function DashboardHomePage() {
-  const router = useRouter();
-  // The tour's own step content lives in lib/productTour.ts; the "Start
-  // Learning →" navigation is attached here since only this page's router
-  // can act on it.
-  const tourSteps = useMemo(
-    () => dashboardTourSteps.map(s => s.isFinish ? { ...s, action: () => router.push(getRecommendedLearningHref()) } : s),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
   const [name, setName] = useState("");
   const [streak, setStreak] = useState(0);
   const [totalKP, setTotalKP] = useState(0);
@@ -347,7 +337,7 @@ export default function DashboardHomePage() {
       {/* RIGHT: sidebar stack */}
       <div className="flex flex-col gap-4 lg:col-span-1">
         {/* Daily Case Challenge */}
-        {todaysCase && <div className="relative h-fit overflow-hidden rounded-3xl bg-[#0F172A] p-5 text-white shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+        {todaysCase && <div data-tour="daily-case" className="relative h-fit overflow-hidden rounded-3xl bg-[#0F172A] p-5 text-white shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
           <Stethoscope size={110} className="pointer-events-none absolute -right-6 -top-6 text-white/5" />
           {/* Decorative ECG trace—no real telemetry, purely visual like the stethoscope glyph above. */}
           <svg viewBox="0 0 120 24" className="pointer-events-none absolute bottom-3 right-3 h-6 w-24 text-teal-400/30"><polyline points="0,12 20,12 26,4 32,20 38,12 50,12 56,8 60,16 66,12 120,12" fill="none" stroke="currentColor" strokeWidth="2" /></svg>
@@ -402,7 +392,7 @@ export default function DashboardHomePage() {
       </div>
     </div>
 
-    <SectionTour id="dashboard" steps={tourSteps} enabled={isOnboardingComplete()} />
+    <SectionTour id="dashboard" steps={dashboardTourSteps} enabled={isOnboardingComplete()} />
   </section>;
 }
 
@@ -489,7 +479,7 @@ function LeaderboardCard({ name, totalKP, streak }: { name: string; totalKP: num
     if (outcome) setChallengedIds(s => new Set(s).add(opponentId));
   }
 
-  return <div className={`${cardClass} p-5`}>
+  return <div data-tour="leaderboard" className={`${cardClass} p-5`}>
     <div className="flex items-center justify-between gap-3">
       <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400"><Trophy size={13} className="text-amber-500" />Leaderboard</span>
       <button type="button" onClick={() => setView(v => v === "allTime" ? "weekly" : "allTime")} className="flex cursor-pointer items-center gap-0.5 text-xs font-bold text-slate-400 transition hover:text-heading dark:hover:text-white">{view === "weekly" ? "Weekly" : "All-time"}<ChevronRight size={13} /></button>
