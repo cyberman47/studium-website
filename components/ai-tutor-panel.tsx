@@ -29,6 +29,16 @@ export const modeIcons: Record<TutorMode, typeof GraduationCap> = { tutor: Gradu
 // General-purpose study utilities—useful for any subject, not locked to one
 // exam or curriculum.
 export const quickActions: { label: string; build: (ctx: TutorContext) => string }[] = [
+  // Grounded in ctx.currentOnScreenText when a caller has attached it (a
+  // lesson concept's own text, a flashcard's front/back, a quiz question's
+  // own options)—quoted straight into the prompt so the model expands on
+  // exactly what's already in front of the student, rather than guessing
+  // what "this" means from the lesson title alone. Falls back to the same
+  // flashcard/question/lessonTitle chain the other quick actions already
+  // use when nothing more specific is attached.
+  { label: "🔍 Explain more about this", build: ctx => ctx.currentOnScreenText
+    ? `Here's exactly what I'm currently looking at:\n\n${ctx.currentOnScreenText}\n\nExplain more about this—go deeper than what I've already read.`
+    : `Explain ${ctx.currentFlashcard?.front ?? ctx.currentPracticeQuestion?.question ?? ctx.lessonTitle} in more depth.` },
   { label: "💡 Give me a hint", build: () => "Give me a hint, don't tell me the answer yet." },
   { label: "⚡ Explain simply", build: ctx => `Explain ${ctx.currentFlashcard?.front ?? ctx.lessonTitle} in the simplest way possible.` },
   { label: "📝 Give me an example", build: ctx => `Give me a real-world example of ${ctx.currentFlashcard?.front ?? ctx.lessonTitle}.` },

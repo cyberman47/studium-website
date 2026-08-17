@@ -33,6 +33,9 @@ type TutorContext = {
   // at the time they sent this message—optional since not every existing
   // caller has been updated, and older cached clients shouldn't 400.
   currentTrack?: string;
+  // Free-text snapshot of exactly what's on the student's screen right
+  // now (see lib/tutorChat.ts)—optional for the same reason as above.
+  currentOnScreenText?: string | null;
 };
 
 type HistoryTurn = { role: "user" | "assistant"; text: string };
@@ -42,6 +45,7 @@ const MAX_TOKENS = 1024;
 const MAX_MESSAGE_LENGTH = 4000;
 const MAX_HISTORY_TURNS = 20;
 const MAX_MISTAKES = 20;
+const MAX_ON_SCREEN_TEXT_LENGTH = 3000;
 
 // Same real prose that used to power buildPlaceholderReply's "if it were
 // connected, I'd..." line—now it's genuinely the model's instruction.
@@ -91,7 +95,8 @@ function sanitizeContext(raw: unknown): TutorContext | null {
       : null,
     recentMistakes: Array.isArray(c.recentMistakes) ? c.recentMistakes.filter((m): m is string => typeof m === "string").slice(0, MAX_MISTAKES) : [],
     studentLevel: typeof c.studentLevel === "string" ? c.studentLevel : "",
-    currentTrack: typeof c.currentTrack === "string" ? c.currentTrack : undefined
+    currentTrack: typeof c.currentTrack === "string" ? c.currentTrack : undefined,
+    currentOnScreenText: typeof c.currentOnScreenText === "string" ? c.currentOnScreenText.slice(0, MAX_ON_SCREEN_TEXT_LENGTH) : null
   };
 }
 
@@ -121,6 +126,12 @@ function buildSystemPrompt(mode: TutorMode, context: TutorContext): string {
   if (context.currentPracticeQuestion) {
     const { question, studentAnswer } = context.currentPracticeQuestion;
     lines.push(`Current practice question: "${question}"${studentAnswer ? ` — student answered: "${studentAnswer}"` : " (not yet answered)"}`);
+  }
+  if (context.currentOnScreenText) {
+    // Quoted verbatim, not summarized—the whole point is grounding the
+    // reply in the literal text already in front of the student (a lesson
+    // concept, a highlighted passage, etc.), not a paraphrase of it.
+    lines.push(`Exactly what the student currently has on their screen:\n"""\n${context.currentOnScreenText}\n"""`);
   }
   if (context.recentMistakes.length > 0) {
     lines.push(`Recent mistakes/misses: ${context.recentMistakes.join(", ")}`);

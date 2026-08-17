@@ -175,6 +175,20 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
   const level = getLevelInfo(getTotalKP());
   const missedConcepts = Array.from(new Set(results.map((r, i) => !r.correct ? lesson.practiceQuestions[i]?.concept : null).filter((c): c is string => !!c)));
 
+  // Whatever's specifically on screen for the current step, in the model's
+  // own words rather than just a step label—captured locally, at zero AI
+  // cost, so any message sent while it's set is grounded in the literal
+  // flashcard/question already in front of the student. The "Learn" step
+  // doesn't set this at the page level (no single "current" concept—each
+  // concept's own "Explain more about this" button attaches its own
+  // snapshot directly, see sendToTutor below).
+  const currentOnScreenText: string | null =
+    step === "flashcards" && lesson.flashcards[cardIndex]
+      ? `Front: ${lesson.flashcards[cardIndex].front}\nBack: ${lesson.flashcards[cardIndex].back}`
+      : step === "practice" && practiceState
+        ? `Question: ${practiceState.question.question}\nOptions: ${practiceState.question.options.join(", ")}`
+        : null;
+
   const tutorContext: TutorContext = {
     sectionName: section?.shortTitle ?? lesson.sectionId,
     subjectName: subject?.name ?? lesson.subjectId,
@@ -187,7 +201,8 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
       : null,
     currentTrack: findCurrentPathDef(getCurrentPathId())?.label,
     recentMistakes: missedConcepts,
-    studentLevel: `Level ${level.level} · ${level.name}`
+    studentLevel: `Level ${level.level} · ${level.name}`,
+    currentOnScreenText
   };
 
   function handleMouseUp() {
@@ -199,8 +214,13 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
     setConnectedTerms(null);
   }
 
-  function sendToTutor(text: string) {
-    sendMessage(lesson!.id, text, getTutorMode(), tutorContext);
+  // onScreenText overrides the page-level snapshot above for one send only
+  // (e.g. a specific concept's own "Explain more about this" button)—
+  // without touching tutorContext itself, so the AI panel's own ambient
+  // context for the current step isn't clobbered by a one-off concept quote.
+  function sendToTutor(text: string, onScreenText?: string) {
+    const ctx = onScreenText ? { ...tutorContext, currentOnScreenText: onScreenText } : tutorContext;
+    sendMessage(lesson!.id, text, getTutorMode(), ctx);
     setHighlight(null);
   }
 
@@ -213,11 +233,12 @@ export default function MCATLessonPage({ params }: { params: { section: string; 
   }
 
   // Scientific Method prototype's "✨ Studium AI" toolbar button and its
-  // per-concept "🧠 Teach Me"—opens the same real AI panel/chat every other
-  // trigger on this page uses, optionally with a concept-specific prompt.
-  function openAIPanel(prompt?: string) {
+  // per-concept "🧠 Teach Me" / "Explain more about this"—opens the same
+  // real AI panel/chat every other trigger on this page uses, optionally
+  // with a concept-specific prompt and its own on-screen text snapshot.
+  function openAIPanel(prompt?: string, onScreenText?: string) {
     setPanelOpen(true);
-    if (prompt) sendToTutor(prompt);
+    if (prompt) sendToTutor(prompt, onScreenText);
   }
 
   function handleConnectConcepts() {

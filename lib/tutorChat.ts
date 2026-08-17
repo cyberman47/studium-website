@@ -35,6 +35,16 @@ export type TutorContext = {
   // The student's real "Currently Studying" track label (lib/currentPath.ts)
   // at send-time—lets /api/tutor frame its answer for their actual field.
   currentTrack?: string;
+  // A free-text snapshot of exactly what's on the student's screen right
+  // now—a lesson concept's own text, a flashcard's front/back, or a quiz
+  // question's own options—captured locally in the browser at zero AI
+  // cost. Only ever attached when something more specific than "the whole
+  // lesson" is on screen; /api/tutor quotes it verbatim to the model so a
+  // reply is grounded in exactly what the student is already looking at,
+  // not a guess at what "this" refers to. The real API call (and its
+  // credit cost) only happens once the student actually sends a message—
+  // attaching this text is free.
+  currentOnScreenText?: string | null;
 };
 
 const CHAT_KEY_PREFIX = "studium_tutor_chat_";

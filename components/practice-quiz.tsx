@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowLeft, ArrowRight, Bookmark, Bot, Check, Clock3, Eraser, Flag, HelpCircle, Maximize, Minimize,
+  ArrowLeft, ArrowRight, Bookmark, Check, Clock3, Eraser, Flag, HelpCircle, Maximize, Minimize,
   PartyPopper, X
 } from "lucide-react";
 import { PracticeQuestion } from "@/lib/mcatPath";
 import { getSavedQuestionIds, SAVED_QUESTIONS_EVENT, toggleSavedQuestion } from "@/lib/practiceHistory";
+import { AiFabTrigger } from "./ai-fab-trigger";
 import { AiTutorPanel } from "./ai-tutor-panel";
 import { InteractiveText } from "./interactive-text";
 import { TutorContext } from "@/lib/tutorChat";
@@ -166,7 +167,8 @@ export function PracticeQuiz({
     currentFlashcard: null,
     currentPracticeQuestion: { question: q.question, studentAnswer: current.selected !== null ? q.options[current.selected] : null },
     recentMistakes: [],
-    studentLevel: (() => { const l = getLevelInfo(getTotalKP()); return `Level ${l.level} · ${l.name}`; })()
+    studentLevel: (() => { const l = getLevelInfo(getTotalKP()); return `Level ${l.level} · ${l.name}`; })(),
+    currentOnScreenText: `Question: ${q.question}\nOptions: ${q.options.join(", ")}`
   } : null;
 
   function setCurrent(idx: number, next: Partial<PerQuestionState>) {
@@ -261,7 +263,17 @@ export function PracticeQuiz({
     className={`grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full transition ${isSaved ? "text-amber-500" : "text-slate-400 hover:bg-slate-100 dark:bg-white/10 hover:text-heading"}`}
   ><Bookmark size={16} fill={isSaved ? "currentColor" : "none"} /></button>;
 
-  const tutorToggle = liveTutorContext && <button type="button" onClick={() => setAiOpen(o => !o)} title="Ask Studium AI" className={`grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full transition ${aiOpen ? "bg-teal-50 dark:bg-teal-500/15 dark:text-teal-300 text-teal-600" : "text-slate-400 hover:bg-slate-100 dark:bg-white/10 hover:text-heading"}`}><Bot size={16} /></button>;
+  // Same floating bottom-right bubble every flashcard study surface in the
+  // app already has (components/ai-fab-trigger.tsx)—not a small header icon
+  // anymore, so asking for help looks and behaves identically whether
+  // you're reviewing flashcards or taking a quiz.
+  const aiFab = liveTutorContext && <AiFabTrigger
+    open={aiOpen}
+    onToggle={() => setAiOpen(o => !o)}
+    hasContext
+    contextLabel={`Context: Question - "${q.question}"`}
+    zIndexClassName="z-[120]"
+  />;
 
   const timerBadge = timed && timeLimitSeconds ? <span className={`flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-extrabold tabular-nums ${secondsLeft <= 30 ? "bg-rose-100 dark:bg-rose-500/20 dark:text-rose-300 text-rose-700" : "bg-slate-100 dark:bg-white/10 text-slate-600"}`}><Clock3 size={13} />{formatClock(secondsLeft)}</span> : null;
 
@@ -369,7 +381,6 @@ export function PracticeQuiz({
         <div className="flex items-center gap-1.5">
           {!showSummary && timerBadge}
           {!showSummary && bookmarkButton}
-          {!showSummary && tutorToggle}
           {/* Manual maximize/minimize is intentionally omitted for
               controlled sessions (started via the Practice Workspace)—
               there's no smaller view to shrink back into, so offering the
@@ -416,6 +427,7 @@ export function PracticeQuiz({
       </footer>}
 
       {tutorDrawer}
+      {aiFab}
     </div>;
   }
 
@@ -423,7 +435,6 @@ export function PracticeQuiz({
     <div className="flex items-center justify-between">
       <h2 className="text-lg font-extrabold tracking-tight">{title}</h2>
       <div className="flex items-center gap-2">
-        {tutorToggle}
         {bookmarkButton}
         <button type="button" onClick={() => setIsFullscreen(true)} title="Fullscreen" className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-heading"><Maximize size={15} /></button>
         <p className="ml-1 shrink-0 text-xs font-bold text-slate-500">{qIndex + 1} / {questions.length}</p>
@@ -433,5 +444,6 @@ export function PracticeQuiz({
     {optionsList}
     {embeddedFooter}
     {tutorDrawer}
+    {aiFab}
   </div>;
 }

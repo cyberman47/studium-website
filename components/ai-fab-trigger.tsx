@@ -7,7 +7,7 @@
 // a single floating action button so the control looks and behaves
 // identically no matter which view state it's opened from.
 import { useEffect } from "react";
-import { Sparkles } from "lucide-react";
+import { Bot } from "lucide-react";
 
 export function AiFabTrigger({
   open, onToggle, hasContext = false, contextLabel, zIndexClassName = "z-50"
@@ -47,10 +47,13 @@ export function AiFabTrigger({
     type="button"
     onClick={onToggle}
     title={contextLabel ?? "Ask Studium AI (⌘K)"}
-    className={`fixed bottom-6 right-6 ${zIndexClassName} flex h-14 w-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-teal-600 text-white shadow-xl transition-all hover:bg-teal-700 hover:shadow-2xl sm:h-auto sm:w-auto sm:justify-start sm:rounded-full sm:px-4 sm:py-3 ${hasContext ? "ring-4 ring-teal-300/50" : ""}`}
+    aria-label="Ask Studium AI"
+    // Always a plain teal circle with a robot glyph—no expanding text pill
+    // on wider screens—so the same unmistakably-AI icon appears identically
+    // on every flashcard surface in the app, full screen or embedded.
+    className={`fixed bottom-6 right-6 ${zIndexClassName} flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-teal-600 text-white shadow-xl transition-all hover:bg-teal-700 hover:shadow-2xl ${hasContext ? "ring-4 ring-teal-300/50" : ""}`}
   >
-    <Sparkles size={18} className="shrink-0" />
-    <span className="hidden text-sm font-bold sm:inline">Ask Studium AI</span>
-    {hasContext && <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-white sm:right-1.5 sm:top-1.5" />}
+    <Bot size={24} className="shrink-0" />
+    {hasContext && <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-white" />}
   </button>;
 }

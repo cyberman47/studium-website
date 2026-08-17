@@ -11,8 +11,14 @@ import { useLessonSpeech } from "@/components/scientific-method/use-lesson-speec
 import { Concept, Difficulty, DocumentLessonContent } from "@/lib/documentLesson";
 import { isInLibrary, toggleLibrarySave } from "@/lib/myLibrary";
 import { LessonContent } from "@/lib/mcatPath";
-import { SectionTour } from "@/components/product-tour/SectionTour";
-import { lessonTourSteps } from "@/lib/productTour";
+
+// The literal on-screen text a concept's "Explain more about this" button
+// attaches to the AI's context—copied straight from the same coreIdea/learn
+// content already rendered below, so the model is grounded in exactly what
+// the student is looking at rather than reconstructing it from the title.
+function conceptOnScreenText(c: Concept): string {
+  return `${c.title}\n\nCore idea: ${c.coreIdea}\n\n${c.learn.join("\n\n")}`;
+}
 
 function progressKey(lessonId: string): string {
   return `studium_doclesson_${lessonId}_v1`;
@@ -55,7 +61,12 @@ export function ScientificMethodLesson({
 }: {
   lesson: LessonContent;
   content: DocumentLessonContent;
-  onOpenAI: (prompt?: string) => void;
+  // onScreenText, when passed, is the literal on-screen content a concept's
+  // own button attaches to the AI's context (see TutorContext.
+  // currentOnScreenText in lib/tutorChat.ts)—copied in locally at zero AI
+  // cost, so the reply this prompt triggers is grounded in exactly what the
+  // student already read, not a guess from the lesson title alone.
+  onOpenAI: (prompt?: string, onScreenText?: string) => void;
   onContinueToFlashcards: () => void;
 }) {
   const { lessonIntro, bigPicture, concepts } = content;
@@ -131,7 +142,7 @@ export function ScientificMethodLesson({
 
       {/* Progress + contents—styled as a document table of contents, not a
           row of dashboard chips. */}
-      <div data-tour="lesson-concept-nav" className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-y border-slate-100 dark:border-white/10 py-3">
+      <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-y border-slate-100 dark:border-white/10 py-3">
         <div className="flex items-center gap-2.5">
           <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><div className="h-full rounded-full bg-teal-500 transition-all duration-500" style={{ width: `${percent}%` }} /></div>
           <span className="text-[11px] font-bold text-slate-400">{done.size} of {concepts.length} concepts</span>
@@ -170,6 +181,7 @@ export function ScientificMethodLesson({
         concept={c}
         onAnswered={() => markDone(c.id)}
         onTeachMe={() => onOpenAI(`Before we continue in the ${lesson.title} lesson, quiz me on "${c.title}"—ask me one question and evaluate my answer.`)}
+        onExplainMore={() => onOpenAI(`Explain more about "${c.title}"—go deeper than what I've already read.`, conceptOnScreenText(c))}
       />)}
     </div>
 
@@ -191,7 +203,6 @@ export function ScientificMethodLesson({
     </div>
 
     <p className="mt-3 px-1 text-xs text-slate-400">Tip: highlight any sentence above for more options.</p>
-    <SectionTour id="lesson" steps={lessonTourSteps} />
   </div>;
 }
 
@@ -204,7 +215,7 @@ function FlowDiagram({ steps }: { steps: string[] }) {
   </div>;
 }
 
-function ConceptSection({ concept: c, onAnswered, onTeachMe }: { concept: Concept; onAnswered: () => void; onTeachMe: () => void }) {
+function ConceptSection({ concept: c, onAnswered, onTeachMe, onExplainMore }: { concept: Concept; onAnswered: () => void; onTeachMe: () => void; onExplainMore: () => void }) {
   return <div id={`concept-${c.id}`} className="scroll-mt-24 mt-16 border-t border-slate-100 dark:border-white/10 pt-16">
     <div className="flex items-baseline gap-3">
       <span className="font-display text-2xl font-extrabold text-slate-300 dark:text-slate-700">{c.number}</span>
@@ -226,6 +237,12 @@ function ConceptSection({ concept: c, onAnswered, onTeachMe }: { concept: Concep
       <div className={`${prose} mt-3 space-y-4`}>
         {c.learn.map(p => <p key={p}><InteractiveText text={p} /></p>)}
       </div>
+      {/* Pastes this concept's own Core Idea + Learn text straight into
+          Studium AI's context (see conceptOnScreenText above)—so asking to
+          go deeper is grounded in exactly what's already on screen, not a
+          re-explanation from scratch. No AI credit is spent opening this;
+          only sending the resulting message is a real call. */}
+      <button type="button" onClick={onExplainMore} className="mt-4 flex cursor-pointer items-center gap-1.5 text-xs font-bold text-slate-400 transition hover:text-teal-700 dark:hover:text-teal-300"><Sparkles size={12} />Explain more about this →</button>
     </div>
 
     {/* Visualize / Analyze */}
