@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Activity, BookOpen, Bot, BrainCircuit, ChevronDown, FileQuestion, FlaskConical, Gift, GraduationCap, Heart, HeartPulse, Home as HomeIcon, Instagram, Layers3, Linkedin, MessageCircle, Microscope, Orbit, PlayCircle, Quote, Rocket, ShieldCheck, Smartphone, Sparkles, Stethoscope, WandSparkles } from "lucide-react";
+import { Activity, BookOpen, Bot, BrainCircuit, ChevronDown, ChevronRight, Clock3, FileQuestion, FlaskConical, Gift, GraduationCap, Heart, HeartPulse, Home as HomeIcon, Instagram, Layers3, Linkedin, MessageCircle, Microscope, Orbit, PlayCircle, Quote, Rocket, ShieldCheck, Smartphone, Sparkles, Stethoscope, Target, WandSparkles } from "lucide-react";
 import { DashboardMockup, AIChat } from "@/components/dashboard";
 import { Logo, Navigation } from "@/components/navigation";
 import { AppleIcon, CheckLine, GooglePlayIcon, PrimaryButton, Reveal, TikTokIcon, VideoButton } from "@/components/ui";
@@ -36,10 +36,10 @@ function Hero() {
         <Reveal delay={.15}><p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-500 sm:text-lg">Everything you need to master your studies in one place—from AI-powered learning and organized notes to flashcards, quizzes, and clinical cases.</p></Reveal>
         <Reveal delay={.22} className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"><PrimaryButton className="w-full !px-7 !py-3.5 !text-base sm:w-auto">Start learning for free</PrimaryButton><VideoButton className="w-full sm:w-auto" /></Reveal>
       </div>
+      {/* DashboardMockup's hero size now supplies its own top-left "Study
+          Shield" streak card, so the standalone badge that used to live
+          here was removed rather than kept as a second, overlapping one. */}
       <Reveal delay={.18} className="relative mt-16 pb-6 sm:mt-20">
-        <div className="absolute -left-4 -top-6 z-10 hidden rounded-2xl border border-white bg-white/90 p-3 shadow-lift backdrop-blur dark:border-white/10 dark:bg-[#0d1917]/90 md:block float">
-          <div className="flex items-center gap-2"><div className="text-lg">🔥</div><div><p className="text-[10px] font-extrabold text-heading">12 day streak</p><p className="text-[9px] text-slate-500">You&apos;re on a roll!</p></div></div>
-        </div>
         <DashboardMockup hero />
       </Reveal>
     </div>
@@ -55,15 +55,19 @@ function LearningShowcase() {
       <div className="container-page relative grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
         <Reveal className="order-2 lg:order-1 lg:col-span-5">
           {/* Slim iPhone-15-Pro-style frame: thin bezel, dynamic island,
-              and a fixed size (no continuous bounce) so it reads as a
-              real device next to the copy rather than a floating blob. */}
-          <div className="relative mx-auto w-full max-w-[240px] sm:max-w-[270px]">
-            <div className="absolute inset-x-4 inset-y-10 -z-10 rounded-[60px] bg-teal-500/10 blur-2xl" />
+              and a real status bar + bottom tab bar/home indicator so it
+              reads as a real device next to the copy rather than a
+              floating blob. `group` + a subtle hover tilt on the frame,
+              a proper radial-gradient back-light, and a glassmorphic
+              (not flat) floating badge—the same premium treatment already
+              applied to the dashboard mockup, brought over here. */}
+          <div className="group relative mx-auto w-full max-w-[240px] sm:max-w-[270px]">
+            <div className="absolute left-1/2 top-1/2 -z-10 h-[130%] w-[150%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(15,139,141,.30),rgba(15,139,141,0)_65%)] blur-3xl" />
             {/* True iPhone proportions (9:19.5) instead of a squared-off
                 card—an explicit aspect-ratio, a real status bar, and a
                 bottom tab bar + home indicator are what make it read as
                 a phone rather than a rounded rectangle. */}
-            <div className="relative aspect-[9/19.5] overflow-hidden rounded-[46px] border-[3px] border-ink bg-white dark:bg-[#0d1917] shadow-[0_28px_55px_-18px_rgba(15,80,80,.35)]">
+            <div className="relative aspect-[9/19.5] overflow-hidden rounded-[46px] border-[3px] border-ink bg-white dark:bg-[#0d1917] shadow-[0_28px_55px_-18px_rgba(15,80,80,.35)] transition-transform duration-500 ease-out group-hover:-rotate-1 group-hover:scale-[1.015]">
               <div className="absolute left-1/2 top-2 z-10 h-[18px] w-[72px] -translate-x-1/2 rounded-full bg-ink" />
               <div className="flex h-full flex-col">
                 <div className="flex items-center justify-between px-5 pb-1 pt-3 text-[8px] font-bold text-heading">
@@ -73,10 +77,38 @@ function LearningShowcase() {
                 <div className="flex flex-1 flex-col px-3.5 pb-2 pt-4">
                   <div className="flex items-center justify-between"><p className="text-[9px] font-extrabold text-heading">Medical revision</p><span className="text-[8px] font-bold text-teal-600">7 / 12</span></div>
                   <div className="mt-3 overflow-hidden rounded-2xl border border-teal-100 dark:border-teal-500/20 bg-[#effbfa] dark:bg-teal-500/10">
-                    <div className="flex h-24 items-center justify-center bg-[radial-gradient(circle_at_center,#d8f4f1,transparent_70%)] dark:bg-[radial-gradient(circle_at_center,rgba(15,139,141,.25),transparent_70%)]"><div className="relative grid h-14 w-14 place-items-center rounded-full border-4 border-teal-400/40 bg-white dark:bg-[#0d1917] text-teal-600 shadow-sm"><HeartPulse size={26} /><span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-teal-500 text-white"><Activity size={9} /></span></div></div>
+                    <div className="flex h-28 items-center justify-center bg-[radial-gradient(circle_at_center,#d8f4f1,transparent_70%)] dark:bg-[radial-gradient(circle_at_center,rgba(15,139,141,.25),transparent_70%)]"><div className="relative grid h-16 w-16 place-items-center rounded-full border-4 border-teal-400/40 bg-white dark:bg-[#0d1917] text-teal-600 shadow-sm"><HeartPulse size={28} /><span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-teal-500 text-white"><Activity size={9} /></span></div></div>
                     <div className="bg-white dark:bg-[#0d1917] p-2.5"><p className="text-[8px] font-bold text-slate-500">CARDIOLOGY</p><p className="mt-1 text-[11px] font-extrabold leading-snug text-heading">What does the mitral valve do?</p></div>
                   </div>
-                  <div className="mt-2.5 grid grid-cols-2 gap-2"><div className="rounded-xl border border-slate-100 dark:border-white/10 p-2"><Microscope size={13} className="text-violet-500" /><p className="mt-1.5 text-[8px] font-extrabold text-heading">Anatomy</p></div><div className="rounded-xl border border-slate-100 dark:border-white/10 p-2"><BrainCircuit size={13} className="text-teal-600" /><p className="mt-1.5 text-[8px] font-extrabold text-heading">Recall</p></div></div>
+
+                  {/* Rating row—the same real Again/Hard/Good/Easy scale
+                      used everywhere flashcards are rated in the actual
+                      app (components/flashcard.tsx's FlashcardRatingRow),
+                      condensed to mockup scale rather than a new invented
+                      control. */}
+                  <div className="mt-2.5 grid grid-cols-4 gap-1.5">
+                    <div className="rounded-lg border border-rose-200 bg-rose-50 py-1.5 text-center dark:border-rose-500/20 dark:bg-rose-500/10"><p className="text-[7px] font-extrabold text-rose-600">Again</p></div>
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 py-1.5 text-center dark:border-amber-500/20 dark:bg-amber-500/10"><p className="text-[7px] font-extrabold text-amber-700">Hard</p></div>
+                    <div className="rounded-lg border border-teal-200 bg-teal-50 py-1.5 text-center dark:border-teal-500/20 dark:bg-teal-500/10"><p className="text-[7px] font-extrabold text-teal-700">Good</p></div>
+                    <div className="rounded-lg bg-teal-600 py-1.5 text-center"><p className="text-[7px] font-extrabold text-white">Easy</p></div>
+                  </div>
+
+                  <div className="mt-2.5 grid grid-cols-2 gap-2">
+                    <div className="rounded-xl border border-slate-100 dark:border-white/10 p-2"><Clock3 size={13} className="text-violet-500" /><p className="mt-1.5 text-[7px] font-bold text-slate-500">Studying</p><p className="text-[9px] font-extrabold text-heading">4m 12s</p></div>
+                    <div className="rounded-xl border border-slate-100 dark:border-white/10 p-2"><Target size={13} className="text-teal-600" /><p className="mt-1.5 text-[7px] font-bold text-slate-500">Accuracy</p><p className="text-[9px] font-extrabold text-heading">86%</p></div>
+                  </div>
+
+                  {/* Up next—a real queue preview, not blank space, so the
+                      screen reads as an in-progress session rather than a
+                      single card floating alone. */}
+                  <div className="mt-2.5">
+                    <p className="text-[7px] font-extrabold uppercase tracking-wide text-slate-400">Up next</p>
+                    <div className="mt-1.5 space-y-1.5">
+                      <div className="flex items-center justify-between rounded-lg border border-slate-100 dark:border-white/10 px-2 py-1.5"><span className="min-w-0 flex-1 truncate text-[8px] font-bold text-heading">Pharmacology · Beta blockers</span><ChevronRight size={10} className="shrink-0 text-slate-300" /></div>
+                      <div className="flex items-center justify-between rounded-lg border border-slate-100 dark:border-white/10 px-2 py-1.5"><span className="min-w-0 flex-1 truncate text-[8px] font-bold text-heading">Physiology · Cardiac output</span><ChevronRight size={10} className="shrink-0 text-slate-300" /></div>
+                    </div>
+                  </div>
+
                   <div className="mt-3"><div className="flex items-center justify-between text-[7px] font-bold text-slate-500"><span>Deck progress</span><span>58%</span></div><div className="mt-1 h-1 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10"><div className="h-full w-[58%] rounded-full bg-teal-500" /></div></div>
                 </div>
                 <div className="flex items-center justify-around border-t border-slate-100 dark:border-white/10 px-3 py-2.5">
@@ -88,7 +120,10 @@ function LearningShowcase() {
                 <div className="flex justify-center pb-1.5 pt-0.5"><div className="h-1 w-20 rounded-full bg-ink/50 dark:bg-white/30" /></div>
               </div>
             </div>
-            <div className="absolute -right-4 -top-3 rounded-2xl border border-white dark:border-white/10 bg-white/95 dark:bg-[#0d1917]/95 p-2.5 shadow-md"><p className="text-[9px] font-extrabold text-teal-700 dark:text-teal-300">+20 XP</p><p className="mt-1 text-[8px] text-slate-500">Great recall!</p></div>
+            <motion.div animate={{ y: [0, -7, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -right-5 -top-4 rounded-2xl border border-white/70 bg-white/80 p-3 shadow-xl backdrop-blur-md dark:border-white/10 dark:bg-[#0d1917]/85">
+              <p className="text-[9px] font-extrabold text-teal-700 dark:text-teal-300">+20 XP</p>
+              <p className="mt-1 text-[8px] font-bold text-slate-500">Great recall!</p>
+            </motion.div>
           </div>
         </Reveal>
         <Reveal delay={.12} className="order-1 max-w-xl lg:order-2 lg:col-span-7">
