@@ -13,6 +13,19 @@ function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(prefix => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
+// The reverse case: a visitor who's already signed in shouldn't land back
+// on the login/signup forms just because they clicked "Log in" or "Sign up"
+// from the marketing homepage (or still has an old tab open to one)—send
+// them straight to their own dashboard instead. Deliberately just these
+// two, not every auth-adjacent page: /forgot-password and /reset-password
+// still need to work even for a signed-in visitor (e.g. changing their own
+// password), so they're left alone.
+const SIGNED_IN_REDIRECT_PATHS = ["/login", "/signup"];
+
+function isSignedInRedirectPath(pathname: string): boolean {
+  return SIGNED_IN_REDIRECT_PATHS.includes(pathname);
+}
+
 // Refreshes the Supabase auth session on every request that passes through
 // middleware.ts, and—this is the actual access-control gate, not just token
 // housekeeping—redirects a signed-out visitor away from a protected path
@@ -51,6 +64,14 @@ export async function updateSession(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", request.nextUrl.pathname + request.nextUrl.search);
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (user && isSignedInRedirectPath(request.nextUrl.pathname)) {
+    // Respects a real "next" destination if one's present (e.g. an old
+    // /login?next=/dashboard/flashcards link opened after already signing
+    // in elsewhere) rather than always dropping them on the bare dashboard.
+    const next = request.nextUrl.searchParams.get("next");
+    return NextResponse.redirect(new URL(next || "/dashboard", request.url));
   }
 
   return supabaseResponse;

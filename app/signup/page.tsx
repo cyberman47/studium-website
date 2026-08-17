@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { ArrowLeft, MailCheck, Sparkles, UserPlus } from "lucide-react";
+import { ArrowLeft, Check, MailCheck, Sparkles, UserPlus, X } from "lucide-react";
 import { LanguageBar, Logo } from "@/components/navigation";
 import { Field, inputClass, OAuthButtons, PasswordField } from "@/components/ui";
 import { saveUser } from "@/lib/onboarding";
@@ -21,6 +21,7 @@ function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   // True once Supabase has actually sent a confirmation email and is
@@ -40,10 +41,22 @@ function SignupForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Real, enforced requirements—not just placeholder copy. Checked live so
+  // the checklist below the field updates as the student types, rather
+  // than only surfacing on submit.
+  const passwordRequirements = [
+    { label: "At least 8 characters", met: password.length >= 8 },
+    { label: "At least one number", met: /\d/.test(password) },
+    { label: "At least one symbol (e.g. ! @ # $)", met: /[^A-Za-z0-9]/.test(password) }
+  ];
+  const passwordMeetsRequirements = passwordRequirements.every(r => r.met);
+  const confirmMismatch = confirmPassword.length > 0 && password !== confirmPassword;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name || !email || !password) { setError("Name, email, and password are required."); return; }
-    if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
+    if (!name || !email || !password || !confirmPassword) { setError("Name, email, password, and confirm password are all required."); return; }
+    if (!passwordMeetsRequirements) { setError("Password doesn't meet the requirements below."); return; }
+    if (password !== confirmPassword) { setError("Passwords don't match."); return; }
     setError("");
     setSubmitting(true);
     const supabase = createClient();
@@ -87,7 +100,21 @@ function SignupForm() {
     <form onSubmit={handleSubmit} className="mt-10 space-y-5 rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-8">
     <Field label="Full name" required><input value={name} onChange={e => setName(e.target.value)} placeholder="Jane Doe" className={inputClass} /></Field>
     <Field label="Email" required><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@email.com" className={inputClass} /></Field>
-    <PasswordField label="Password" required value={password} onChange={setPassword} placeholder="At least 8 characters" autoComplete="new-password" />
+    <div>
+      <PasswordField label="Password" required value={password} onChange={setPassword} placeholder="Create a password" autoComplete="new-password" />
+      {/* Only shown once the student starts typing—an unearned checklist
+          sitting there empty before they've engaged with the field is just
+          clutter. */}
+      {password.length > 0 && <ul className="mt-2.5 space-y-1">
+        {passwordRequirements.map(r => <li key={r.label} className={`flex items-center gap-1.5 text-[11px] font-bold ${r.met ? "text-teal-600" : "text-slate-400"}`}>
+          {r.met ? <Check size={12} strokeWidth={3} /> : <X size={12} strokeWidth={3} />}{r.label}
+        </li>)}
+      </ul>}
+    </div>
+    <div>
+      <PasswordField label="Confirm password" required value={confirmPassword} onChange={setConfirmPassword} placeholder="Type your password again" autoComplete="new-password" />
+      {confirmMismatch && <p className="mt-1.5 text-[11px] font-bold text-rose-600">Passwords don&apos;t match.</p>}
+    </div>
     {error && <p className="text-xs font-bold text-rose-600">{error}</p>}
     <button type="submit" disabled={submitting} className="w-full cursor-pointer rounded-full bg-accent-500 py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">{submitting ? "Creating account…" : "Create free account"}</button>
     <p className="text-center text-[11px] leading-relaxed text-slate-500">By creating an account, you agree to our Terms and Privacy Policy.</p>
