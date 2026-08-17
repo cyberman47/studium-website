@@ -16,6 +16,26 @@ import { motion } from "framer-motion";
 
 export type FlashcardRating = "again" | "hard" | "good" | "easy";
 
+// UI-only placeholder—no speech actually happens yet. Sits here (rather
+// than wired up like the lesson's real Listen button in
+// components/scientific-method/use-lesson-speech.ts) because a real
+// implementation is coming later, once a TTS API is picked; for now this
+// just gives every flashcard surface in the app (in-lesson deck, fullscreen
+// Focus Mode, Terminology review, the main Flashcards section) a consistent
+// place for that control to land.
+function useSpeakPlaceholder() {
+  const [noticeVisible, setNoticeVisible] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  function trigger(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setNoticeVisible(true);
+    timeoutRef.current = setTimeout(() => setNoticeVisible(false), 1800);
+  }
+  useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
+  return { noticeVisible, trigger };
+}
+
 export type FlashcardProps = {
   /** Changing this remounts the card so the entrance slide replays. */
   cardKey: string | number;
@@ -62,6 +82,7 @@ export function Flashcard({
   const prevCardKey = useRef(cardKey);
   const prevFlipped = useRef(flipped);
   const flipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const speak = useSpeakPlaceholder();
 
   useEffect(() => {
     const cardChanged = prevCardKey.current !== cardKey;
@@ -104,6 +125,12 @@ export function Flashcard({
         the geometry mismatch entirely, on either axis. */}
     <div className={`pointer-events-none absolute inset-x-5 top-3 z-0 ${height} rounded-2xl border border-slate-200/70 dark:border-white/10 bg-white dark:bg-[#0d1917] transition-opacity duration-150 ${midFlip ? "opacity-0" : "opacity-100"}`} style={{ transform: "scale(0.96)" }} />
     <div className={`pointer-events-none absolute inset-x-2.5 top-1.5 z-0 ${height} rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d1917] transition-opacity duration-150 ${midFlip ? "opacity-0" : "opacity-100"}`} style={{ transform: "scale(0.98)" }} />
+
+    {/* Text-to-speech placeholder—not wired to any API yet (see
+        useSpeakPlaceholder above). Sits at this outer level, not inside
+        either face, so it stays in the same spot through the flip. */}
+    <button type="button" onClick={speak.trigger} title="Read card aloud" aria-label="Read card aloud" className="absolute right-3 top-3 z-20 grid h-8 w-8 cursor-pointer place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 dark:bg-white/10 hover:text-teal-600"><SpeakerIcon size={15} /></button>
+    {speak.noticeVisible && <span className="absolute right-3 top-12 z-20 whitespace-nowrap rounded-full bg-ink px-2.5 py-1 text-[10px] font-bold text-white shadow-lift">Not connected yet</span>}
 
     {/* Entrance slide: a real @keyframes animation (.flashcard-enter, in
         app/globals.css), not a Framer Motion initial->animate handshake or
@@ -170,4 +197,15 @@ function RatingEasyButton({ onRate }: { onRate: (rating: FlashcardRating) => voi
 // primitives file dependency-light; identical glyph to lucide's Check.
 function CheckIcon() {
   return <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>;
+}
+
+// Inlined for the same reason as CheckIcon above; identical glyph to
+// lucide's Volume2, used elsewhere in the app for the lesson's real Listen
+// control (components/scientific-method/scientific-method-lesson.tsx).
+function SpeakerIcon({ size = 15 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+    <path d="M16 9a5 5 0 0 1 0 6" />
+    <path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
+  </svg>;
 }

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bookmark, Bot, ChevronsRight, Eye, EyeOff, Flag, GraduationCap, Layers, Lightbulb, Microscope, Send, Sparkles,
-  Star, Trash2, Wand2, X
+  Star, Trash2, Volume2, Wand2, X
 } from "lucide-react";
 import {
   ChatMessage, getChatHistory, getTutorMode, modeLabels, sendMessage, setTutorMode, TUTOR_CHAT_EVENT, TutorContext, TutorMode
@@ -43,6 +43,18 @@ export function AiTutorPanel({ context, proactiveTip, onDismissTip, onCollapse }
   const [input, setInput] = useState("");
   const [tab, setTab] = useState<Tab>("chat");
   const scrollRef = useRef<HTMLDivElement>(null);
+  // UI-only placeholder for reading a reply aloud—no speech actually
+  // happens yet. Not wired to anything, same as the flashcards' speaker
+  // icon (components/flashcard.tsx)—a real implementation lands once a TTS
+  // API is picked.
+  const [speakNoticeId, setSpeakNoticeId] = useState<string | null>(null);
+  const speakNoticeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  function triggerSpeakNotice(id: string) {
+    if (speakNoticeTimeout.current) clearTimeout(speakNoticeTimeout.current);
+    setSpeakNoticeId(id);
+    speakNoticeTimeout.current = setTimeout(() => setSpeakNoticeId(null), 1800);
+  }
+  useEffect(() => () => { if (speakNoticeTimeout.current) clearTimeout(speakNoticeTimeout.current); }, []);
 
   useEffect(() => {
     setMode(getTutorMode());
@@ -136,9 +148,15 @@ export function AiTutorPanel({ context, proactiveTip, onDismissTip, onCollapse }
           const bubbleClass = m.error
             ? "border border-rose-200 bg-rose-50 dark:bg-rose-500/15 dark:text-rose-300 text-rose-700"
             : "border border-slate-200/70 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] text-slate-600 dark:text-slate-200";
-          return <div key={m.id} className={`max-w-[90%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${bubbleClass}`}>
-            {m.streaming && !m.text ? <TypingDots /> : <InteractiveText text={m.text} />}
-            {m.streaming && m.text && <span className="ml-0.5 inline-block h-3 w-1 translate-y-0.5 animate-pulse bg-teal-400 align-middle" />}
+          return <div key={m.id} className="max-w-[90%]">
+            <div className={`whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${bubbleClass}`}>
+              {m.streaming && !m.text ? <TypingDots /> : <InteractiveText text={m.text} />}
+              {m.streaming && m.text && <span className="ml-0.5 inline-block h-3 w-1 translate-y-0.5 animate-pulse bg-teal-400 align-middle" />}
+            </div>
+            {!m.streaming && m.text && <div className="relative mt-1 flex items-center gap-1 pl-1">
+              <button type="button" onClick={() => triggerSpeakNotice(m.id)} title="Read reply aloud" aria-label="Read reply aloud" className="flex cursor-pointer items-center gap-1 text-[10px] font-bold text-slate-400 transition hover:text-teal-600"><Volume2 size={11} />Listen</button>
+              {speakNoticeId === m.id && <span className="rounded-full bg-ink px-2 py-0.5 text-[10px] font-bold text-white shadow-lift">Not connected yet</span>}
+            </div>}
           </div>;
         })}
       </div>

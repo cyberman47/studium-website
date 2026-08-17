@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { ArrowLeft, MailCheck, Sparkles, UserPlus } from "lucide-react";
 import { LanguageBar, Logo } from "@/components/navigation";
-import { Field, inputClass, OAuthButtons } from "@/components/ui";
+import { Field, inputClass, OAuthButtons, PasswordField } from "@/components/ui";
 import { saveUser } from "@/lib/onboarding";
 import { createClient } from "@/lib/supabase/client";
 import { capturePendingReferralCode, clearPendingReferralCode, getPendingReferralCode } from "@/lib/referrals";
@@ -87,7 +87,7 @@ function SignupForm() {
     <form onSubmit={handleSubmit} className="mt-10 space-y-5 rounded-3xl border border-slate-100 bg-white p-6 shadow-soft sm:p-8">
     <Field label="Full name" required><input value={name} onChange={e => setName(e.target.value)} placeholder="Jane Doe" className={inputClass} /></Field>
     <Field label="Email" required><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@email.com" className={inputClass} /></Field>
-    <Field label="Password" required><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="At least 8 characters" className={inputClass} /></Field>
+    <PasswordField label="Password" required value={password} onChange={setPassword} placeholder="At least 8 characters" autoComplete="new-password" />
     {error && <p className="text-xs font-bold text-rose-600">{error}</p>}
     <button type="submit" disabled={submitting} className="w-full cursor-pointer rounded-full bg-accent-500 py-3.5 text-sm font-bold text-white shadow-[0_12px_25px_-12px_#047857] transition hover:-translate-y-0.5 hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">{submitting ? "Creating account…" : "Create free account"}</button>
     <p className="text-center text-[11px] leading-relaxed text-slate-500">By creating an account, you agree to our Terms and Privacy Policy.</p>

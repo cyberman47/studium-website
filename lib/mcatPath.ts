@@ -3843,7 +3843,2559 @@ const evolutionEcologyLessons: LessonContent[] = [
   }
 ];
 
-const lessonContentList: LessonContent[] = [...biologyLessons, ...cellBiologyLessons, ...geneticsLessons, ...biochemistryLessons, ...organSystemsLessons, ...evolutionEcologyLessons];
+// ---- Chemical & Physical Foundations of Biological Systems ----
+// General Chemistry (10), Organic Chemistry (6), and Physics (9)—all 25
+// lessons in this section, restructured into the same document-lesson
+// layout as lib/documentLessons/ (see lib/documentLessons/index.ts).
+
+const generalChemistryLessons: LessonContent[] = [
+  {
+    id: "atomic-structure-periodic-trends",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Atomic Structure & Periodic Trends",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    prerequisiteLessonId: null,
+    sections: [
+      {
+        heading: "Atomic Structure and Isotopes",
+        body: "An atom's identity is fixed by its number of protons (atomic number, Z); a neutral atom has equal protons and electrons, while the number of neutrons can vary without changing what element it is. Isotopes are atoms of the same element (same Z) with different numbers of neutrons, giving them different mass numbers (A = protons + neutrons)—most elements exist as a natural mix of isotopes, which is why atomic masses on the periodic table are weighted averages, not whole numbers.",
+        keyTerms: [
+          { term: "Atomic number (Z)", definition: "The number of protons in an atom's nucleus; defines the element." },
+          { term: "Isotope", definition: "Atoms of the same element with different numbers of neutrons, and therefore different mass numbers." }
+        ]
+      },
+      {
+        heading: "Electron Configuration",
+        body: "The Aufbau principle fills orbitals in order of increasing energy (1s, 2s, 2p, 3s, 3p, 4s, 3d...); Hund's rule says electrons occupy degenerate orbitals within a subshell singly, with parallel spins, before any pairing occurs. The Pauli exclusion principle limits each orbital to two electrons, and only if their spins are opposite—together these three rules let you predict an atom's full electron configuration and, from that, its valence electron count and chemical behavior.",
+        keyTerms: [
+          { term: "Aufbau principle", definition: "Electrons fill orbitals from lowest to highest energy." },
+          { term: "Hund's rule", definition: "Electrons occupy degenerate orbitals singly, with parallel spins, before pairing." },
+          { term: "Pauli exclusion principle", definition: "No orbital holds more than two electrons, and only with opposite spins." }
+        ]
+      },
+      {
+        heading: "Periodic Trends",
+        body: "Moving left to right across a period, effective nuclear charge increases while electrons are added to the same shell, so atomic radius shrinks and it becomes progressively harder to remove an electron (ionization energy rises) or easier to attract one (electronegativity, electron affinity rise). Moving down a group, each new row adds an entire electron shell, so atomic radius increases and the outermost electrons—now farther from the nucleus and more shielded—are held less tightly, so ionization energy and electronegativity decrease.",
+        keyTerms: [
+          { term: "Effective nuclear charge", definition: "The net positive charge felt by valence electrons, after accounting for shielding by inner electrons." },
+          { term: "Ionization energy", definition: "The energy required to remove an electron from a gaseous atom or ion." },
+          { term: "Electronegativity", definition: "An atom's tendency to attract shared electrons in a bond." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Atomic number (protons) defines the element; isotopes share that atomic number but differ in neutrons and therefore mass number.",
+      "Aufbau (lowest energy first), Hund's rule (singly occupy degenerate orbitals before pairing), and Pauli exclusion (max two electrons per orbital, opposite spins) together determine an atom's electron configuration.",
+      "Across a period, increasing effective nuclear charge shrinks atomic radius and raises ionization energy/electronegativity; down a group, added electron shells increase radius and lower them."
+    ],
+    knowledgeCheck: [
+      { question: "What distinguishes an isotope from a completely different element?", answer: "Isotopes share the same atomic number (proton count)—what defines the element—but differ in neutron count and therefore mass number." },
+      { question: "Why does ionization energy generally increase across a period from left to right?", answer: "Effective nuclear charge increases as electrons are added to the same shell, holding valence electrons more tightly and making them harder to remove." }
+    ],
+    flashcards: [
+      { front: "Atomic number (Z)", back: "Number of protons; defines the element." },
+      { front: "Isotope", back: "Same element, different neutron count and mass number." },
+      { front: "Aufbau principle", back: "Fill orbitals from lowest to highest energy." },
+      { front: "Hund's rule", back: "Singly occupy degenerate orbitals before pairing." },
+      { front: "Electronegativity trend", back: "Increases across a period, decreases down a group." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Carbon-12 and carbon-14 are both forms of carbon. What makes them isotopes of the same element rather than different elements?",
+        concept: "Atomic structure and isotopes",
+        options: ["They have the same mass number", "They have the same number of protons", "They have the same number of neutrons", "They have the same number of electrons in their outer shell only"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—their mass numbers actually differ (12 vs. 14), since they have different neutron counts.",
+          "Correct—isotopes share the same atomic number (proton count), which is what defines the element.",
+          "Incorrect—it's exactly their differing neutron counts that distinguishes carbon-12 from carbon-14.",
+          "Incorrect—valence electron count doesn't define isotopes; proton count does."
+        ]
+      },
+      {
+        question: "Why does nitrogen's ground-state electron configuration place one electron in each of its three 2p orbitals rather than pairing two electrons in one orbital first?",
+        concept: "Electron configuration",
+        options: ["The Pauli exclusion principle forbids any pairing in p orbitals", "Hund's rule favors maximum unpaired electrons with parallel spin across degenerate orbitals before pairing", "The Aufbau principle requires filling from highest to lowest energy", "Nitrogen has too few electrons to pair any of them"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—Pauli exclusion allows pairing (with opposite spins); it just limits each orbital to two electrons.",
+          "Correct—Hund's rule specifically governs distribution among orbitals of equal energy, favoring single occupancy first.",
+          "Incorrect—Aufbau fills from lowest to highest energy, not highest to lowest.",
+          "Incorrect—nitrogen has 7 electrons, plenty to pair if Hund's rule didn't apply."
+        ]
+      },
+      {
+        question: "Which explanation correctly accounts for why ionization energy generally increases across a period from left to right?",
+        concept: "Periodic trends",
+        options: ["Atomic radius increases, making electrons easier to remove", "Effective nuclear charge increases, holding valence electrons more tightly", "Electrons are added to a new, farther shell", "Shielding from inner electrons increases substantially"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—atomic radius actually decreases across a period, not increases.",
+          "Correct—increasing effective nuclear charge pulls valence electrons in more tightly, raising ionization energy.",
+          "Incorrect—electrons across a period fill the same shell, not a new one.",
+          "Incorrect—shielding from inner electrons stays roughly constant across a period, since no new inner shell is added."
+        ]
+      },
+      {
+        question: "Comparing sodium (Na) and chlorine (Cl), both in period 3, which has the larger atomic radius and why?",
+        concept: "Periodic trends",
+        options: ["Chlorine, because it has a higher atomic number", "Sodium, because it has a lower effective nuclear charge pulling its valence electron in", "They have identical atomic radii since they're in the same period", "Chlorine, because it has more electron shells"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—higher atomic number in the same period corresponds to smaller radius, not larger.",
+          "Correct—sodium's lower effective nuclear charge holds its valence electron less tightly, giving it a larger atomic radius than chlorine.",
+          "Incorrect—atomic radius changes considerably across a period; same-period elements are not equal in size.",
+          "Incorrect—both are in period 3, so they have the same number of electron shells."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Think of an atom's identity card as just its proton count—everything else (neutrons, electron arrangement) can vary without changing who it is, which is exactly what isotopes are. Electrons fill up an atom the way people fill a stadium's row of seats: lowest, cheapest seats first (Aufbau), everyone tries to grab their own seat before doubling up (Hund's rule), and each seat only fits two people who don't want to sit exactly the same way (Pauli exclusion). Once you know how many electrons are in the outermost 'seats,' periodic trends fall out almost automatically: more protons pulling on the same shell (across a period) makes atoms smaller and grabbier for electrons, while adding a whole new shell (down a group) makes them bigger and looser."
+  },
+  {
+    id: "chemical-bonding-molecular-structure",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Chemical Bonding & Molecular Structure",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    prerequisiteLessonId: "atomic-structure-periodic-trends",
+    sections: [
+      {
+        heading: "Ionic vs. Covalent Bonding",
+        body: "Ionic bonds form when one atom is electronegative enough to pull an electron away from another entirely, creating oppositely charged ions held together by electrostatic attraction—typical of a metal bonding with a nonmetal. Covalent bonds form when atoms share electrons instead of transferring them; if the atoms have similar electronegativity the sharing is roughly equal (nonpolar covalent), and if one atom is modestly more electronegative the shared electrons sit closer to it, creating a bond dipole (polar covalent).",
+        keyTerms: [
+          { term: "Ionic bond", definition: "A bond formed by electron transfer, creating oppositely charged ions held by electrostatic attraction." },
+          { term: "Polar covalent bond", definition: "A covalent bond where shared electrons sit closer to the more electronegative atom, creating a bond dipole." }
+        ]
+      },
+      {
+        heading: "Lewis Structures and VSEPR",
+        body: "Drawing a Lewis structure means arranging all valence electrons as bonding pairs and lone pairs so each atom (usually) achieves an octet; formal charge helps choose the best structure, and resonance applies when electrons can be delocalized across more than one valid arrangement. VSEPR theory starts from the Lewis structure's electron groups around the central atom and arranges them to minimize repulsion—two groups give linear geometry, three give trigonal planar, four give tetrahedral, and lone pairs compress bond angles more than bonding pairs do.",
+        keyTerms: [
+          { term: "Lewis structure", definition: "A diagram showing valence electrons as bonding pairs and lone pairs." },
+          { term: "VSEPR theory", definition: "Predicts molecular geometry by minimizing repulsion between electron groups around a central atom." }
+        ]
+      },
+      {
+        heading: "Hybridization and Sigma/Pi Bonds",
+        body: "A central atom's hybridization state matches its number of electron groups: two groups give sp (linear), three give sp2 (trigonal planar), four give sp3 (tetrahedral)—these hybrid orbitals form sigma bonds and hold lone pairs. Any bond beyond the first between two atoms is a pi bond, formed by sideways overlap of unhybridized p orbitals; pi bonds prevent free rotation around that bond axis, which is why double bonds create fixed cis/trans geometry.",
+        keyTerms: [
+          { term: "Sigma bond", definition: "A bond from head-on orbital overlap, allowing free rotation; present in every single bond." },
+          { term: "Pi bond", definition: "A bond from sideways p-orbital overlap; restricts rotation and adds to double/triple bonds." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Electronegativity difference predicts bond type: large differences give ionic bonds, small differences give covalent bonds (polar or nonpolar).",
+      "Lewis structures show electron distribution; VSEPR uses electron-group count to predict 3D molecular geometry.",
+      "Hybridization (sp/sp2/sp3) forms sigma bonds; extra bonds in double/triple bonds are pi bonds, which restrict rotation."
+    ],
+    knowledgeCheck: [
+      { question: "What determines whether a bond between two atoms is ionic or covalent?", answer: "The electronegativity difference between the atoms—large differences favor ionic bonds (electron transfer), small differences favor covalent bonds (electron sharing)." },
+      { question: "Why can't the two carbons in a C=C double bond rotate freely relative to each other?", answer: "The pi bond's sideways p-orbital overlap would be broken by rotation, so it restricts rotation around that bond axis (the sigma bond component alone would allow free rotation)." }
+    ],
+    flashcards: [
+      { front: "Ionic bond", back: "Electron transfer; large electronegativity difference." },
+      { front: "Covalent bond", back: "Electron sharing; small electronegativity difference." },
+      { front: "VSEPR theory", back: "Predicts geometry by minimizing electron-group repulsion." },
+      { front: "Sigma bond", back: "Head-on overlap; allows free rotation." },
+      { front: "Pi bond", back: "Sideways p-orbital overlap; restricts rotation." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A bond forms between an atom with low electronegativity and one with very high electronegativity. What type of bond is most likely to result?",
+        concept: "Ionic vs. covalent bonding",
+        options: ["Nonpolar covalent", "Polar covalent", "Ionic", "No bond will form"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—nonpolar covalent requires very similar electronegativities, not a large difference.",
+          "Incorrect—polar covalent requires a smaller, intermediate electronegativity difference.",
+          "Correct—a large electronegativity difference favors essentially complete electron transfer, forming an ionic bond.",
+          "Incorrect—a bond does form; the large electronegativity difference just changes its character."
+        ]
+      },
+      {
+        question: "Ammonia (NH3) has three bonding pairs and one lone pair around nitrogen. Why is its molecular geometry trigonal pyramidal rather than tetrahedral?",
+        concept: "Lewis structures and VSEPR",
+        options: ["Molecular geometry only counts electron groups, not atoms, so it's still tetrahedral", "The lone pair occupies one of the four positions, but molecular geometry describes only atom positions, not the lone pair", "Lone pairs don't count as electron groups", "Nitrogen doesn't obey VSEPR theory"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—molecular geometry specifically describes atom positions, which is why it differs from electron-group geometry here.",
+          "Correct—the electron-group geometry is tetrahedral, but with a lone pair occupying one position, the visible atom shape is trigonal pyramidal.",
+          "Incorrect—lone pairs do count as electron groups for determining electron-group geometry.",
+          "Incorrect—nitrogen's arrangement in ammonia is a standard VSEPR example, not an exception."
+        ]
+      },
+      {
+        question: "Ethylene (H2C=CH2) has a carbon-carbon double bond. Why can't the two CH2 groups rotate freely around it?",
+        concept: "Hybridization and sigma/pi bonds",
+        options: ["Double bonds are too short and rigid to rotate", "The pi bond's sideways p-orbital overlap would be broken by rotation", "Sp2 carbons cannot rotate under any circumstances", "Double bonds contain two sigma bonds, which lock rotation"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—bond length isn't the reason rotation is restricted; the pi bond's geometry is.",
+          "Correct—rotating around the double bond would misalign the p orbitals forming the pi bond, breaking that overlap.",
+          "Incorrect—sp2 carbons can rotate freely around single bonds; it's the pi bond specifically that restricts rotation.",
+          "Incorrect—a double bond is one sigma bond plus one pi bond, not two sigma bonds."
+        ]
+      },
+      {
+        question: "Carbon dioxide (CO2) has two electron groups around its central carbon, with no lone pairs on carbon. What molecular geometry and hybridization does this predict?",
+        concept: "Lewis structures and VSEPR",
+        options: ["Bent geometry, sp3 hybridization", "Trigonal planar geometry, sp2 hybridization", "Linear geometry, sp hybridization", "Tetrahedral geometry, sp3 hybridization"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—bent geometry results from four electron groups with two lone pairs, not two electron groups with none.",
+          "Incorrect—trigonal planar requires three electron groups, not two.",
+          "Correct—two electron groups with no lone pairs gives linear geometry and sp hybridization, matching CO2's actual structure.",
+          "Incorrect—tetrahedral requires four electron groups, not two."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Bonding is basically a tug-of-war over electrons: if one atom wins outright, that's an ionic bond (a clean transfer); if the atoms share more or less evenly, that's covalent. Once you know a molecule's Lewis structure (who's bonded to whom, and where the lone pairs sit), VSEPR just arranges those electron groups as far apart as possible, the same way people spread out to avoid touching in a crowded room—lone pairs take up a bit more 'personal space' than bonding pairs, which is why they squeeze bond angles down. Hybridization and sigma/pi bonds explain the mechanics underneath that shape: sigma bonds are the sturdy, rotatable backbone, while pi bonds are extra, more fragile bonds layered on top that lock a double bond's two ends from spinning relative to each other."
+  },
+  {
+    id: "stoichiometry-chemical-reactions",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Stoichiometry & Chemical Reactions",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    prerequisiteLessonId: "chemical-bonding-molecular-structure",
+    sections: [
+      {
+        heading: "The Mole and Molar Mass",
+        body: "A mole is simply a very large counting number, defined so that one mole of a substance's molar mass in grams contains exactly Avogadro's number (6.022 × 10^23) of particles. Molar mass (g/mol), found by summing atomic masses from the periodic table, is the conversion factor between the mass of a sample and the number of moles it contains—every stoichiometry calculation starts by converting given quantities into moles.",
+        keyTerms: [
+          { term: "Mole", definition: "A counting unit equal to Avogadro's number (6.022 × 10^23) of particles." },
+          { term: "Molar mass", definition: "The mass in grams of one mole of a substance; converts between mass and moles." }
+        ]
+      },
+      {
+        heading: "Limiting Reactant and Yield",
+        body: "A balanced equation's coefficients give the mole ratio in which reactants combine; when reactants aren't supplied in exactly that ratio, one runs out first (the limiting reactant) and stops the reaction, while the other is left over (in excess). Theoretical yield is the maximum product possible, calculated from the limiting reactant; percent yield = (actual yield / theoretical yield) × 100% reflects real-world losses.",
+        keyTerms: [
+          { term: "Limiting reactant", definition: "The reactant that runs out first, capping the amount of product that can form." },
+          { term: "Theoretical yield", definition: "The maximum product possible, calculated from the limiting reactant." },
+          { term: "Percent yield", definition: "(Actual yield / theoretical yield) × 100%; reflects real-world losses." }
+        ]
+      },
+      {
+        heading: "Classifying Reaction Types",
+        body: "Synthesis (A + B → AB) combines two substances into one; decomposition (AB → A + B) breaks one substance into two or more; single displacement (A + BC → AC + B) swaps one element into a compound. Double displacement (AB + CD → AD + CB) swaps ions between two compounds, often producing a precipitate, gas, or water; combustion reactions involve a hydrocarbon reacting with O2 to produce CO2 and H2O.",
+        keyTerms: [
+          { term: "Double displacement", definition: "A reaction where two compounds swap ionic partners, often forming a precipitate." },
+          { term: "Combustion", definition: "A hydrocarbon reacting with O2 to produce CO2 and H2O, releasing energy." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "The mole is a counting unit tied to Avogadro's number; molar mass converts between a substance's mass and its amount in moles.",
+      "The limiting reactant runs out first and caps theoretical yield; percent yield compares actual product recovered to that maximum.",
+      "Reaction type can be identified from the pattern of reactants and products: synthesis, decomposition, single/double displacement, and combustion."
+    ],
+    knowledgeCheck: [
+      { question: "How do you determine which reactant is limiting in a reaction?", answer: "Convert all given quantities to moles, then compare the mole ratio actually supplied to the mole ratio required by the balanced equation—whichever reactant would run out first, based on that comparison, is limiting." },
+      { question: "What information does percent yield provide that theoretical yield alone doesn't?", answer: "Percent yield reflects real-world losses (incomplete reactions, side reactions, purification losses) by comparing the actual amount of product recovered to the theoretical maximum." }
+    ],
+    flashcards: [
+      { front: "Mole", back: "6.022 × 10^23 particles (Avogadro's number)." },
+      { front: "Molar mass", back: "Grams per mole; converts mass to moles." },
+      { front: "Limiting reactant", back: "Runs out first; caps the amount of product." },
+      { front: "Theoretical yield", back: "Maximum possible product from the limiting reactant." },
+      { front: "Combustion reaction", back: "Hydrocarbon + O2 → CO2 + H2O + energy." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A sample contains 2 moles of water (H2O, molar mass 18 g/mol). What is the mass of the sample?",
+        concept: "The mole and molar mass",
+        options: ["9 g", "18 g", "36 g", "6.022 × 10^23 g"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—9 g would be half of one mole's mass, not two moles.",
+          "Incorrect—18 g is the mass of only 1 mole, not 2 moles.",
+          "Correct—mass = moles × molar mass = 2 mol × 18 g/mol = 36 g.",
+          "Incorrect—this confuses Avogadro's number (a particle count) with mass in grams."
+        ]
+      },
+      {
+        question: "In the reaction N2 + 3H2 → 2NH3, 1 mole of N2 is mixed with 2 moles of H2. Which reactant is limiting?",
+        concept: "Limiting reactant and yield",
+        options: ["N2, because it has a coefficient of 1", "H2, because 1 mole of N2 requires 3 moles of H2 but only 2 are available", "Neither—they are both fully consumed", "It cannot be determined without molar masses"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—a coefficient of 1 doesn't by itself determine which reactant is limiting.",
+          "Correct—the equation requires 3 moles of H2 per mole of N2, but only 2 moles of H2 are available, so H2 runs out first.",
+          "Incorrect—with H2 limiting, N2 will be left over (in excess), not fully consumed.",
+          "Incorrect—the moles given are already sufficient to determine the limiting reactant via mole ratios; molar mass isn't needed here."
+        ]
+      },
+      {
+        question: "AgNO3(aq) + NaCl(aq) → AgCl(s) + NaNO3(aq). What type of reaction is this?",
+        concept: "Classifying reaction types",
+        options: ["Synthesis", "Decomposition", "Single displacement", "Double displacement"],
+        correctIndex: 3,
+        optionExplanations: [
+          "Incorrect—synthesis combines two substances into one; here, two compounds swap partners instead.",
+          "Incorrect—decomposition breaks one substance into two or more; two compounds start as reactants here.",
+          "Incorrect—single displacement involves one element displacing another; no free element is involved here.",
+          "Correct—the silver and sodium ions swap partners between the two compounds, defining a double displacement reaction."
+        ]
+      },
+      {
+        question: "A reaction's theoretical yield is 50 g, but only 40 g of product is actually recovered. What is the percent yield?",
+        concept: "Limiting reactant and yield",
+        options: ["50%", "60%", "80%", "125%"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—50% doesn't match the given actual/theoretical values.",
+          "Incorrect—60% doesn't match (40/50) × 100%.",
+          "Correct—percent yield = (actual/theoretical) × 100% = (40/50) × 100% = 80%.",
+          "Incorrect—125% would require actual yield to exceed theoretical yield, which shouldn't happen in a real reaction."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Stoichiometry is just unit conversion with a recipe attached: the mole is the 'serving size' chemists count in, and a balanced equation is the recipe ratio telling you how many servings of each ingredient (reactant) combine to make how many servings of the finished dish (product). Run out of one ingredient before the others, and that's your limiting reactant—it doesn't matter how much of everything else you have left over, the dish can only be as big as your smallest ingredient allows. And just like a real kitchen, the recipe's 'theoretical' yield rarely matches what actually comes out, which is exactly what percent yield measures."
+  },
+  {
+    id: "solutions-concentrations",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Solutions & Concentrations",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "stoichiometry-chemical-reactions",
+    sections: [
+      {
+        heading: "Concentration Units",
+        body: "Molarity (M) = moles of solute / liters of solution is the standard concentration unit for reactions and titrations, but it changes slightly with temperature. Molality (m) = moles of solute / kilograms of solvent is temperature-independent and is the unit used for colligative property calculations; mole fraction (x) = moles of one component / total moles of all components is used in Raoult's law and vapor pressure problems.",
+        keyTerms: [
+          { term: "Molarity", definition: "Moles of solute per liter of solution; the standard reaction concentration unit." },
+          { term: "Molality", definition: "Moles of solute per kilogram of solvent; temperature-independent, used for colligative properties." }
+        ]
+      },
+      {
+        heading: "Colligative Properties",
+        body: "Adding solute particles to a solvent raises its boiling point (ΔTb = i·Kb·m) and lowers its freezing point (ΔTf = i·Kf·m), because dissolved particles disrupt the solvent's ability to freeze or boil normally. The van't Hoff factor (i) accounts for solutes that dissociate into multiple particles in solution—NaCl (i = 2) has twice the colligative effect of an equal molal concentration of glucose (i = 1)—and osmotic pressure (Π = iMRT) follows the same particle-counting logic.",
+        keyTerms: [
+          { term: "Colligative property", definition: "A property (boiling point, freezing point, osmotic pressure) that depends only on the number of dissolved particles." },
+          { term: "Van't Hoff factor (i)", definition: "The number of particles a solute dissociates into in solution." }
+        ]
+      },
+      {
+        heading: "Dilutions and Solution Stoichiometry",
+        body: "Diluting a solution adds solvent without adding more solute, so the moles of solute before and after dilution are equal: M1V1 = M2V2. This same mole-conservation logic extends to titrations, where the moles of titrant added at the equivalence point equal the moles of analyte originally present (adjusted for stoichiometric ratio).",
+        keyTerms: [
+          { term: "Dilution", definition: "Adding solvent to a solution without changing the moles of solute present." },
+          { term: "M1V1 = M2V2", definition: "The dilution equation; moles of solute are conserved before and after dilution." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Molarity (mol/L solution) is standard for reactions; molality (mol/kg solvent) is temperature-independent and used for colligative properties.",
+      "Colligative properties depend on the total number of dissolved particles, scaled by the van't Hoff factor for solutes that dissociate.",
+      "Dilution conserves moles of solute while changing volume and concentration, summarized by M1V1 = M2V2."
+    ],
+    knowledgeCheck: [
+      { question: "Why is molality used instead of molarity for freezing point depression calculations?", answer: "Molality is based on mass of solvent, which doesn't change with temperature, unlike solution volume (which molarity depends on)." },
+      { question: "Why does a 1 M CaCl2 solution have a greater colligative effect than a 1 M glucose solution?", answer: "CaCl2 dissociates into three ions (i = 3), while glucose doesn't dissociate at all (i = 1), so CaCl2's effective particle concentration is three times higher." }
+    ],
+    flashcards: [
+      { front: "Molarity", back: "Moles solute / liters solution." },
+      { front: "Molality", back: "Moles solute / kg solvent; temperature-independent." },
+      { front: "Van't Hoff factor", back: "Number of particles a solute dissociates into." },
+      { front: "Colligative property", back: "Depends only on number of dissolved particles." },
+      { front: "M1V1 = M2V2", back: "Dilution equation; moles of solute conserved." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Why is molality, rather than molarity, used in freezing point depression and boiling point elevation calculations?",
+        concept: "Concentration units",
+        options: ["Molality is always a larger number than molarity", "Molality is based on mass of solvent, which doesn't change with temperature, unlike solution volume", "Molarity cannot be calculated for aqueous solutions", "Freezing and boiling points don't depend on concentration"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—molality isn't inherently larger; it just uses a different denominator.",
+          "Correct—molality's mass-based denominator is unaffected by temperature, unlike molarity's volume-based denominator.",
+          "Incorrect—molarity can be calculated for aqueous solutions; it's just less convenient for temperature-changing calculations.",
+          "Incorrect—these properties absolutely do depend on concentration, which is the entire premise of this topic."
+        ]
+      },
+      {
+        question: "Equal molal solutions of glucose (a nonelectrolyte) and CaCl2 (which dissociates into 3 ions) are compared. Which has the greater freezing point depression?",
+        concept: "Colligative properties",
+        options: ["Glucose, because smaller molecules have a bigger effect", "CaCl2, because its van't Hoff factor of 3 gives it three times the effective particle concentration", "They are equal, since molality alone determines freezing point depression", "Neither depresses freezing point; only boiling point is affected"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—molecular size isn't the deciding factor; particle count is.",
+          "Correct—CaCl2's dissociation into 3 ions triples its effective particle concentration compared to non-dissociating glucose.",
+          "Incorrect—molality must be multiplied by the van't Hoff factor to get effective particle concentration; they are not equal here.",
+          "Incorrect—solutes depress freezing point and elevate boiling point simultaneously."
+        ]
+      },
+      {
+        question: "50 mL of a 4 M NaOH solution is diluted to a final volume of 200 mL. What is the new concentration?",
+        concept: "Dilutions and solution stoichiometry",
+        options: ["0.5 M", "1 M", "2 M", "4 M"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—0.5 M doesn't satisfy M1V1 = M2V2 for these values.",
+          "Correct—(4 M)(50 mL) = M2(200 mL), so M2 = 200/200 = 1 M.",
+          "Incorrect—2 M doesn't satisfy the dilution equation here.",
+          "Incorrect—4 M was the original, undiluted concentration."
+        ]
+      },
+      {
+        question: "A solution's osmotic pressure is measured. Which factor, if doubled while all else stays constant, would double the osmotic pressure according to Π = iMRT?",
+        concept: "Colligative properties",
+        options: ["The container's volume", "The molar concentration (M)", "The type of solute used, regardless of dissociation", "The atmospheric pressure"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—container volume doesn't appear in the osmotic pressure equation.",
+          "Correct—Π is directly proportional to M, so doubling molar concentration doubles osmotic pressure (holding i, R, T constant).",
+          "Incorrect—the solute's identity matters only through its van't Hoff factor (i), not arbitrarily.",
+          "Incorrect—atmospheric pressure isn't part of the osmotic pressure equation."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Concentration units are just different ways of answering 'how crowded is this solution,' and which one you use depends on what you're about to calculate—molarity for reactions, molality when temperature is changing. Colligative properties are solution behavior that only cares about headcount, not who's in the room: freezing point, boiling point, and osmotic pressure all shift based purely on how many dissolved particles are present, which is why a salt that splits into three ions packs three times the punch of a sugar that stays in one piece. Dilution, meanwhile, is just adding more room to the same crowd—the number of people (moles of solute) never changes, only how spread out they are."
+  },
+  {
+    id: "gases-liquids-solids",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Gases, Liquids & Solids",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "solutions-concentrations",
+    sections: [
+      {
+        heading: "Gas Laws and Kinetic Molecular Theory",
+        body: "The ideal gas law, PV = nRT, combines Boyle's, Charles's, and Avogadro's laws into one equation, assuming gas particles have negligible volume and no intermolecular attraction. In a mixture of gases, Dalton's law of partial pressures says each gas contributes to the total pressure independently and proportionally to its mole fraction: Ptotal = P1 + P2 + ....",
+        keyTerms: [
+          { term: "Ideal gas law", definition: "PV = nRT; relates pressure, volume, moles, and temperature for an idealized gas." },
+          { term: "Dalton's law", definition: "Total pressure of a gas mixture is the sum of each component's partial pressure." }
+        ]
+      },
+      {
+        heading: "Real Gases and Intermolecular Forces",
+        body: "Real gases deviate from ideal behavior most at high pressure (particles are forced close together) and low temperature (particles move slowly enough for attractions to matter). Intermolecular forces increase from London dispersion forces (present in all molecules) to dipole-dipole forces (between polar molecules) to hydrogen bonding (H bonded directly to N, O, or F).",
+        keyTerms: [
+          { term: "London dispersion force", definition: "A weak, temporary attraction present in all molecules from momentary electron imbalance." },
+          { term: "Hydrogen bonding", definition: "A strong dipole-dipole interaction when H is bonded directly to N, O, or F." }
+        ]
+      },
+      {
+        heading: "Phase Changes and Phase Diagrams",
+        body: "On a heating curve, temperature plateaus during a phase change, since added heat goes into overcoming intermolecular forces rather than raising kinetic energy. A phase diagram plots pressure vs. temperature; the triple point is where all three phases coexist, and the critical point is where the liquid-gas distinction disappears.",
+        keyTerms: [
+          { term: "Triple point", definition: "The unique pressure/temperature condition where solid, liquid, and gas coexist in equilibrium." },
+          { term: "Critical point", definition: "The point beyond which liquid and gas become indistinguishable (a supercritical fluid)." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "PV = nRT relates the four gas variables for an idealized gas; Dalton's law sums partial pressures in a gas mixture.",
+      "Real gases deviate from ideal behavior at high pressure and low temperature, where intermolecular forces become significant.",
+      "Heating curve plateaus mark phase changes; phase diagrams map stable phases, including the triple point and critical point."
+    ],
+    knowledgeCheck: [
+      { question: "Under what conditions do real gases deviate most from ideal gas behavior?", answer: "At high pressure (particles are forced close together, so volume and attraction matter) and low temperature (particles move slowly enough for intermolecular attractions to have a noticeable effect)." },
+      { question: "Why does temperature stay constant during a phase change even though heat is still being added?", answer: "The added heat is being used to overcome intermolecular forces and separate particles into the next phase, not to increase kinetic energy (which is what temperature measures)." }
+    ],
+    flashcards: [
+      { front: "Ideal gas law", back: "PV = nRT" },
+      { front: "Dalton's law", back: "Total pressure = sum of partial pressures." },
+      { front: "London dispersion force", back: "Weakest IMF; present in all molecules." },
+      { front: "Hydrogen bonding", back: "Strongest common IMF; H bonded to N, O, or F." },
+      { front: "Triple point", back: "Pressure/temperature where all three phases coexist." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A rigid, sealed container holds a fixed amount of gas. If the temperature is increased, what happens to the pressure?",
+        concept: "Gas laws and kinetic molecular theory",
+        options: ["Pressure decreases, since volume must decrease to compensate", "Pressure increases, since temperature and pressure are directly proportional at constant volume and moles", "Pressure stays the same", "It cannot be determined without knowing the specific gas"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the container is rigid, so volume cannot change to compensate.",
+          "Correct—with n and V fixed, P = (nR/V)T shows P and T are directly proportional.",
+          "Incorrect—pressure does change, since temperature is changing and volume is fixed.",
+          "Incorrect—the ideal gas law applies generally, without needing to know the specific gas identity."
+        ]
+      },
+      {
+        question: "Why does water (H2O, boiling point 100°C) have a much higher boiling point than H2S (boiling point -60°C), despite similar molar mass?",
+        concept: "Real gases and intermolecular forces",
+        options: ["H2O molecules are heavier, giving them stronger dispersion forces", "Water can form hydrogen bonds, while H2S cannot", "H2S is a much larger molecule", "Boiling point is unrelated to intermolecular forces"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—their molar masses are actually comparable, so dispersion force differences don't explain this large a gap.",
+          "Correct—water's O-H bonds allow strong hydrogen bonding, while H2S's lower electronegativity means it lacks meaningful hydrogen bonding.",
+          "Incorrect—H2S is not meaningfully larger than H2O; their sizes are comparable.",
+          "Incorrect—boiling point is directly determined by the strength of intermolecular forces that must be overcome."
+        ]
+      },
+      {
+        question: "On a heating curve for water, temperature stays at 100°C for several minutes while heat is continuously added as the liquid boils. Where does this energy go?",
+        concept: "Phase changes and phase diagrams",
+        options: ["It isn't being added; the heat source has stopped", "Increasing the kinetic energy of the water molecules", "Overcoming intermolecular forces (hydrogen bonds) to separate liquid molecules into gas", "Decreasing the entropy of the system"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—heat is genuinely still being added throughout the plateau.",
+          "Incorrect—kinetic energy (and therefore temperature) stays constant during the plateau, so energy isn't going there.",
+          "Correct—energy goes into breaking hydrogen bonds to separate molecules into the gas phase, not into raising temperature.",
+          "Incorrect—entropy increases (not decreases) going from liquid to gas."
+        ]
+      },
+      {
+        question: "A gas sample is compressed to a very high pressure at a low temperature. Compared to ideal gas law predictions, how does the real gas's behavior likely differ?",
+        concept: "Real gases and intermolecular forces",
+        options: ["It will behave essentially identically to an ideal gas", "It will deviate significantly, since particle volume and intermolecular attractions become significant under these conditions", "It will deviate only if the gas is a noble gas", "Real gases only deviate from ideal behavior at very high temperature"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—high pressure and low temperature are exactly the conditions where ideal gas assumptions break down most.",
+          "Correct—at high pressure and low temperature, particle volume and intermolecular attraction (both ignored by the ideal gas law) become significant.",
+          "Incorrect—this deviation applies to all real gases, not just noble gases.",
+          "Incorrect—deviation is greatest at low temperature, not high temperature."
+        ]
+      }
+    ],
+    simplifiedExplanation: "The ideal gas law describes a fantasy world where gas particles are infinitely small and completely ignore each other—which works fine most of the time, but breaks down exactly when you'd expect: cram particles close together (high pressure) or slow them down enough to actually notice each other (low temperature), and their real size and stickiness (intermolecular forces) start to matter. Those same intermolecular forces are the whole story behind liquids and solids too—the stronger the attraction between molecules, the more energy it takes to pull them apart into a gas, which is exactly why a heating curve pauses at each phase change: all the added energy is going into prying molecules apart, not speeding them up."
+  },
+  {
+    id: "thermochemistry-thermodynamics",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Thermochemistry & Thermodynamics",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "gases-liquids-solids",
+    sections: [
+      {
+        heading: "Enthalpy and Hess's Law",
+        body: "Enthalpy change (ΔH) is negative for exothermic reactions and positive for endothermic reactions; because enthalpy is a state function, ΔH depends only on initial and final states, not on the path taken. Hess's law exploits this: if a reaction can be written as the sum of two or more steps, its overall ΔH is simply the sum of each step's ΔH (reversing a step flips the sign; scaling a step scales its ΔH).",
+        keyTerms: [
+          { term: "Enthalpy (ΔH)", definition: "Heat exchanged at constant pressure; negative for exothermic, positive for endothermic reactions." },
+          { term: "Hess's law", definition: "The ΔH of an overall reaction equals the sum of the ΔH of steps that add up to it." }
+        ]
+      },
+      {
+        heading: "Entropy and Gibbs Free Energy",
+        body: "Entropy increases (ΔS > 0) when a system becomes more disordered. A reaction is spontaneous when ΔG < 0; since ΔG = ΔH - TΔS, a reaction that is exothermic and increases entropy is always spontaneous, one that is endothermic and decreases entropy is never spontaneous, and the other two combinations depend on temperature.",
+        keyTerms: [
+          { term: "Entropy (ΔS)", definition: "A measure of disorder/dispersal; increases when a system becomes more disordered." },
+          { term: "Gibbs free energy (ΔG)", definition: "ΔG = ΔH - TΔS; determines spontaneity (spontaneous when ΔG < 0)." }
+        ]
+      },
+      {
+        heading: "Calorimetry",
+        body: "The equation q = mcΔT calculates heat absorbed or released by a substance, where c (specific heat capacity) is the heat needed to raise 1 gram of the substance by 1°C. In a calorimeter, heat lost by one substance equals heat gained by another, assuming no heat escapes to the environment.",
+        keyTerms: [
+          { term: "Specific heat capacity (c)", definition: "The heat needed to raise 1 gram of a substance by 1°C." },
+          { term: "Calorimetry", definition: "Measuring heat transfer using q = mcΔT and conservation of energy." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Enthalpy (ΔH) is a state function measuring heat at constant pressure; Hess's law sums step ΔH values to find an overall ΔH.",
+      "Gibbs free energy (ΔG = ΔH - TΔS) determines spontaneity: exothermic + entropy-increasing reactions are always spontaneous; the reverse is never spontaneous; the other two combinations depend on temperature.",
+      "Calorimetry uses q = mcΔT and conservation of energy (heat lost equals heat gained) to calculate heat transfer."
+    ],
+    knowledgeCheck: [
+      { question: "How does Hess's law let you calculate the ΔH of a reaction you can't measure directly?", answer: "By summing the ΔH values of a series of steps (reversing or scaling as needed) that add up to the overall reaction, since enthalpy is a state function depending only on initial and final states." },
+      { question: "Why is a reaction that is exothermic and increases entropy always spontaneous?", answer: "Both terms in ΔG = ΔH - TΔS work in the spontaneous direction: negative ΔH and positive ΔS (making -TΔS negative) combine to guarantee ΔG is negative at any temperature." }
+    ],
+    flashcards: [
+      { front: "Enthalpy (ΔH)", back: "Heat at constant pressure; negative for exothermic." },
+      { front: "Hess's law", back: "Sum step ΔH values to get overall ΔH." },
+      { front: "Entropy (ΔS)", back: "Measure of disorder; increases with more disorder." },
+      { front: "Gibbs free energy", back: "ΔG = ΔH - TΔS; spontaneous when ΔG < 0." },
+      { front: "q = mcΔT", back: "Calculates heat absorbed or released." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Reaction 1 (A → B) has ΔH = +40 kJ. Reaction 2 (B → C) has ΔH = -60 kJ. What is ΔH for A → C?",
+        concept: "Enthalpy and Hess's law",
+        options: ["+100 kJ", "+20 kJ", "-20 kJ", "-100 kJ"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—this would result from subtracting incorrectly rather than summing the two given ΔH values.",
+          "Incorrect—+20 kJ doesn't match the correct sum of +40 kJ and -60 kJ.",
+          "Correct—summing the two steps (A → B → C) gives +40 + (-60) = -20 kJ.",
+          "Incorrect—this would require doubling one of the values, which isn't warranted here."
+        ]
+      },
+      {
+        question: "A reaction has ΔH > 0 (endothermic) and ΔS > 0 (entropy increases). Under what condition is this reaction spontaneous?",
+        concept: "Entropy and Gibbs free energy",
+        options: ["It is always spontaneous, regardless of temperature", "It is never spontaneous, regardless of temperature", "It is spontaneous only at high temperature", "It is spontaneous only at low temperature"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—a positive ΔH works against spontaneity at low temperature, so it isn't always spontaneous.",
+          "Incorrect—at high enough temperature, the -TΔS term can outweigh the positive ΔH, making it spontaneous.",
+          "Correct—at high temperature, -TΔS becomes large and negative enough to outweigh positive ΔH, making ΔG negative.",
+          "Incorrect—at low temperature, the -TΔS term is small, so ΔG stays positive (non-spontaneous)."
+        ]
+      },
+      {
+        question: "A 50 g sample of metal at 100°C is placed into 100 g of water at 20°C, and they reach a common final temperature. Which principle is used to solve for that temperature?",
+        concept: "Calorimetry",
+        options: ["The metal and water each independently reach equilibrium with the room", "Heat lost by the metal equals heat gained by the water (conservation of energy)", "The metal and water must end up at the same temperature they started at", "Specific heat capacity is irrelevant to this calculation"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the problem assumes an isolated system between the metal and water, not each reaching equilibrium with an outside room.",
+          "Correct—energy conservation (assuming no heat escapes) requires heat lost by the metal to equal heat gained by the water.",
+          "Incorrect—the whole point is finding a new, shared final temperature different from either starting temperature.",
+          "Incorrect—specific heat capacity is essential, since q = mcΔT is used for both substances."
+        ]
+      },
+      {
+        question: "Which combination of ΔH and ΔS values guarantees a reaction is non-spontaneous (ΔG > 0) at every temperature?",
+        concept: "Entropy and Gibbs free energy",
+        options: ["ΔH < 0, ΔS > 0", "ΔH < 0, ΔS < 0", "ΔH > 0, ΔS < 0", "ΔH > 0, ΔS > 0"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—this combination (exothermic, entropy-increasing) is always spontaneous, not always non-spontaneous.",
+          "Incorrect—this combination is temperature-dependent, not guaranteed non-spontaneous at every temperature.",
+          "Correct—positive ΔH and negative ΔS both work against spontaneity (ΔG = ΔH - TΔS stays positive at any temperature).",
+          "Incorrect—this combination is also temperature-dependent, not guaranteed non-spontaneous."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Enthalpy is heat accounting, and because it's a state function, it doesn't matter which route you take to get from reactants to products—only where you started and ended—which is exactly why Hess's law lets you add up steps like a travel itinerary and still land on the right total. Spontaneity is a tug-of-war between two things a reaction wants: to release energy (favorable ΔH) and to spread out into more disorder (favorable ΔS)—Gibbs free energy is the referee that combines both, weighted by temperature, into a single verdict. Calorimetry is just watching that heat accounting happen in real time: whatever heat one object loses, another object in the same system must gain, no exceptions."
+  },
+  {
+    id: "chemical-equilibrium",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Chemical Equilibrium",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "thermochemistry-thermodynamics",
+    sections: [
+      {
+        heading: "The Equilibrium Constant and Reaction Quotient",
+        body: "For a reaction aA + bB ⇌ cC + dD, the equilibrium constant K = [C]^c[D]^d / [A]^a[B]^b, with pure solids and liquids omitted. The reaction quotient Q has the same expression but uses concentrations at any point in time; comparing Q to K tells you which way the reaction will shift—if Q < K, forward; if Q > K, reverse; if Q = K, already at equilibrium.",
+        keyTerms: [
+          { term: "Equilibrium constant (K)", definition: "The ratio of products to reactants at equilibrium, from the law of mass action." },
+          { term: "Reaction quotient (Q)", definition: "The same expression as K, but using concentrations at any point in time." }
+        ]
+      },
+      {
+        heading: "Le Chatelier's Principle",
+        body: "Adding a reactant (or removing a product) shifts equilibrium forward, and vice versa; decreasing volume (increasing pressure) shifts equilibrium toward the side with fewer moles of gas. Temperature changes actually change the value of K itself: treating heat as a reactant (endothermic) or product (exothermic) predicts the shift.",
+        keyTerms: [
+          { term: "Le Chatelier's principle", definition: "A system at equilibrium shifts to relieve a disturbance and reestablish equilibrium." }
+        ]
+      },
+      {
+        heading: "ICE Tables and Equilibrium Calculations",
+        body: "An ICE table lists each species' Initial concentration, the Change it undergoes (using stoichiometric coefficients and unknown x), and the resulting Equilibrium concentration. Substituting the Equilibrium row into the K expression gives an algebraic equation solvable for x; when K is very small, the approximation that x is negligible often simplifies the algebra.",
+        keyTerms: [
+          { term: "ICE table", definition: "Initial, Change, Equilibrium—organizes concentration changes toward equilibrium." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "K describes the product/reactant ratio at equilibrium; comparing Q to K predicts whether a reaction shifts forward (Q < K) or reverse (Q > K).",
+      "Le Chatelier's principle predicts a system's response to disturbance: shifts to relieve concentration changes, shifts toward fewer gas moles under pressure, and K itself changes with temperature.",
+      "ICE tables track Initial, Change, and Equilibrium concentrations, letting you solve for unknown equilibrium concentrations via the K expression."
+    ],
+    knowledgeCheck: [
+      { question: "How do you predict which direction a reaction will shift to reach equilibrium?", answer: "Calculate the reaction quotient Q and compare it to K—if Q < K the reaction shifts forward, if Q > K it shifts in reverse, and if Q = K it's already at equilibrium." },
+      { question: "Why is temperature different from other equilibrium disturbances (like concentration or pressure changes)?", answer: "Temperature changes actually change the value of K itself, not just shift the position of equilibrium the way concentration or pressure changes do." }
+    ],
+    flashcards: [
+      { front: "Equilibrium constant (K)", back: "Product/reactant ratio at equilibrium." },
+      { front: "Reaction quotient (Q)", back: "Same expression as K, at any point in time." },
+      { front: "Le Chatelier's principle", back: "System shifts to relieve a disturbance." },
+      { front: "ICE table", back: "Initial, Change, Equilibrium concentrations." },
+      { front: "Q < K", back: "Reaction shifts forward toward products." }
+    ],
+    practiceQuestions: [
+      {
+        question: "For a reaction with K = 10, a reaction mixture currently has Q = 2. Which direction will the reaction proceed?",
+        concept: "The equilibrium constant and reaction quotient",
+        options: ["Forward, toward more products, since Q < K", "Reverse, toward more reactants, since Q < K", "The reaction is already at equilibrium", "It cannot be determined without concentrations"],
+        correctIndex: 0,
+        optionExplanations: [
+          "Correct—since Q (2) is less than K (10), the reaction proceeds forward until Q rises to equal K.",
+          "Incorrect—Q < K means the reaction needs to move toward products (forward), not reactants.",
+          "Incorrect—Q and K are not equal here, so the system is not yet at equilibrium.",
+          "Incorrect—Q and K alone are sufficient to determine the direction of shift."
+        ]
+      },
+      {
+        question: "For the exothermic reaction N2(g) + 3H2(g) ⇌ 2NH3(g), what happens to the equilibrium position if temperature is increased?",
+        concept: "Le Chatelier's principle",
+        options: ["Equilibrium shifts forward, favoring more NH3", "Equilibrium shifts in reverse, favoring N2 and H2", "No shift occurs", "The reaction stops entirely"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—for an exothermic reaction, adding heat shifts equilibrium away from products, not toward them.",
+          "Correct—treating heat as a product of this exothermic reaction, adding heat shifts equilibrium in reverse, favoring reactants.",
+          "Incorrect—temperature is one of the disturbances that does cause a shift (and changes K itself).",
+          "Incorrect—the reaction continues; it just re-equilibrates at a new position."
+        ]
+      },
+      {
+        question: "In an ICE table for the reaction A ⇌ B + C, starting with only 1.0 M of A and no B or C, what does the 'Change' row show for each species?",
+        concept: "ICE tables and equilibrium calculations",
+        options: ["A: +x, B: -x, C: -x", "A: -x, B: +x, C: +x", "A: -2x, B: +x, C: +x", "All species change by the same fixed amount, unrelated to x"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—A is consumed (should be -x), not produced, as the reaction proceeds forward.",
+          "Correct—A is consumed (-x) while B and C are produced (+x each), matching their 1:1:1 stoichiometry.",
+          "Incorrect—A's coefficient is 1, not 2, so its change should be -x, not -2x.",
+          "Incorrect—the changes are expressed in terms of the variable x, not a fixed, unrelated amount."
+        ]
+      },
+      {
+        question: "A sealed container at equilibrium contains a gas-phase reaction with more moles of gas on the product side than the reactant side. If the container's volume is suddenly decreased, which way does equilibrium shift?",
+        concept: "Le Chatelier's principle",
+        options: ["Toward products, since decreasing volume favors more moles of gas", "Toward reactants, since decreasing volume favors fewer moles of gas", "No shift occurs, since volume doesn't affect equilibrium", "It depends on whether the reaction is exothermic or endothermic"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—decreasing volume (increasing pressure) favors the side with fewer moles of gas, not more.",
+          "Correct—decreasing volume increases pressure, and equilibrium shifts toward the side with fewer gas moles (the reactant side here) to partially relieve that increase.",
+          "Incorrect—volume/pressure changes do shift equilibrium when moles of gas differ between sides.",
+          "Incorrect—the pressure/volume shift depends on relative moles of gas, not on whether the reaction is exo- or endothermic (that's relevant for temperature changes instead)."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Equilibrium isn't a finish line—it's a busy two-way street where forward and reverse reactions are both still happening, just at matched speeds, so nothing appears to change overall. K is the street's 'normal traffic ratio,' and Q is just a snapshot of current traffic—compare the two, and you know which direction traffic needs to shift to get back to normal. Le Chatelier's principle is that self-correcting mechanism in action: push on the system (add a reactant, squeeze the volume, change the temperature) and it pushes back, shifting to counteract whatever you just did. ICE tables are simply the bookkeeping tool that turns all of this into solvable algebra."
+  },
+  {
+    id: "acids-bases-buffers",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Acids, Bases & Buffers",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "chemical-equilibrium",
+    sections: [
+      {
+        heading: "Acid-Base Theories",
+        body: "The Arrhenius definition (acids produce H+ in water, bases produce OH-) is the most limited; the Brønsted-Lowry definition (acids donate a proton, bases accept a proton) is more general; the Lewis definition (acids accept an electron pair, bases donate one) is the broadest. In a Brønsted-Lowry reaction, the acid becomes its conjugate base after losing H+, and the base becomes its conjugate acid after gaining H+.",
+        keyTerms: [
+          { term: "Brønsted-Lowry acid", definition: "A species that donates a proton (H+)." },
+          { term: "Conjugate acid-base pair", definition: "Two species differing by a single proton, related by donation/acceptance of H+." }
+        ]
+      },
+      {
+        heading: "pH, pKa, and the Henderson-Hasselbalch Equation",
+        body: "A lower pKa means a stronger acid; pH and pKa use the same logarithmic relationship as concentration and equilibrium constants. The Henderson-Hasselbalch equation, pH = pKa + log([A-]/[HA]), directly connects a solution's pH to the ratio of a weak acid's conjugate base to its undissociated acid; when [A-] = [HA], pH = pKa exactly.",
+        keyTerms: [
+          { term: "pKa", definition: "-log(Ka); a measure of acid strength—lower pKa means a stronger acid." },
+          { term: "Henderson-Hasselbalch equation", definition: "pH = pKa + log([A-]/[HA]); relates pH to the conjugate base/acid ratio." }
+        ]
+      },
+      {
+        heading: "Buffers and Titration Curves",
+        body: "A buffer resists pH change because it contains both a weak acid and its conjugate base; buffer capacity is greatest near its pKa. On a titration curve, the equivalence point is where titrant exactly neutralizes the analyte, and the half-equivalence point (where pH = pKa) is where exactly half the original acid has been converted to its conjugate base.",
+        keyTerms: [
+          { term: "Buffer", definition: "A weak acid and its conjugate base (or weak base and conjugate acid) that resists pH change." },
+          { term: "Equivalence point", definition: "The point in a titration where titrant exactly neutralizes the analyte." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Brønsted-Lowry acids donate H+ and bases accept H+, forming conjugate acid-base pairs; strong acids/bases dissociate completely, weak ones partially.",
+      "The Henderson-Hasselbalch equation connects pH and pKa; when a weak acid and its conjugate base are equally concentrated, pH equals pKa.",
+      "A buffer resists pH change, most effectively near its pKa; on a titration curve, pH = pKa at the half-equivalence point."
+    ],
+    knowledgeCheck: [
+      { question: "What is the Brønsted-Lowry definition of an acid and a base?", answer: "An acid donates a proton (H+); a base accepts a proton—the resulting species after donation/acceptance are called conjugate acid-base pairs." },
+      { question: "Why does a buffer resist pH change most effectively near its pKa?", answer: "Near its pKa, a buffer contains substantial, roughly equal amounts of both the weak acid and its conjugate base, so it can neutralize either added acid or added base effectively." }
+    ],
+    flashcards: [
+      { front: "Brønsted-Lowry acid", back: "Donates a proton (H+)." },
+      { front: "Conjugate base", back: "What remains after an acid donates H+." },
+      { front: "pKa", back: "-log(Ka); lower pKa = stronger acid." },
+      { front: "Henderson-Hasselbalch", back: "pH = pKa + log([A-]/[HA])" },
+      { front: "Half-equivalence point", back: "Where pH = pKa in a titration." }
+    ],
+    practiceQuestions: [
+      {
+        question: "In the reaction NH3 + H2O ⇌ NH4+ + OH-, which species is the conjugate acid of NH3?",
+        concept: "Acid-base theories",
+        options: ["H2O", "OH-", "NH4+", "NH3 has no conjugate acid in this reaction"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—H2O is the acid in this reaction, not related to NH3 as a conjugate pair.",
+          "Incorrect—OH- is the conjugate base of H2O, not related to NH3.",
+          "Correct—NH3 accepts a proton to become NH4+, its conjugate acid.",
+          "Incorrect—NH3 does have a conjugate acid here: NH4+."
+        ]
+      },
+      {
+        question: "A weak acid has a pKa of 4.75. In a solution where [A-] = [HA], what is the solution's pH?",
+        concept: "pH, pKa, and Henderson-Hasselbalch",
+        options: ["0", "4.75", "7.00", "9.50"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—pH of 0 would require an extremely concentrated strong acid, not this scenario.",
+          "Correct—when [A-] = [HA], log(1) = 0, so pH = pKa = 4.75.",
+          "Incorrect—7.00 would be neutral pH, not what Henderson-Hasselbalch gives here.",
+          "Incorrect—9.50 doesn't match pH = pKa + log(1)."
+        ]
+      },
+      {
+        question: "On a titration curve for a weak acid titrated with a strong base, why does the curve appear relatively flat near the half-equivalence point?",
+        concept: "Buffers and titration curves",
+        options: ["The reaction has stopped in that region", "This is the buffer region, where roughly equal amounts of weak acid and conjugate base resist pH change", "No titrant is being added during this region", "The solution is at its equivalence point throughout this region"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the reaction continues throughout the titration, not just outside this region.",
+          "Correct—substantial amounts of both the weak acid and its conjugate base near the half-equivalence point create an effective buffer.",
+          "Incorrect—titrant continues to be added throughout the titration, including this region.",
+          "Incorrect—the equivalence point is a single, distinct point (a steep rise), not this flat buffer region."
+        ]
+      },
+      {
+        question: "Which of the following would most increase the acidity (lower the pKa) of a carboxylic acid?",
+        concept: "pH, pKa, and Henderson-Hasselbalch",
+        options: ["Adding an electron-donating group near the acidic proton", "Adding an electron-withdrawing group (like a halogen) near the acidic proton", "Increasing the molecule's overall size with no functional change", "Removing all polar groups from the molecule"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—electron-donating groups would destabilize the negative charge on the conjugate base, decreasing acidity.",
+          "Correct—electron-withdrawing groups stabilize the negative charge on the conjugate base inductively, increasing acidity (lowering pKa).",
+          "Incorrect—size alone, without an electronic effect, doesn't meaningfully change acidity.",
+          "Incorrect—removing polar groups would generally decrease, not increase, acidity."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Acid-base chemistry is fundamentally about who's handing off a proton and who's catching it—Brønsted-Lowry acids give, bases receive, and whatever's left over on each side (the conjugate pair) is just the same molecule missing or holding an extra H+. pH and pKa speak the same logarithmic language, and Henderson-Hasselbalch is the translator connecting them: it tells you that when a weak acid and its conjugate base are in equal supply, the pH just is the pKa, no other math needed. A buffer is basically a shock absorber built from that same equal mixture—stock enough of both the acid and its conjugate base, and the solution can soak up a punch of added acid or base without its pH swinging wildly."
+  },
+  {
+    id: "redox-electrochemistry",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Redox & Electrochemistry",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "acids-bases-buffers",
+    sections: [
+      {
+        heading: "Oxidation States and Redox Reactions",
+        body: "Oxidation states are assigned by rules and track how an atom's oxidation state changes across a reaction to identify whether it's being oxidized or reduced. The species oxidized (loses electrons) is the reducing agent; the species reduced (gains electrons) is the oxidizing agent.",
+        keyTerms: [
+          { term: "Oxidation", definition: "Loss of electrons; oxidation state increases." },
+          { term: "Reducing agent", definition: "The species that is oxidized, enabling another species to be reduced." }
+        ]
+      },
+      {
+        heading: "Galvanic (Voltaic) Cells",
+        body: "In a galvanic cell, oxidation happens at the anode and reduction happens at the cathode—electrons flow through the external wire from anode to cathode. Standard cell potential, E°cell = E°cathode - E°anode, is positive for a spontaneous galvanic cell, connecting to ΔG° = -nFE°cell.",
+        keyTerms: [
+          { term: "Anode", definition: "The electrode where oxidation occurs." },
+          { term: "Cathode", definition: "The electrode where reduction occurs." }
+        ]
+      },
+      {
+        heading: "Electrolytic Cells",
+        body: "Electrolytic cells require an external power source to drive a nonspontaneous redox reaction (negative E°cell), unlike galvanic cells which generate current from a spontaneous one. Oxidation still occurs at the anode and reduction at the cathode, but the polarity relative to the power source is reversed compared to a galvanic cell.",
+        keyTerms: [
+          { term: "Electrolysis", definition: "Using external electrical current to drive a nonspontaneous redox reaction." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "The species oxidized (loses electrons) is the reducing agent, and the species reduced (gains electrons) is the oxidizing agent.",
+      "In a galvanic cell, oxidation occurs at the anode and reduction at the cathode; a positive E°cell indicates a spontaneous reaction.",
+      "Electrolytic cells use external electrical energy to drive a nonspontaneous reaction, while galvanic cells generate electrical energy from a spontaneous one."
+    ],
+    knowledgeCheck: [
+      { question: "How do you determine which species is the oxidizing agent in a redox reaction?", answer: "The oxidizing agent is the species that is reduced (gains electrons)—it's named for what it does to the other species (causes it to be oxidized), which is the opposite of what happens to itself." },
+      { question: "What is the fundamental difference between a galvanic cell and an electrolytic cell?", answer: "A galvanic cell generates electrical energy from a spontaneous redox reaction; an electrolytic cell uses external electrical energy to drive a nonspontaneous redox reaction." }
+    ],
+    flashcards: [
+      { front: "Oxidation", back: "Loss of electrons." },
+      { front: "Reduction", back: "Gain of electrons." },
+      { front: "Anode", back: "Where oxidation occurs." },
+      { front: "Cathode", back: "Where reduction occurs." },
+      { front: "Galvanic cell", back: "Generates current from a spontaneous reaction." }
+    ],
+    practiceQuestions: [
+      {
+        question: "In the reaction Zn + Cu2+ → Zn2+ + Cu, zinc's oxidation state goes from 0 to +2. What role does zinc play?",
+        concept: "Oxidation states and redox reactions",
+        options: ["Zinc is oxidized and acts as the oxidizing agent", "Zinc is oxidized and acts as the reducing agent", "Zinc is reduced and acts as the oxidizing agent", "Zinc is reduced and acts as the reducing agent"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—zinc is oxidized, but the species oxidized is called the reducing agent, not the oxidizing agent.",
+          "Correct—zinc loses electrons (oxidized), and by enabling Cu2+ to be reduced, it acts as the reducing agent.",
+          "Incorrect—zinc is oxidized (loses electrons), not reduced.",
+          "Incorrect—zinc is indeed the reducing agent, but it is oxidized, not reduced."
+        ]
+      },
+      {
+        question: "In a galvanic cell built from Zn/Zn2+ and Cu/Cu2+ half-cells, electrons flow spontaneously from zinc to copper. Which electrode is the anode?",
+        concept: "Galvanic (voltaic) cells",
+        options: ["Copper, because reduction occurs there", "Copper, because oxidation occurs there", "Zinc, because oxidation occurs there and releases the electrons that flow through the wire", "Zinc, because reduction occurs there"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—copper is where reduction occurs, making it the cathode, not the anode.",
+          "Incorrect—oxidation occurs at zinc, not copper.",
+          "Correct—zinc loses electrons (oxidation), and oxidation defines the anode.",
+          "Incorrect—reduction occurs at copper, not zinc."
+        ]
+      },
+      {
+        question: "Which statement correctly distinguishes an electrolytic cell from a galvanic cell?",
+        concept: "Electrolytic cells",
+        options: ["Reduction occurs at the anode in an electrolytic cell but not a galvanic cell", "An electrolytic cell drives a nonspontaneous reaction using external electrical energy, while a galvanic cell generates electrical energy from a spontaneous reaction", "Electrolytic cells don't involve electron transfer", "Galvanic cells always have a negative E°cell"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—oxidation occurs at the anode in both cell types; this doesn't change between them.",
+          "Correct—this spontaneity/energy-direction distinction is the defining difference between the two cell types.",
+          "Incorrect—electrolytic cells absolutely involve electron transfer, driven by an external source.",
+          "Incorrect—galvanic cells have a positive E°cell, since they run on spontaneous reactions."
+        ]
+      },
+      {
+        question: "A galvanic cell has E°cathode = +0.34 V and E°anode = -0.76 V. What is E°cell, and is the reaction spontaneous?",
+        concept: "Galvanic (voltaic) cells",
+        options: ["-0.42 V; not spontaneous", "+0.42 V; spontaneous", "+1.10 V; spontaneous", "-1.10 V; not spontaneous"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—this doesn't match E°cell = E°cathode - E°anode with these values.",
+          "Incorrect—+0.42 V doesn't match the correct subtraction.",
+          "Correct—E°cell = 0.34 - (-0.76) = 1.10 V, positive and therefore spontaneous.",
+          "Incorrect—the sign and magnitude here don't match E°cathode - E°anode."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Redox reactions are always a paired transaction—one species loses electrons (oxidized) exactly as another gains them (reduced), and the naming convention flips what you'd expect: whichever species gets oxidized is called the reducing agent, because its sacrifice is what allows something else to be reduced. Galvanic cells physically separate that electron handoff across a wire, letting you harvest useful current from a reaction that wants to happen anyway (oxidation at the anode, reduction at the cathode, always). Electrolytic cells just run that same setup in reverse—instead of harvesting current from a willing reaction, you're forcing current into an unwilling one, spending electrical energy to make a nonspontaneous reaction happen anyway."
+  },
+  {
+    id: "chemical-kinetics",
+    subjectId: "general-chemistry",
+    sectionId: "chem-phys",
+    title: "Chemical Kinetics",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "redox-electrochemistry",
+    sections: [
+      {
+        heading: "Reaction Rates and Rate Laws",
+        body: "The rate law's exponents (reaction orders) must be determined from experimental data, not read from the balanced equation's coefficients. The rate constant k is specific to a given reaction at a given temperature; overall reaction order is the sum of the individual orders.",
+        keyTerms: [
+          { term: "Rate law", definition: "rate = k[A]^m[B]^n; describes how rate depends on concentration, with orders determined experimentally." },
+          { term: "Reaction order", definition: "The exponent on a reactant's concentration in the rate law." }
+        ]
+      },
+      {
+        heading: "Reaction Mechanisms and the Rate-Determining Step",
+        body: "A mechanism is a series of elementary steps that sum to the overall reaction; intermediates are produced in one step and consumed in a later step. The rate-determining step (the slowest step) bottlenecks the overall rate, and the overall rate law is written directly from that step's reactants.",
+        keyTerms: [
+          { term: "Rate-determining step", definition: "The slowest elementary step in a mechanism; controls the overall rate law." },
+          { term: "Intermediate", definition: "A species produced in one mechanism step and consumed in a later one." }
+        ]
+      },
+      {
+        heading: "Activation Energy and Catalysts",
+        body: "The Arrhenius equation, k = Ae^(-Ea/RT), shows that k increases with temperature and decreases with higher activation energy. A catalyst speeds up a reaction by providing a lower-activation-energy pathway without being consumed, unlike an intermediate, which is produced and then consumed.",
+        keyTerms: [
+          { term: "Activation energy (Ea)", definition: "The energy barrier that must be overcome for a reaction to proceed." },
+          { term: "Catalyst", definition: "A substance that lowers activation energy without being consumed in the reaction." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Rate laws (rate = k[A]^m[B]^n) describe how rate depends on concentration, with reaction orders determined experimentally, not from the balanced equation.",
+      "A mechanism's rate-determining (slowest) step controls the overall rate law, written from that step's own reactants.",
+      "The Arrhenius equation shows rate increases with temperature and decreases with activation energy; catalysts lower activation energy without being consumed."
+    ],
+    knowledgeCheck: [
+      { question: "Why can't you determine a reaction's rate law just by looking at its balanced equation?", answer: "Reaction orders (the rate law's exponents) must be determined experimentally, since they reflect the mechanism's rate-determining step, not necessarily the overall balanced equation's coefficients." },
+      { question: "How does a catalyst differ from a reaction intermediate?", answer: "A catalyst is present at the start of a mechanism and regenerated unchanged by the end (lowering activation energy without being consumed), while an intermediate is produced partway through the mechanism and consumed before the end." }
+    ],
+    flashcards: [
+      { front: "Rate law", back: "rate = k[A]^m[B]^n; orders found experimentally." },
+      { front: "Rate-determining step", back: "The slowest step; controls the overall rate law." },
+      { front: "Intermediate", back: "Produced then consumed within a mechanism." },
+      { front: "Catalyst", back: "Lowers activation energy; not consumed." },
+      { front: "Arrhenius equation", back: "k = Ae^(-Ea/RT)" }
+    ],
+    practiceQuestions: [
+      {
+        question: "For the reaction 2A + B → C, experiments show that doubling [A] alone doubles the rate, and doubling [B] alone quadruples the rate. What is the rate law?",
+        concept: "Reaction rates and rate laws",
+        options: ["rate = k[A]^2[B]", "rate = k[A][B]^2", "rate = k[A][B]", "rate = k[A]^2[B]^2"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this would mean doubling [A] quadruples the rate, which contradicts the given data.",
+          "Correct—doubling [A] doubles rate (order 1 in A); doubling [B] quadruples rate (2² = 4, order 2 in B).",
+          "Incorrect—this would mean doubling [B] only doubles the rate, not quadruples it.",
+          "Incorrect—this would mean doubling [A] alone quadruples the rate, which contradicts the given data."
+        ]
+      },
+      {
+        question: "A proposed two-step mechanism has Step 1 (slow): A + B → C, and Step 2 (fast): C + A → D. What is the rate law implied?",
+        concept: "Reaction mechanisms and the rate-determining step",
+        options: ["rate = k[C][A], based on step 2", "rate = k[A][B], based on the slow step (step 1)", "rate = k[A]^2[B], based on the overall reaction", "It cannot be determined without more information"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—step 2 is the fast step and doesn't limit the overall rate.",
+          "Correct—the rate law is written from the rate-determining (slow) step's reactants: A and B.",
+          "Incorrect—the overall reaction's coefficients aren't used to write the rate law; the RDS's reactants are.",
+          "Incorrect—the given mechanism is enough information to write the rate law from the slow step."
+        ]
+      },
+      {
+        question: "A substance appears as a reactant in the first step of a mechanism and is regenerated, unchanged, as a product in the final step. What role does it play?",
+        concept: "Activation energy and catalysts",
+        options: ["Reactant", "Intermediate", "Catalyst", "Product"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—a true reactant is consumed overall, not regenerated unchanged by the end.",
+          "Incorrect—an intermediate is produced partway through and consumed before the end, the reverse of this pattern.",
+          "Correct—present at the start and regenerated unchanged at the end describes a catalyst.",
+          "Incorrect—a true product is formed, not regenerated back to its original starting form."
+        ]
+      },
+      {
+        question: "Increasing the temperature of a reaction increases its rate. According to the Arrhenius equation, what is the best explanation for this?",
+        concept: "Activation energy and catalysts",
+        options: ["Higher temperature decreases the activation energy", "Higher temperature increases the rate constant k, since more molecules have enough energy to overcome the activation energy barrier", "Higher temperature has no real effect on rate; only catalysts do", "Higher temperature always doubles the rate exactly"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—temperature doesn't change activation energy; that's a property of the reaction pathway itself, changed only by a catalyst.",
+          "Correct—the Arrhenius equation shows k increases with temperature, since more molecules have sufficient energy to overcome Ea.",
+          "Incorrect—temperature is one of the most direct ways to change reaction rate, per the Arrhenius equation.",
+          "Incorrect—the relationship is exponential, not a fixed doubling regardless of the specific temperature change."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Kinetics is about speed, not destination—it doesn't ask where a reaction ends up (that's equilibrium's job), just how fast it gets there, and the rate law is the experimentally-measured speedometer for that. When a reaction happens in multiple steps, its overall speed is bottlenecked by whichever step is slowest, the same way a highway's overall travel time is set by its worst traffic jam, not its fastest stretch. Temperature and catalysts both speed things up, but for different reasons: heat gives more molecules enough energy to clear the activation-energy hurdle, while a catalyst just makes the hurdle itself shorter, without getting used up in the process."
+  }
+];
+
+const organicChemistryLessons: LessonContent[] = [
+  {
+    id: "organic-structure-functional-groups",
+    subjectId: "organic-chemistry",
+    sectionId: "chem-phys",
+    title: "Organic Structure & Functional Groups",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    prerequisiteLessonId: "chemical-kinetics",
+    sections: [
+      {
+        heading: "Recognizing Functional Groups",
+        body: "Oxygen-containing functional groups form a reactivity ladder: alcohols (-OH) and ethers (C-O-C) are the least reactive; aldehydes (terminal C=O with an H) and ketones (internal C=O) are more reactive; carboxylic acids (-COOH) and their derivatives (esters, amides) are the most reactive. Nitrogen-containing groups include amines (basic) and amides (much less basic, due to resonance delocalization of the nitrogen lone pair into the carbonyl).",
+        keyTerms: [
+          { term: "Functional group", definition: "A specific arrangement of atoms giving a molecule characteristic reactivity." },
+          { term: "Carbonyl", definition: "A carbon double-bonded to oxygen (C=O); present in aldehydes, ketones, carboxylic acids, and derivatives." }
+        ]
+      },
+      {
+        heading: "IUPAC Nomenclature Basics",
+        body: "Naming starts by finding the longest continuous carbon chain containing the highest-priority functional group, using the root matching its carbon count, then numbering the chain to give the lowest locants. The suffix indicates the highest-priority functional group present (-oic acid, -al, -one, -ol, -amine), while lower-priority groups become substituent prefixes.",
+        keyTerms: [
+          { term: "Parent chain", definition: "The longest continuous carbon chain containing the highest-priority functional group." },
+          { term: "Suffix", definition: "The part of an IUPAC name indicating the highest-priority functional group present." }
+        ]
+      },
+      {
+        heading: "Structural Representations and Degrees of Unsaturation",
+        body: "In a skeletal structure, each line endpoint or vertex represents a carbon atom, with hydrogens implied. Degrees of unsaturation (DoU) = (2C + 2 + N - H) / 2 gives the total number of rings plus pi bonds in a molecule.",
+        keyTerms: [
+          { term: "Skeletal structure", definition: "A structural drawing where carbons are line vertices with implied hydrogens." },
+          { term: "Degrees of unsaturation", definition: "The total count of rings and pi bonds implied by a molecular formula." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Functional groups determine a molecule's chemical behavior; oxygen-containing groups range from alcohols (least reactive) to carboxylic acid derivatives (most reactive), while amines are basic and amides are only weakly basic.",
+      "IUPAC names identify the longest chain containing the highest-priority functional group and use a suffix that identifies that group.",
+      "Skeletal structures show carbons as line vertices with implied hydrogens; degrees of unsaturation count the total rings and pi bonds a structure must contain."
+    ],
+    knowledgeCheck: [
+      { question: "What distinguishes an aldehyde from a ketone structurally?", answer: "An aldehyde's carbonyl carbon is bonded to a hydrogen (terminal position); a ketone's carbonyl carbon is bonded to two other carbons (internal position, no H)." },
+      { question: "What does a molecule's degrees of unsaturation tell you about its structure?", answer: "It gives the total number of rings plus pi bonds (double bonds count as 1, triple bonds count as 2) that the structure must contain." }
+    ],
+    flashcards: [
+      { front: "Aldehyde", back: "Terminal C=O bonded to an H." },
+      { front: "Ketone", back: "Internal C=O bonded to two carbons." },
+      { front: "Carboxylic acid", back: "-COOH group." },
+      { front: "Amine", back: "Basic nitrogen group; -NH2/-NHR/-NR2." },
+      { front: "Degrees of unsaturation", back: "Total rings + pi bonds implied by molecular formula." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A molecule contains a carbon double-bonded to oxygen, where that carbon is also bonded to a hydrogen and to the rest of the carbon chain. What functional group is this?",
+        concept: "Recognizing functional groups",
+        options: ["Ketone", "Aldehyde", "Carboxylic acid", "Ester"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—a ketone's carbonyl carbon is bonded to two carbons, not a hydrogen.",
+          "Correct—a carbonyl carbon bonded to a hydrogen (terminal position) defines an aldehyde.",
+          "Incorrect—carboxylic acids require an additional oxygen bonded to the carbonyl carbon.",
+          "Incorrect—esters also require an additional oxygen bonded to the carbonyl carbon."
+        ]
+      },
+      {
+        question: "A molecule is named 'pentan-2-one.' What does this tell you about its structure?",
+        concept: "IUPAC nomenclature basics",
+        options: ["A 5-carbon chain with an alcohol at carbon 2", "A 5-carbon chain with a ketone at carbon 2", "A 2-carbon chain with 5 substituents", "A 5-carbon chain that is a carboxylic acid"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—'-ol' would indicate an alcohol; '-one' indicates a ketone instead.",
+          "Correct—'pentan-' indicates 5 carbons, '-one' indicates a ketone, and '2' places the carbonyl at position 2.",
+          "Incorrect—'pentan-' refers to the chain length (5 carbons), not the number of substituents.",
+          "Incorrect—'-oic acid' would indicate a carboxylic acid, not '-one.'"
+        ]
+      },
+      {
+        question: "A compound has the molecular formula C6H12. How many degrees of unsaturation does it have?",
+        concept: "Structural representations and degrees of unsaturation",
+        options: ["0", "1", "2", "It cannot be determined without more information"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—0 degrees would require the formula C6H14 (fully saturated hexane).",
+          "Correct—DoU = (2×6 + 2 - 12)/2 = 2/2 = 1, indicating one ring or double bond.",
+          "Incorrect—2 degrees would require the formula C6H10.",
+          "Incorrect—DoU is calculable directly from the molecular formula alone."
+        ]
+      },
+      {
+        question: "Which functional group would you expect to find in the compound named 'butanoic acid'?",
+        concept: "IUPAC nomenclature basics",
+        options: ["An alcohol", "A ketone", "A carboxylic acid", "An amine"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—an alcohol would be named with the suffix '-ol,' not '-oic acid.'",
+          "Incorrect—a ketone would be named with the suffix '-one,' not '-oic acid.'",
+          "Correct—the suffix '-oic acid' specifically indicates a carboxylic acid.",
+          "Incorrect—an amine would be named with the suffix '-amine,' not '-oic acid.'"
+        ]
+      }
+    ],
+    simplifiedExplanation: "Think of the carbon backbone as a plain string of beads and the functional group as whatever colorful charm is hanging off it—the charm is what actually does the chemistry, while the string mostly just holds it in place. IUPAC names are simply a systematic address: first find the longest street (parent chain) that passes by the most important charm, then note which house number (locant) it's at, and the suffix tells you which charm you're dealing with. Degrees of unsaturation is a neat trick that lets you count how many rings or double/triple bonds a formula must contain before you've even drawn the structure, just from the atom counts alone."
+  },
+  {
+    id: "isomers-stereochemistry",
+    subjectId: "organic-chemistry",
+    sectionId: "chem-phys",
+    title: "Isomers & Stereochemistry",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "organic-structure-functional-groups",
+    sections: [
+      {
+        heading: "Structural Isomers vs. Stereoisomers",
+        body: "Structural isomers have the same molecular formula but their atoms are bonded together in a genuinely different order. Stereoisomers have identical connectivity but differ in how those atoms are arranged in three-dimensional space.",
+        keyTerms: [
+          { term: "Structural isomer", definition: "Isomers with the same molecular formula but different atom connectivity." },
+          { term: "Stereoisomer", definition: "Isomers with identical connectivity but different 3D spatial arrangement." }
+        ]
+      },
+      {
+        heading: "Chirality and R/S Configuration",
+        body: "A carbon is a chiral center when bonded to four different groups; such a molecule is non-superimposable on its mirror image (an enantiomer). R/S configuration is assigned using CIP priority rules: rank groups by atomic number, orient the lowest priority away, and trace 1→2→3—clockwise is R, counterclockwise is S.",
+        keyTerms: [
+          { term: "Chiral center", definition: "A carbon bonded to four different groups, creating non-superimposable mirror images." },
+          { term: "Enantiomers", definition: "Non-superimposable mirror-image stereoisomers." }
+        ]
+      },
+      {
+        heading: "Diastereomers and Meso Compounds",
+        body: "Diastereomers are stereoisomers that differ at only some (not all) stereocenters and are not mirror images; cis/trans isomers are a specific type. A meso compound has multiple stereocenters but is achiral overall due to an internal mirror plane.",
+        keyTerms: [
+          { term: "Diastereomer", definition: "A stereoisomer that is not a mirror image of another stereoisomer." },
+          { term: "Meso compound", definition: "A compound with multiple stereocenters that is achiral due to an internal mirror plane." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Structural isomers differ in atom connectivity; stereoisomers share identical connectivity but differ in 3D spatial arrangement.",
+      "A chiral center produces enantiomers—non-superimposable mirror images assigned R or S by CIP priority rules.",
+      "Diastereomers are stereoisomers that aren't mirror images; a meso compound has multiple stereocenters but is achiral overall due to an internal mirror plane."
+    ],
+    knowledgeCheck: [
+      { question: "What is the first question to ask when comparing two molecules with the same molecular formula?", answer: "Whether their atoms have the same connectivity—if connectivity differs, they're structural isomers; only if connectivity is identical do you move on to considering stereochemistry." },
+      { question: "Why can two enantiomers of a drug have very different biological effects despite being chemically 'identical' in most respects?", answer: "Biological receptors and enzymes are themselves chiral, so they can interact very differently with each mirror-image enantiomer, much like a hand only fits one of two mirror-image gloves." }
+    ],
+    flashcards: [
+      { front: "Structural isomer", back: "Same formula, different connectivity." },
+      { front: "Stereoisomer", back: "Same connectivity, different 3D arrangement." },
+      { front: "Chiral center", back: "Carbon bonded to four different groups." },
+      { front: "Enantiomers", back: "Non-superimposable mirror images." },
+      { front: "Meso compound", back: "Multiple stereocenters, but achiral overall." }
+    ],
+    practiceQuestions: [
+      {
+        question: "1-propanol and 2-propanol have the same molecular formula, C3H8O, but the -OH group is on a different carbon. What type of isomers are these?",
+        concept: "Structural isomers vs. stereoisomers",
+        options: ["Enantiomers", "Diastereomers", "Structural (constitutional) isomers", "They are not isomers at all"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—enantiomers require identical connectivity; these two molecules have different connectivity.",
+          "Incorrect—diastereomers also require identical connectivity, which isn't the case here.",
+          "Correct—the -OH is bonded to a different carbon in each, meaning genuinely different connectivity.",
+          "Incorrect—they do share the same molecular formula, which makes them isomers by definition."
+        ]
+      },
+      {
+        question: "Two enantiomers of the same drug are otherwise chemically identical. Why might they have dramatically different biological effects?",
+        concept: "Chirality and R/S configuration",
+        options: ["Enantiomers actually have different molecular formulas", "Enzymes and receptors are themselves chiral, interacting differently with each enantiomer", "Enantiomers have different boiling points, affecting absorption", "There is no possible difference in biological effect"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—enantiomers share the same molecular formula; only their 3D spatial arrangement differs.",
+          "Correct—chiral biological receptors/enzymes can bind one enantiomer much more effectively than its mirror image.",
+          "Incorrect—enantiomers actually share identical physical properties like boiling point.",
+          "Incorrect—differences in biological effect between enantiomers are well documented and expected."
+        ]
+      },
+      {
+        question: "One stereoisomer of tartaric acid, which has two stereocenters, is optically inactive due to an internal mirror plane. What is this type of compound called?",
+        concept: "Diastereomers and meso compounds",
+        options: ["An enantiomer", "A diastereomer", "A meso compound", "A structural isomer"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—an enantiomer is chiral and optically active; this compound is achiral.",
+          "Incorrect—a diastereomer is a distinct stereoisomer, not a description of internal symmetry within one molecule.",
+          "Correct—a compound with multiple stereocenters that is nonetheless achiral due to internal symmetry is a meso compound.",
+          "Incorrect—this compound shares identical connectivity with other tartaric acid stereoisomers, so it isn't a structural isomer of them."
+        ]
+      },
+      {
+        question: "Cis-2-butene and trans-2-butene share the same connectivity but differ in the spatial arrangement of substituents around a double bond. What type of isomers are these?",
+        concept: "Diastereomers and meso compounds",
+        options: ["Enantiomers", "Diastereomers (specifically, cis/trans isomers)", "Structural isomers", "They are the same compound"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—enantiomers are mirror images of each other; cis and trans isomers are not mirror images.",
+          "Correct—cis/trans isomers are a specific type of diastereomer, differing in spatial arrangement without being mirror images.",
+          "Incorrect—they share identical connectivity, ruling out structural isomerism.",
+          "Incorrect—they have genuinely different spatial arrangements and different physical properties."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Isomers are a decision tree: first ask if two molecules are connected the same way at all—if not, they're structural isomers, case closed. If they are connected identically, the only remaining difference can be their 3D shape, which is where stereochemistry takes over. A chiral center is like a molecular left-vs-right hand: its mirror image (an enantiomer) looks identical on paper but can't be superimposed on the original, the same way your left and right hands look alike but never quite line up. Diastereomers are stereoisomers that aren't mirror images at all, and a meso compound is the special, symmetrical case where a molecule's own internal mirror image cancels out its handedness entirely."
+  },
+  {
+    id: "organic-reactions",
+    subjectId: "organic-chemistry",
+    sectionId: "chem-phys",
+    title: "Organic Reactions",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "isomers-stereochemistry",
+    sections: [
+      {
+        heading: "SN1 and SN2 Substitution",
+        body: "SN2 reactions happen in one concerted step, with the nucleophile attacking opposite the leaving group, inverting stereochemistry—favored by unhindered substrates, strong nucleophiles, and polar aprotic solvents. SN1 reactions proceed through a carbocation intermediate, giving racemization—favored by stabilized (tertiary) carbocations, weak nucleophiles, and polar protic solvents.",
+        keyTerms: [
+          { term: "SN2 reaction", definition: "A concerted substitution with backside attack, causing stereochemical inversion." },
+          { term: "SN1 reaction", definition: "A substitution proceeding through a carbocation intermediate, causing racemization." }
+        ]
+      },
+      {
+        heading: "E1 and E2 Elimination",
+        body: "E2 is a concerted, one-step elimination requiring a strong, bulky base and anti-periplanar geometry; E1 proceeds through the same carbocation intermediate as SN1. Zaitsev's rule predicts the more substituted (more stable) alkene as the major elimination product.",
+        keyTerms: [
+          { term: "Zaitsev's rule", definition: "The major elimination product is usually the more substituted, more stable alkene." }
+        ]
+      },
+      {
+        heading: "Addition Reactions to Alkenes and Alkynes",
+        body: "In electrophilic addition, the alkene's pi bond attacks an electrophile, forming a carbocation intermediate. Markovnikov's rule predicts H adds to the carbon with more existing hydrogens, since the reaction proceeds through the more stable carbocation intermediate.",
+        keyTerms: [
+          { term: "Markovnikov's rule", definition: "In addition of HX to an alkene, H adds to the carbon with more hydrogens, forming the more stable carbocation." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "SN2 is concerted with stereochemical inversion, favored by unhindered substrates and strong nucleophiles; SN1 proceeds through a carbocation with racemization, favored by tertiary substrates, weak nucleophiles, and polar protic solvents.",
+      "E2 is concerted and requires anti-periplanar geometry; E1 shares SN1's carbocation intermediate; Zaitsev's rule predicts the more substituted alkene as the major product.",
+      "Electrophilic addition to alkenes proceeds through a carbocation intermediate; Markovnikov's rule predicts the more stable carbocation forms."
+    ],
+    knowledgeCheck: [
+      { question: "What substrate, nucleophile, and solvent conditions favor an SN1 mechanism over SN2?", answer: "Tertiary (or otherwise stabilized carbocation-forming) substrates, weak nucleophiles, and polar protic solvents all favor SN1 over SN2." },
+      { question: "Why does Markovnikov's rule predict that H adds to the carbon with more existing hydrogens?", answer: "Because the reaction proceeds through whichever carbocation intermediate is more stable, and protonating that carbon leaves the more stable (more substituted) carbocation at the other carbon." }
+    ],
+    flashcards: [
+      { front: "SN2", back: "Concerted, backside attack, stereochemical inversion." },
+      { front: "SN1", back: "Carbocation intermediate, racemization." },
+      { front: "Zaitsev's rule", back: "More substituted alkene is the major elimination product." },
+      { front: "Markovnikov's rule", back: "H adds to the carbon with more existing hydrogens." },
+      { front: "Carbocation stability", back: "Tertiary > secondary > primary." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A tertiary alkyl halide is reacted with a weak nucleophile in a polar protic solvent. Which mechanism is most likely, and what stereochemical outcome is expected?",
+        concept: "SN1 and SN2 substitution",
+        options: ["SN2, with inversion of configuration", "SN1, with racemization", "SN2, with retention of configuration", "Neither mechanism can occur with a tertiary substrate"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—a tertiary substrate is too hindered for SN2's backside attack.",
+          "Correct—tertiary substrate, weak nucleophile, and polar protic solvent all favor SN1, which proceeds through a carbocation and gives racemization.",
+          "Incorrect—SN2 doesn't occur readily with tertiary substrates, and it wouldn't give retention anyway (it gives inversion).",
+          "Incorrect—SN1 readily occurs with tertiary substrates; it's actually the favored pathway here."
+        ]
+      },
+      {
+        question: "According to Zaitsev's rule, when an elimination reaction can form two different alkenes, which is typically the major product?",
+        concept: "E1 and E2 elimination",
+        options: ["The less substituted alkene, because it is less hindered", "The more substituted alkene, because additional alkyl substitution stabilizes the double bond", "Whichever alkene forms fastest, regardless of stability", "Both alkenes form in exactly equal amounts"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—Zaitsev's rule favors the more substituted alkene, not the less substituted one, as the major product.",
+          "Correct—more substituted alkenes are more thermodynamically stable, and Zaitsev's rule favors that more stable product.",
+          "Incorrect—Zaitsev's rule is specifically about thermodynamic stability of the product, not reaction speed alone.",
+          "Incorrect—the more substituted (Zaitsev) product is typically the major product, not an equal mixture."
+        ]
+      },
+      {
+        question: "HBr is added across the double bond of 2-methylpropene, (CH3)2C=CH2. According to Markovnikov's rule, on which carbon does bromine end up?",
+        concept: "Addition reactions to alkenes and alkynes",
+        options: ["The terminal CH2 carbon", "The more substituted carbon, since that forms the more stable tertiary carbocation intermediate", "It adds equally to both carbons", "Bromine does not add to alkenes under these conditions"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—hydrogen (not bromine) adds to the terminal CH2 carbon, which has more existing hydrogens.",
+          "Correct—protonation at the terminal carbon generates the more stable tertiary carbocation, and bromide then attacks that more substituted carbon.",
+          "Incorrect—Markovnikov's rule predicts a specific regiochemical outcome, not an equal mixture.",
+          "Incorrect—electrophilic addition of HBr to alkenes is a standard, well-established reaction."
+        ]
+      },
+      {
+        question: "A primary alkyl halide is reacted with a strong, small nucleophile in a polar aprotic solvent. Which mechanism is most favored?",
+        concept: "SN1 and SN2 substitution",
+        options: ["SN1, since primary carbocations are especially stable", "SN2, since the unhindered primary substrate and strong nucleophile both favor a concerted backside attack", "Neither SN1 nor SN2 can occur with primary substrates", "E1, since elimination always dominates with primary substrates"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—primary carbocations are actually the least stable, making SN1 unfavorable here.",
+          "Correct—an unhindered primary substrate combined with a strong, small nucleophile in polar aprotic solvent strongly favors SN2.",
+          "Incorrect—SN2 readily occurs with primary substrates; it's the favored mechanism under these conditions.",
+          "Incorrect—E1 requires a carbocation intermediate, which primary substrates don't readily form; SN2 dominates instead."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Substitution and elimination are constantly competing for the same starting materials, and the outcome comes down to a few dials: how crowded the substrate is, how strong and bulky the incoming nucleophile/base is, and what solvent it's all happening in. SN2 is a clean, one-step swap that needs room to attack from behind (so it hates crowded, tertiary substrates), while SN1 takes the substrate apart first into a carbocation and lets the nucleophile attack from either side afterward (so it loves substrates that make a stable carbocation). Addition reactions to alkenes follow that same carbocation-stability logic in reverse—wherever the more stable carbocation would form, that's where the new bond goes, which is all Markovnikov's rule is really saying."
+  },
+  {
+    id: "carbonyls-carboxylic-acids-derivatives",
+    subjectId: "organic-chemistry",
+    sectionId: "chem-phys",
+    title: "Carbonyls, Carboxylic Acids & Derivatives",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "organic-reactions",
+    sections: [
+      {
+        heading: "Aldehydes, Ketones, and Nucleophilic Addition",
+        body: "The C=O bond's polarity makes the carbonyl carbon electrophilic; a nucleophile attacks it, forming a tetrahedral intermediate—since there's no leaving group, the reaction is an addition, not a substitution. Aldehydes react faster than ketones due to less steric hindrance and electron donation from alkyl groups.",
+        keyTerms: [
+          { term: "Nucleophilic addition", definition: "A nucleophile attacks an electrophilic carbonyl carbon with no leaving group present." },
+          { term: "Hemiacetal", definition: "The product of one alcohol adding to a carbonyl." }
+        ]
+      },
+      {
+        heading: "Carboxylic Acid Acidity",
+        body: "Carboxylic acids are far more acidic than alcohols because their conjugate base (carboxylate) is resonance-stabilized, delocalizing the negative charge across two equivalent oxygens. Electron-withdrawing groups nearby further stabilize the negative charge, increasing acidity.",
+        keyTerms: [
+          { term: "Carboxylate", definition: "The resonance-stabilized conjugate base of a carboxylic acid." }
+        ]
+      },
+      {
+        heading: "Carboxylic Acid Derivatives and Reactivity",
+        body: "Nucleophilic acyl substitution has a leaving group depart after the tetrahedral intermediate forms, regenerating a new carbonyl. Reactivity ranks by leaving group ability: acid halides > anhydrides > esters > amides—more reactive derivatives convert readily into less reactive ones, not efficiently the reverse.",
+        keyTerms: [
+          { term: "Nucleophilic acyl substitution", definition: "A carbonyl reaction where a leaving group departs after the tetrahedral intermediate forms." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Nucleophiles attack the electrophilic carbonyl carbon of aldehydes and ketones in an addition reaction; aldehydes react faster than ketones.",
+      "Carboxylic acids are far more acidic than alcohols because their conjugate base (carboxylate) is resonance-stabilized across two oxygens.",
+      "Carboxylic acid derivatives interconvert via nucleophilic acyl substitution, with reactivity order acid halide > anhydride > ester > amide, reflecting leaving group ability."
+    ],
+    knowledgeCheck: [
+      { question: "Why do aldehydes react faster than ketones in nucleophilic addition?", answer: "Ketones' two alkyl groups provide more steric hindrance and electron donation than an aldehyde's one alkyl group, both of which slow nucleophilic addition." },
+      { question: "Why is acetic acid a much stronger acid than ethanol?", answer: "Acetic acid's conjugate base (acetate) is resonance-stabilized across two equivalent oxygens, while ethanol's conjugate base (ethoxide) has no comparable stabilization." }
+    ],
+    flashcards: [
+      { front: "Nucleophilic addition", back: "Nucleophile attacks carbonyl carbon; no leaving group." },
+      { front: "Carboxylate", back: "Resonance-stabilized conjugate base of a carboxylic acid." },
+      { front: "Nucleophilic acyl substitution", back: "Leaving group departs after tetrahedral intermediate forms." },
+      { front: "Reactivity order", back: "Acid halide > anhydride > ester > amide." },
+      { front: "Amide", back: "Least reactive carboxylic acid derivative; very stable." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Why do aldehydes generally react faster than ketones in nucleophilic addition reactions?",
+        concept: "Aldehydes, ketones, and nucleophilic addition",
+        options: ["Aldehydes have a more electronegative carbonyl oxygen than ketones", "Ketones have two alkyl groups providing more steric hindrance and electron donation, making their carbonyl less electrophilic and more shielded", "Aldehydes lack a carbonyl group entirely", "Ketones cannot undergo nucleophilic addition at all"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the carbonyl oxygen's electronegativity doesn't differ between aldehydes and ketones.",
+          "Correct—ketones' extra alkyl group both donates electron density and physically blocks nucleophilic approach.",
+          "Incorrect—aldehydes do have a carbonyl group; that's the defining feature of the functional group.",
+          "Incorrect—ketones do undergo nucleophilic addition, just more slowly than aldehydes."
+        ]
+      },
+      {
+        question: "Why is acetic acid (pKa ≈ 4.8) a much stronger acid than ethanol (pKa ≈ 16), despite both losing a proton from an O-H bond?",
+        concept: "Carboxylic acid acidity",
+        options: ["Acetic acid's conjugate base is resonance-stabilized across two oxygens, while ethanol's conjugate base has no such stabilization", "Ethanol has a higher molecular weight, making it harder to lose a proton", "Acetic acid has more carbon atoms, which inherently increases acidity", "There is no real difference in acid strength between the two"],
+        correctIndex: 0,
+        optionExplanations: [
+          "Correct—resonance delocalization across two equivalent oxygens in the carboxylate stabilizes the negative charge far more than an alkoxide can.",
+          "Incorrect—molecular weight isn't the deciding factor in acid strength here.",
+          "Incorrect—carbon count alone doesn't determine acidity; the resonance stabilization of the conjugate base does.",
+          "Incorrect—their pKa values differ by over 11 units, a very substantial real difference in acid strength."
+        ]
+      },
+      {
+        question: "Why can an acid chloride be readily converted into an amide, but converting an amide directly into an acid chloride is not practical?",
+        concept: "Carboxylic acid derivatives and reactivity",
+        options: ["Acid chlorides and amides are actually the same functional group", "Chloride is a much better leaving group than an amine, so the forward reaction is favorable while the reverse is not", "Amides are more electrophilic than acid chlorides", "Nucleophilic acyl substitution only works in one direction, regardless of leaving group"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—acid chlorides and amides are distinct functional groups with very different reactivity.",
+          "Correct—chloride's superior leaving group ability makes the acid chloride → amide direction favorable, not the reverse.",
+          "Incorrect—amides are actually less electrophilic (less reactive) than acid chlorides, not more.",
+          "Incorrect—nucleophilic acyl substitution can go either direction; it's leaving group ability that determines which direction is favorable."
+        ]
+      },
+      {
+        question: "Which of the following carboxylic acid derivatives is generally the least reactive toward nucleophilic acyl substitution?",
+        concept: "Carboxylic acid derivatives and reactivity",
+        options: ["Acid chloride", "Anhydride", "Ester", "Amide"],
+        correctIndex: 3,
+        optionExplanations: [
+          "Incorrect—acid chlorides are actually the most reactive derivative, due to chloride's excellent leaving group ability.",
+          "Incorrect—anhydrides are more reactive than esters and amides, though less than acid chlorides.",
+          "Incorrect—esters are more reactive than amides, though less than acid chlorides and anhydrides.",
+          "Correct—amides are the least reactive derivative, since an amine is the poorest leaving group among these options."
+        ]
+      }
+    ],
+    simplifiedExplanation: "The carbonyl carbon is the single most electrophilic hotspot in most of organic chemistry, and everything in this lesson is really just different consequences of that one fact. When there's no leaving group attached (aldehydes, ketones), a nucleophile just adds on and stays—simple addition. When there is a leaving group attached (carboxylic acid derivatives), that same nucleophilic attack sets up a swap: the new group comes in, and the old one leaves, in nucleophilic acyl substitution. Carboxylic acid acidity comes from a completely different but related idea—once that acidic proton leaves, the negative charge left behind gets to spread out over two oxygens instead of being stuck on one, and spreading out a charge is always stabilizing, which is exactly why carboxylic acids give up a proton so much more easily than plain alcohols do."
+  },
+  {
+    id: "amines-amides-biological-molecules",
+    subjectId: "organic-chemistry",
+    sectionId: "chem-phys",
+    title: "Amines, Amides & Biological Molecules",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "carbonyls-carboxylic-acids-derivatives",
+    sections: [
+      {
+        heading: "Amine Structure and Basicity",
+        body: "An amine's nitrogen has a lone pair not involved in resonance, making it readily available to accept a proton or act as a nucleophile. Amines are classified as primary, secondary, or tertiary by how many carbon groups are attached to nitrogen.",
+        keyTerms: [
+          { term: "Amine", definition: "A nitrogen-containing functional group with a basic, freely available lone pair." }
+        ]
+      },
+      {
+        heading: "Amide Resonance and the Peptide Bond",
+        body: "In an amide, nitrogen's lone pair delocalizes by resonance into the carbonyl, making amides far less basic than amines. This same resonance gives the C-N bond partial double-bond character, restricting rotation and forcing planarity—the direct chemical reason the peptide bond is rigid and planar.",
+        keyTerms: [
+          { term: "Amide resonance", definition: "Delocalization of nitrogen's lone pair into the carbonyl, reducing basicity and restricting C-N rotation." },
+          { term: "Peptide bond", definition: "The amide bond linking amino acids together in a protein." }
+        ]
+      },
+      {
+        heading: "Connecting to Biological Molecules",
+        body: "Amino acids contain a basic amine group, typically protonated at physiological pH. The peptide bond connecting amino acids is chemically an amide bond, and its resonance-driven planarity constrains the protein backbone's possible shapes.",
+        keyTerms: [
+          { term: "N-terminus", definition: "The free amine end of a peptide or protein chain." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Amines are basic because nitrogen's freely available lone pair readily accepts a proton; classified as primary, secondary, or tertiary.",
+      "Amide resonance delocalizes nitrogen's lone pair into the carbonyl, making amides far less basic than amines and giving the C-N bond restricted rotation and planarity.",
+      "Amino acids' amine groups follow standard basicity rules, and the peptide bond linking amino acids is chemically an amide bond, inheriting its planarity."
+    ],
+    knowledgeCheck: [
+      { question: "Why are amines basic while amides are only very weakly basic, despite both containing nitrogen?", answer: "An amine's nitrogen lone pair is freely available, but an amide's nitrogen lone pair is delocalized by resonance into the carbonyl, making it much less available to accept a proton." },
+      { question: "What organic functional group is the peptide bond linking amino acids together?", answer: "An amide bond, formed by condensation between one amino acid's carboxylic acid and the next amino acid's amine." }
+    ],
+    flashcards: [
+      { front: "Amine", back: "Basic nitrogen group with a freely available lone pair." },
+      { front: "Amide resonance", back: "Nitrogen lone pair delocalizes into the carbonyl." },
+      { front: "Peptide bond", back: "The amide bond linking amino acids." },
+      { front: "Primary amine", back: "One carbon group attached to nitrogen." },
+      { front: "Amide planarity", back: "Restricted C-N rotation from partial double-bond character." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Why are amines generally basic, while alcohols are only very weakly basic by comparison?",
+        concept: "Amine structure and basicity",
+        options: ["Nitrogen is more electronegative than oxygen, making its lone pair more available", "Nitrogen is less electronegative than oxygen, so it holds its lone pair less tightly and donates it more readily", "Amines don't actually have a lone pair on nitrogen", "Alcohols have no lone pairs on oxygen at all"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—nitrogen is actually less electronegative than oxygen, not more.",
+          "Correct—nitrogen's lower electronegativity means it holds its lone pair less tightly, making it more available to accept a proton.",
+          "Incorrect—amines do have a nitrogen lone pair; that's exactly what makes them basic.",
+          "Incorrect—oxygen does have lone pairs, just less available ones due to its higher electronegativity."
+        ]
+      },
+      {
+        question: "Why is rotation around the C-N bond in an amide much more restricted than in a typical amine C-N bond?",
+        concept: "Amide resonance and the peptide bond",
+        options: ["The amide C-N bond has significant double-bond character from resonance delocalization into the carbonyl", "Amide nitrogen is sp3 hybridized, unlike amine nitrogen", "There is no actual restriction on amide bond rotation", "The oxygen atom physically blocks rotation"],
+        correctIndex: 0,
+        optionExplanations: [
+          "Correct—resonance donation of the lone pair into the carbonyl gives the C-N bond partial double-bond character, restricting rotation.",
+          "Incorrect—amide nitrogen actually behaves more like sp2 due to this resonance, not simple sp3.",
+          "Incorrect—amide bond rotation genuinely is restricted, which is a well-documented structural fact.",
+          "Incorrect—it's an electronic effect (resonance), not physical blocking by the oxygen atom."
+        ]
+      },
+      {
+        question: "The bond linking two amino acids together in a protein chain is best described as which functional group?",
+        concept: "Connecting to biological molecules",
+        options: ["An ester bond", "An amide bond, formed between a carboxylic acid and an amine", "An amine bond only, with no carbonyl involved", "An ether bond"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—an ester forms from an alcohol and a carboxylic acid, not an amine and a carboxylic acid.",
+          "Correct—the peptide bond forms from condensation of a carboxylic acid and an amine, forming an amide bond.",
+          "Incorrect—a carbonyl is very much involved; the amide bond includes both the carbonyl and the nitrogen.",
+          "Incorrect—an ether is a C-O-C linkage with no carbonyl, unrelated to the peptide bond."
+        ]
+      },
+      {
+        question: "At physiological pH, why are many amine groups on amino acid side chains typically found in their protonated form?",
+        concept: "Connecting to biological molecules",
+        options: ["Amines are acidic and readily lose a proton at physiological pH", "Amines are basic, and their freely available lone pair readily accepts a proton at physiological pH", "Amines don't interact with protons under any conditions", "Protonation of amines only occurs in extremely acidic environments, well below physiological pH"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—amines are basic (proton acceptors), not acidic (proton donors).",
+          "Correct—amines' basicity means their lone pair readily accepts a proton, and physiological pH (around 7.4) is well below many amines' pKa, keeping them protonated.",
+          "Incorrect—amines readily interact with protons; that's the basis of their basicity.",
+          "Incorrect—many amines remain substantially protonated at physiological pH, not only in extremely acidic conditions."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Amines and amides look like siblings—both have nitrogen bonded to carbon—but they behave completely differently because of one thing: whether that nitrogen's lone pair is free or tied up. In an amine, the lone pair is unattached and eager to grab a proton, which is exactly what makes amines basic. In an amide, that same lone pair gets pulled into the neighboring carbonyl by resonance, like being recruited into a different job—it's no longer available to grab a proton, and the amide bond becomes rigid and flat as a side effect of that recruitment. This isn't just organic chemistry trivia: it's the exact reason the peptide bond holding every protein together is rigid and planar, which in turn shapes how proteins are able to fold."
+  },
+  {
+    id: "organic-chemistry-spectroscopy",
+    subjectId: "organic-chemistry",
+    sectionId: "chem-phys",
+    title: "Organic Chemistry & Spectroscopy",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "amines-amides-biological-molecules",
+    sections: [
+      {
+        heading: "IR Spectroscopy",
+        body: "IR spectroscopy measures which frequencies of infrared light a molecule's bonds absorb as they stretch, making the resulting spectrum a fingerprint of which functional groups are present. The highest-yield regions are a broad O-H stretch, a sharper N-H stretch, and a strong, sharp C=O stretch.",
+        keyTerms: [
+          { term: "IR spectroscopy", definition: "Identifies functional groups from characteristic bond-stretching absorption frequencies." }
+        ]
+      },
+      {
+        heading: "1H NMR Spectroscopy",
+        body: "Chemical shift indicates a hydrogen's electronic environment; splitting follows the n+1 rule (n neighboring hydrogens split a signal into n+1 peaks); integration gives the relative ratio of hydrogens contributing to each signal.",
+        keyTerms: [
+          { term: "Chemical shift", definition: "A hydrogen's position (in ppm) on an NMR spectrum, reflecting its electronic environment." },
+          { term: "n+1 rule", definition: "n neighboring, non-equivalent hydrogens split a signal into n+1 peaks." }
+        ]
+      },
+      {
+        heading: "Mass Spectrometry and Combining Techniques",
+        body: "The molecular ion peak (M+) gives molecular weight; fragment peaks offer structural clues. No single technique fully solves a structure alone—IR, NMR, and mass spectrometry are used together to determine an unknown structure.",
+        keyTerms: [
+          { term: "Molecular ion peak", definition: "The mass spectrum peak corresponding to the intact, singly-ionized molecule; gives molecular weight." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "IR spectroscopy identifies functional groups by characteristic absorption frequencies—broad O-H, sharper N-H, and strong sharp C=O are the highest-yield regions.",
+      "1H NMR chemical shift indicates electronic environment, splitting (n+1 rule) reveals neighboring hydrogens, and integration gives relative hydrogen ratios.",
+      "Mass spectrometry's molecular ion peak reveals molecular weight; combining mass spec with IR and NMR is how an unknown structure is fully determined."
+    ],
+    knowledgeCheck: [
+      { question: "What does the n+1 rule in 1H NMR tell you?", answer: "It predicts that a hydrogen's signal is split into n+1 peaks by n neighboring, non-equivalent hydrogens on adjacent carbons." },
+      { question: "Why is no single spectroscopic technique usually sufficient to fully determine an unknown structure?", answer: "Each technique reveals different information—IR shows functional groups, NMR shows hydrogen environments and connectivity, and mass spec shows molecular weight and fragmentation—so combining them is needed for a complete structure." }
+    ],
+    flashcards: [
+      { front: "IR spectroscopy", back: "Identifies functional groups by absorption frequency." },
+      { front: "Chemical shift", back: "A hydrogen's electronic environment, in ppm." },
+      { front: "n+1 rule", back: "n neighboring hydrogens split a signal into n+1 peaks." },
+      { front: "Integration", back: "Relative ratio of hydrogens in each NMR signal." },
+      { front: "Molecular ion peak", back: "Gives molecular weight in mass spectrometry." }
+    ],
+    practiceQuestions: [
+      {
+        question: "An IR spectrum shows a strong, sharp absorption around 1715 cm⁻¹ but no broad absorption in the O-H region. Which functional group is most consistent?",
+        concept: "IR spectroscopy",
+        options: ["Alcohol", "Carboxylic acid", "Ketone", "Amine"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—an alcohol would show a broad O-H absorption, which is absent here.",
+          "Incorrect—a carboxylic acid would also show a broad O-H absorption, which is absent here.",
+          "Correct—the sharp C=O stretch with no O-H absorption fits a ketone (has a carbonyl but no O-H).",
+          "Incorrect—an amine wouldn't produce a strong C=O stretch at all."
+        ]
+      },
+      {
+        question: "In a 1H NMR spectrum, a signal appears as a quartet. Based on the n+1 rule, how many neighboring hydrogens does this signal's hydrogen have?",
+        concept: "1H NMR spectroscopy",
+        options: ["1", "2", "3", "4"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—1 neighboring hydrogen would give a doublet (n+1 = 2), not a quartet.",
+          "Incorrect—2 neighboring hydrogens would give a triplet (n+1 = 3), not a quartet.",
+          "Correct—a quartet has 4 peaks, so n+1 = 4, meaning n = 3 neighboring hydrogens.",
+          "Incorrect—4 neighboring hydrogens would give a quintet (n+1 = 5), not a quartet."
+        ]
+      },
+      {
+        question: "A mass spectrum shows a molecular ion peak at m/z = 72. What does this value most directly tell you?",
+        concept: "Mass spectrometry and combining techniques",
+        options: ["The number of hydrogens it contains", "Its molecular weight (for a singly charged ion)", "The number of distinct functional groups present", "Its melting point"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—hydrogen count isn't directly given by the molecular ion peak alone.",
+          "Correct—the molecular ion's mass-to-charge ratio directly equals the molecule's molecular weight, for a singly charged ion.",
+          "Incorrect—functional group count comes from IR and NMR, not directly from the molecular ion peak.",
+          "Incorrect—melting point isn't determined by mass spectrometry."
+        ]
+      },
+      {
+        question: "A compound's 1H NMR spectrum shows two signals with an integration ratio of 3:2. If the molecule has 10 total hydrogens, how many hydrogens does each signal represent?",
+        concept: "1H NMR spectroscopy",
+        options: ["3 and 2", "6 and 4", "5 and 5", "It cannot be determined from a 3:2 ratio"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—3 and 2 would only sum to 5 total hydrogens, not the given 10.",
+          "Correct—scaling the 3:2 ratio to sum to 10 total hydrogens gives 6 and 4 (which simplifies back to 3:2).",
+          "Incorrect—5 and 5 would be a 1:1 ratio, not 3:2.",
+          "Incorrect—integration ratios combined with a known total hydrogen count are sufficient to solve for exact hydrogen counts."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Spectroscopy is detective work: no single clue solves the case, but each technique narrows the suspect list in its own way. IR is a quick pat-down for which functional groups are present, based on which frequencies of light get absorbed. NMR is far more detailed—it maps out every distinct hydrogen environment in the molecule, how many neighbors each one has (splitting), and how many hydrogens of each type exist (integration), essentially sketching the molecule's hydrogen skeleton. Mass spectrometry rounds it out with the molecule's actual weight and how it breaks apart under stress—put all three clues together, and an unknown structure that seemed impossible from any single piece of evidence usually becomes solvable."
+  }
+];
+
+const physicsLessons: LessonContent[] = [
+  {
+    id: "units-math-graphs",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Units, Math & Graphs",
+    estimatedMinutes: 20,
+    difficulty: "Beginner",
+    prerequisiteLessonId: "organic-chemistry-spectroscopy",
+    sections: [
+      {
+        heading: "Units and Dimensional Analysis",
+        body: "Converting between units means multiplying by conversion factors arranged so unwanted units cancel out, leaving only the desired unit. Every valid physics equation must have matching units on both sides; a units mismatch reliably signals an error somewhere in the calculation.",
+        keyTerms: [
+          { term: "Dimensional analysis", definition: "Converting units by canceling them algebraically, using conversion factors." }
+        ]
+      },
+      {
+        heading: "Scalars vs. Vectors",
+        body: "Scalars (mass, speed, distance) have magnitude only; vectors (displacement, velocity, force) have both magnitude and direction. Adding vectors at an angle requires breaking them into perpendicular components, adding component-by-component, then recombining with the Pythagorean theorem.",
+        keyTerms: [
+          { term: "Scalar", definition: "A quantity with magnitude only, like speed or mass." },
+          { term: "Vector", definition: "A quantity with both magnitude and direction, like velocity or force." }
+        ]
+      },
+      {
+        heading: "Interpreting Graphs",
+        body: "A graph's slope represents the rate of change of the y-axis quantity with respect to the x-axis quantity (e.g., slope of position-vs-time is velocity). The area under a graph represents the accumulated product of the two axes (e.g., area under velocity-vs-time is displacement).",
+        keyTerms: [
+          { term: "Slope (of a graph)", definition: "The rate of change between a graph's two axes." },
+          { term: "Area under a graph", definition: "The accumulated product of a graph's two axes." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Dimensional analysis converts units by canceling them algebraically, and checking units on both sides of an equation is a quick way to catch errors.",
+      "Scalars (speed, distance, mass) have magnitude only; vectors (velocity, displacement, force) have magnitude and direction, and combine via component addition.",
+      "A graph's slope represents a rate of change; the area under a graph represents an accumulated product of its two axes."
+    ],
+    knowledgeCheck: [
+      { question: "How can checking units help catch an error in a physics calculation?", answer: "Every valid equation must have matching units on both sides—if your final answer's units don't match what's expected, it signals an error somewhere in the calculation." },
+      { question: "Why is displacement generally less than or equal to distance traveled?", answer: "Distance is the total scalar path length traveled, while displacement is the vector straight-line distance from start to end—any path that isn't perfectly straight makes displacement less than distance." }
+    ],
+    flashcards: [
+      { front: "Dimensional analysis", back: "Converting units by canceling them algebraically." },
+      { front: "Scalar", back: "Magnitude only (speed, mass, distance)." },
+      { front: "Vector", back: "Magnitude and direction (velocity, force, displacement)." },
+      { front: "Graph slope", back: "Rate of change between the two axes." },
+      { front: "Area under a graph", back: "Accumulated product of the two axes." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A problem asks you to calculate a velocity, but your final units come out to m/s². What does this indicate?",
+        concept: "Units and dimensional analysis",
+        options: ["The answer is correct; m/s² is acceptable for velocity", "An error was made, since velocity should have units of m/s, not m/s²", "Units don't need to match for velocity calculations", "The equation must have been for acceleration, so no error occurred"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—m/s² is the unit for acceleration, not velocity.",
+          "Correct—getting m/s² instead of m/s signals a units mismatch and therefore an error somewhere in the setup.",
+          "Incorrect—matching units is essential for verifying a calculation is set up correctly.",
+          "Incorrect—the problem asked for velocity; getting acceleration's units means an error occurred, not that the goal changed."
+        ]
+      },
+      {
+        question: "A car travels 3 km east, then 4 km north. What is the magnitude of its total displacement, and how does it compare to the distance traveled?",
+        concept: "Scalars vs. vectors",
+        options: ["Displacement is 7 km, the same as distance", "Displacement is 5 km, less than the 7 km distance traveled", "Displacement and distance are always identical", "Displacement cannot be calculated without knowing speed"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—7 km is the total distance (path length), not the displacement.",
+          "Correct—displacement is the straight-line distance: √(3² + 4²) = 5 km, less than the 7 km path length.",
+          "Incorrect—they are only equal for straight-line motion; here the path isn't straight.",
+          "Incorrect—displacement is a purely geometric calculation here and doesn't require speed."
+        ]
+      },
+      {
+        question: "On a velocity-vs-time graph, the area between the curve and the time axis over an interval represents which quantity?",
+        concept: "Interpreting graphs",
+        options: ["Acceleration during that interval", "The displacement that occurred during that interval", "The object's mass", "The instantaneous velocity at the end of the interval"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—acceleration is read from the graph's slope, not its area.",
+          "Correct—area under a velocity-time graph equals velocity × time, which is displacement.",
+          "Incorrect—mass isn't represented on a velocity-time graph at all.",
+          "Incorrect—instantaneous velocity at a point is read directly from the curve's height, not the area."
+        ]
+      },
+      {
+        question: "Convert a speed of 20 m/s to km/h using dimensional analysis.",
+        concept: "Units and dimensional analysis",
+        options: ["20 km/h", "36 km/h", "72 km/h", "7200 km/h"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—20 km/h would be the case only if no conversion were applied.",
+          "Incorrect—36 km/h doesn't correctly apply both the distance and time conversion factors.",
+          "Correct—20 m/s × (3600 s/h) × (1 km/1000 m) = 72 km/h.",
+          "Incorrect—7200 km/h would result from forgetting to divide by 1000 m/km."
+        ]
+      }
+    ],
+    simplifiedExplanation: "These three tools aren't really separate physics topics—they're the quality-control checks you run on every other physics calculation. Dimensional analysis is a built-in error detector: track your units through a calculation, and if they don't come out matching what the question is actually asking for, something upstream went wrong. Scalars and vectors are about not losing information—direction matters, and pretending it doesn't (treating a vector like a scalar) is a classic way to get a wrong answer that looks reasonable. And graphs are just physics diagrams in disguise: once you know slope means rate and area means accumulation, you can read real physical meaning out of almost any graph the exam throws at you, no separate formula needed."
+  },
+  {
+    id: "kinematics-newtonian-mechanics",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Kinematics & Newtonian Mechanics",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "units-math-graphs",
+    sections: [
+      {
+        heading: "Kinematics Equations and Projectile Motion",
+        body: "For constant acceleration, four kinematics equations connect displacement, initial/final velocity, acceleration, and time. Projectile motion splits into independent horizontal (constant velocity) and vertical (constant downward acceleration g) components, connected only by shared time of flight.",
+        keyTerms: [
+          { term: "Kinematics equations", definition: "Equations relating displacement, velocity, acceleration, and time under constant acceleration." },
+          { term: "Projectile motion", definition: "Motion with independent horizontal (constant velocity) and vertical (constant acceleration) components." }
+        ]
+      },
+      {
+        heading: "Newton's Three Laws",
+        body: "Newton's first law (inertia): an object's velocity stays constant unless acted on by a net force. Second law: F = ma. Third law: every force has an equal, opposite reaction force, acting on a different object.",
+        keyTerms: [
+          { term: "Inertia", definition: "An object's resistance to a change in motion, proportional to mass." },
+          { term: "Newton's third law", definition: "Force pairs are equal, opposite, and act on two different objects." }
+        ]
+      },
+      {
+        heading: "Free-Body Diagrams and Common Forces",
+        body: "A free-body diagram isolates one object and shows every force acting on it, summed separately along perpendicular axes. Friction opposes relative motion, proportional to normal force—static friction (up to a max) prevents motion from starting; kinetic friction acts on an object already sliding.",
+        keyTerms: [
+          { term: "Free-body diagram", definition: "A diagram isolating one object and showing every force acting on it." },
+          { term: "Friction", definition: "A force opposing relative motion between surfaces, proportional to normal force." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "The kinematics equations relate displacement, velocity, acceleration, and time under constant acceleration; projectile motion treats horizontal and vertical motion as independent.",
+      "Newton's first law describes inertia, the second law is F = ma, and the third law's equal/opposite force pairs act on two different objects.",
+      "A free-body diagram isolates every force on an object for Newton's second law; friction (static or kinetic) is proportional to normal force."
+    ],
+    knowledgeCheck: [
+      { question: "Why are horizontal and vertical motion treated independently in projectile motion?", answer: "Gravity acts only vertically, so it doesn't affect horizontal velocity (which stays constant), while horizontal motion has no effect on vertical acceleration—the two are linked only through their shared total time of flight." },
+      { question: "Why don't a Newton's third law force pair ever cancel out for a single object's motion analysis?", answer: "Because the two forces in a third-law pair act on two different objects, they can never be summed together to analyze the net force on either object individually." }
+    ],
+    flashcards: [
+      { front: "Kinematics equations", back: "Relate displacement, velocity, acceleration, time." },
+      { front: "Newton's first law", back: "Inertia: no net force, no change in velocity." },
+      { front: "Newton's second law", back: "F = ma" },
+      { front: "Newton's third law", back: "Equal, opposite forces on two different objects." },
+      { front: "Static friction", back: "Prevents motion from starting; up to a maximum value." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A ball is thrown horizontally off a cliff. Ignoring air resistance, what happens to its horizontal velocity as it falls?",
+        concept: "Kinematics equations and projectile motion",
+        options: ["It increases due to gravity", "It decreases due to gravity", "It stays constant, since gravity only acts vertically", "It becomes zero immediately"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—gravity acts vertically, not horizontally, so it doesn't increase horizontal velocity.",
+          "Incorrect—gravity doesn't decrease horizontal velocity either, for the same reason.",
+          "Correct—with no horizontal force (ignoring air resistance), horizontal velocity remains constant throughout the fall.",
+          "Incorrect—there's no force causing horizontal velocity to suddenly vanish."
+        ]
+      },
+      {
+        question: "A book rests on a table, with the table's normal force and the book's reaction force forming a Newton's third law pair. Why doesn't this pair explain why the book stays still?",
+        concept: "Newton's three laws",
+        options: ["They do cancel out, and that's why the book doesn't accelerate", "They act on two different objects, so they can't be summed to find the net force on either object", "The book's weight is unrelated to this pair", "Newton's third law doesn't apply to objects at rest"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—third law pairs act on different objects and can never be summed to explain one object's own equilibrium.",
+          "Correct—the normal force on the book and the book's reaction force on the table act on two different objects.",
+          "Incorrect—the book's weight is indeed a separate force, and it's what actually balances the normal force ON the book.",
+          "Incorrect—Newton's third law applies universally, including to objects at rest."
+        ]
+      },
+      {
+        question: "A box sits stationary on a rough floor. A small horizontal force is applied but the box doesn't move. What force balances the applied force?",
+        concept: "Free-body diagrams and common forces",
+        options: ["Gravity", "Normal force", "Static friction", "Tension"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—gravity acts vertically and balances the normal force, not the horizontal applied force.",
+          "Incorrect—normal force acts vertically, balancing gravity, not the horizontal applied force.",
+          "Correct—static friction adjusts to balance the applied horizontal force, up to its maximum value, keeping the box stationary.",
+          "Incorrect—tension requires a string or cable, which isn't present in this scenario."
+        ]
+      },
+      {
+        question: "A ball is thrown straight up and reaches its maximum height before falling back down. What is true about its acceleration at the exact top of its path?",
+        concept: "Kinematics equations and projectile motion",
+        options: ["Acceleration is zero at the top", "Acceleration is g, directed downward, the same as throughout the flight", "Acceleration reverses direction to point upward momentarily", "Acceleration cannot be determined at the exact top"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—velocity (not acceleration) is momentarily zero at the top; acceleration due to gravity remains constant throughout.",
+          "Correct—gravity acts continuously and uniformly downward throughout the entire flight, including at the top, where only velocity is momentarily zero.",
+          "Incorrect—gravity's direction doesn't reverse; it consistently points downward throughout the motion.",
+          "Incorrect—acceleration is g downward at every point of free-fall motion, including the top."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Kinematics is the choreography (describing how something moves), and Newton's laws are the director explaining why it moves that way. Projectile motion looks intimidating but is really just two separate, simpler kinematics problems bolted together by a shared clock—one tracking constant horizontal speed, the other tracking a steady downward acceleration. Newton's second law (F = ma) is the engine behind almost every mechanics calculation, and a free-body diagram is simply the disciplined habit of drawing every force acting on an object before doing any math with it—skip that step, and it's easy to forget a force (or invent one that isn't really there)."
+  },
+  {
+    id: "work-energy-momentum",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Work, Energy & Momentum",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "kinematics-newtonian-mechanics",
+    sections: [
+      {
+        heading: "Work and the Work-Energy Theorem",
+        body: "Work is done only by the component of force acting along displacement (W = Fd cos θ). The work-energy theorem states that net work done on an object equals its change in kinetic energy.",
+        keyTerms: [
+          { term: "Work", definition: "W = Fd cos θ; done by the component of force along the direction of displacement." },
+          { term: "Work-energy theorem", definition: "Net work done on an object equals its change in kinetic energy." }
+        ]
+      },
+      {
+        heading: "Conservation of Energy and Power",
+        body: "With only conservative forces, total mechanical energy (KE + PE) stays constant; non-conservative forces like friction remove mechanical energy, converting it to heat. Power is the rate of energy transfer, P = W/t (or P = Fv).",
+        keyTerms: [
+          { term: "Mechanical energy", definition: "The sum of kinetic and potential energy; conserved without non-conservative forces." },
+          { term: "Power", definition: "The rate of energy transfer or work done, P = W/t." }
+        ]
+      },
+      {
+        heading: "Momentum and Collisions",
+        body: "Momentum (p = mv) is conserved in any closed system, regardless of collision type. Kinetic energy is additionally conserved only in elastic collisions; in inelastic collisions (including perfectly inelastic, where objects stick together), kinetic energy is lost to heat, sound, or deformation.",
+        keyTerms: [
+          { term: "Momentum", definition: "p = mv; conserved in any closed-system collision." },
+          { term: "Elastic collision", definition: "A collision in which both momentum and kinetic energy are conserved." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Work equals force times displacement in the direction of motion (W = Fd cos θ), and the work-energy theorem connects net work to change in kinetic energy.",
+      "Total mechanical energy (kinetic + potential) is conserved without non-conservative forces like friction; power measures the rate of energy transfer.",
+      "Momentum is conserved in any closed-system collision; kinetic energy is additionally conserved only in elastic collisions."
+    ],
+    knowledgeCheck: [
+      { question: "Why does a force perpendicular to an object's motion do zero work on it?", answer: "Work is W = Fd cos θ, and cos(90°) = 0, so a force with no component along the direction of displacement does no work, regardless of its magnitude." },
+      { question: "What is conserved in every closed-system collision, and what is additionally conserved only in elastic collisions?", answer: "Momentum is conserved in every closed-system collision; kinetic energy is additionally conserved only in elastic collisions, not in inelastic ones." }
+    ],
+    flashcards: [
+      { front: "Work", back: "W = Fd cos θ" },
+      { front: "Work-energy theorem", back: "Net work = change in kinetic energy." },
+      { front: "Power", back: "P = W/t; rate of energy transfer." },
+      { front: "Momentum", back: "p = mv; always conserved in closed systems." },
+      { front: "Elastic collision", back: "Both momentum and kinetic energy conserved." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A satellite orbits Earth in a perfect circle at constant speed, with gravity providing centripetal force. How much work does gravity do over one orbit?",
+        concept: "Work and the work-energy theorem",
+        options: ["A large positive amount", "A large negative amount", "Zero, since gravity is always perpendicular to velocity", "It depends on the satellite's mass"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—gravity does no net work here, since it's always perpendicular to the velocity.",
+          "Incorrect—for the same reason, gravity doesn't do negative work either in this circular case.",
+          "Correct—centripetal force is always perpendicular to velocity in circular motion, so W = Fd cos(90°) = 0.",
+          "Incorrect—the perpendicularity argument holds regardless of mass; work is zero either way."
+        ]
+      },
+      {
+        question: "A ball is dropped from height h and falls freely (no air resistance). Using conservation of energy, what is its speed just before impact?",
+        concept: "Conservation of energy and power",
+        options: ["v = gh", "v = √(2gh)", "v = 2gh", "v = √(gh)"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this doesn't have the correct units or form for speed derived from energy conservation.",
+          "Correct—setting mgh = ½mv² and solving gives v = √(2gh).",
+          "Incorrect—this would result from an algebra error solving for v.",
+          "Incorrect—this is missing the factor of 2 from the correct derivation."
+        ]
+      },
+      {
+        question: "Two identical train cars collide and lock together, moving as one unit afterward. Which quantity(ies) are conserved?",
+        concept: "Momentum and collisions",
+        options: ["Both momentum and kinetic energy", "Only momentum; kinetic energy is not, since this is a perfectly inelastic collision", "Only kinetic energy; momentum is not", "Neither momentum nor kinetic energy"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—kinetic energy is not conserved in a perfectly inelastic collision like this one.",
+          "Correct—momentum is always conserved in a closed system, but the cars sticking together means kinetic energy is lost to heat, sound, and deformation.",
+          "Incorrect—momentum, not kinetic energy, is the quantity always conserved in any closed-system collision.",
+          "Incorrect—momentum is conserved in this collision, even though kinetic energy is not."
+        ]
+      },
+      {
+        question: "A machine does 500 J of work in 10 seconds. What is its power output?",
+        concept: "Conservation of energy and power",
+        options: ["5 W", "50 W", "500 W", "5000 W"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—5 W doesn't match P = W/t = 500/10.",
+          "Correct—P = W/t = 500 J / 10 s = 50 W.",
+          "Incorrect—500 W would be the case if the work were done in 1 second, not 10.",
+          "Incorrect—5000 W doesn't match the given values."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Work and energy are one bookkeeping system, tracking how force applied over distance converts into motion (kinetic energy) or stored potential—and as long as nothing's stealing energy away as heat (friction), that total stays perfectly constant, just trading forms back and forth. Momentum is a completely separate bookkeeping system that's even more universally reliable: it's conserved in every collision, no exceptions, whether the objects bounce apart cleanly (elastic) or crumple together (inelastic)—kinetic energy, on the other hand, only survives intact in the cleanest, bounciest collisions, and gets 'spent' as heat, sound, or deformation the rest of the time."
+  },
+  {
+    id: "fluids-pressure",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Fluids & Pressure",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "work-energy-momentum",
+    sections: [
+      {
+        heading: "Hydrostatic Pressure and Pascal's Principle",
+        body: "Hydrostatic pressure increases with depth (P = P0 + ρgh). Pascal's principle states that a pressure change applied anywhere in an enclosed fluid transmits equally throughout, letting hydraulic systems multiply force using a difference in piston area.",
+        keyTerms: [
+          { term: "Hydrostatic pressure", definition: "Pressure within a static fluid, increasing with depth: P = P0 + ρgh." },
+          { term: "Pascal's principle", definition: "Pressure applied to an enclosed fluid transmits equally throughout." }
+        ]
+      },
+      {
+        heading: "Buoyancy and Archimedes' Principle",
+        body: "Buoyant force equals the weight of fluid displaced (Fb = ρfluid × Vdisplaced × g). An object floats if its average density is less than the fluid's, sinks if greater, and is neutrally buoyant if equal.",
+        keyTerms: [
+          { term: "Buoyant force", definition: "The upward force from a fluid, equal to the weight of fluid displaced." },
+          { term: "Archimedes' principle", definition: "Buoyant force equals the weight of the fluid displaced by a submerged object." }
+        ]
+      },
+      {
+        heading: "Fluid Dynamics: Continuity and Bernoulli's Equation",
+        body: "The continuity equation (A1v1 = A2v2) states fluid speeds up where a pipe narrows. Bernoulli's equation shows that at constant height, faster-moving fluid has lower pressure.",
+        keyTerms: [
+          { term: "Continuity equation", definition: "A1v1 = A2v2; fluid speed increases where cross-sectional area decreases." },
+          { term: "Bernoulli's equation", definition: "Shows that, at constant height, fluid pressure decreases as speed increases." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Hydrostatic pressure increases with depth; Pascal's principle lets hydraulic systems multiply force using a difference in piston area.",
+      "Archimedes' principle states buoyant force equals the weight of fluid displaced; density comparison predicts floating vs. sinking.",
+      "The continuity equation shows fluid speeds up in narrower pipe sections; Bernoulli's equation shows faster fluid has lower pressure at constant height."
+    ],
+    knowledgeCheck: [
+      { question: "How does a hydraulic lift use a small input force to generate a much larger output force?", answer: "By Pascal's principle, pressure is transmitted equally throughout the enclosed fluid; since pressure = force/area, a larger output piston area produces a proportionally larger output force from the same pressure." },
+      { question: "What determines whether an object floats or sinks in a fluid?", answer: "Whether the object's average density is less than (floats), greater than (sinks), or equal to (neutrally buoyant) the fluid's density." }
+    ],
+    flashcards: [
+      { front: "Hydrostatic pressure", back: "P = P0 + ρgh; increases with depth." },
+      { front: "Pascal's principle", back: "Pressure transmits equally through an enclosed fluid." },
+      { front: "Archimedes' principle", back: "Buoyant force = weight of fluid displaced." },
+      { front: "Continuity equation", back: "A1v1 = A2v2" },
+      { front: "Bernoulli's equation", back: "Faster fluid has lower pressure (constant height)." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A hydraulic lift has a small piston (2 cm²) and a large piston (20 cm²). A force of 10 N is applied to the small piston. What force is generated at the large piston?",
+        concept: "Hydrostatic pressure and Pascal's principle",
+        options: ["10 N", "20 N", "100 N", "200 N"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—10 N would mean no force multiplication occurred, which contradicts Pascal's principle here.",
+          "Incorrect—20 N doesn't match F1/A1 = F2/A2 for these values.",
+          "Correct—F1/A1 = F2/A2, so 10/2 = F2/20, giving F2 = 100 N.",
+          "Incorrect—200 N would require a 20:1 area ratio scaled incorrectly."
+        ]
+      },
+      {
+        question: "A solid block has a density of 0.8 g/mL and is placed in water (density 1.0 g/mL). What happens?",
+        concept: "Buoyancy and Archimedes' principle",
+        options: ["It sinks to the bottom", "It floats, with part of it above the water's surface", "It remains fully submerged but neutrally buoyant", "It cannot be determined without knowing its volume"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—an object with lower density than the fluid floats; it doesn't sink.",
+          "Correct—since the block's density is less than water's, it floats, displacing only enough water to equal its own weight.",
+          "Incorrect—neutral buoyancy would require equal densities, which isn't the case here.",
+          "Incorrect—density comparison alone (without needing volume) determines floating vs. sinking."
+        ]
+      },
+      {
+        question: "Water flows through a horizontal pipe that narrows partway along its length. In the narrower section, what happens to speed and pressure?",
+        concept: "Fluid dynamics: continuity and Bernoulli's equation",
+        options: ["Speed increases, pressure increases", "Speed increases, pressure decreases", "Speed decreases, pressure increases", "Speed decreases, pressure decreases"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—pressure doesn't increase alongside speed; they move in opposite directions here.",
+          "Correct—continuity requires faster flow in the narrower section, and Bernoulli's equation shows that faster flow corresponds to lower pressure at constant height.",
+          "Incorrect—speed increases (not decreases) in a narrower section, per the continuity equation.",
+          "Incorrect—speed increases, not decreases, in the narrower section."
+        ]
+      },
+      {
+        question: "An object has exactly the same density as the fluid it's placed in. What happens to the object?",
+        concept: "Buoyancy and Archimedes' principle",
+        options: ["It sinks to the bottom", "It floats mostly above the surface", "It remains suspended at any depth (neutrally buoyant)", "It cannot exist stably in the fluid"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—sinking occurs when the object's density exceeds the fluid's, not when they're equal.",
+          "Incorrect—floating mostly above the surface would require a density well below the fluid's.",
+          "Correct—equal densities mean the buoyant force exactly balances weight at any depth, so the object is neutrally buoyant.",
+          "Incorrect—neutral buoyancy is a stable (if delicate) equilibrium, not an impossibility."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Fluids at rest and fluids in motion are governed by related but distinct rules. At rest, pressure just builds up with depth (like the weight of everything above pressing down), and Pascal's principle says squeeze that pressure in anywhere and it transmits everywhere equally, which is the whole trick behind a hydraulic lift multiplying force. Buoyancy is really just 'how much fluid did you shove out of the way, and how much does that shoved-aside fluid weigh'—if your own weight is less than that, you float. Once the fluid starts moving, a new trade-off kicks in: squeeze it through a narrower opening and it has to speed up (continuity), and wherever it speeds up, its pressure drops (Bernoulli)—the same principle that gives an airplane wing lift."
+  },
+  {
+    id: "physics-thermodynamics",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Thermodynamics",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "fluids-pressure",
+    sections: [
+      {
+        heading: "Heat Transfer: Conduction, Convection, Radiation",
+        body: "Conduction transfers heat through direct particle contact; convection transfers heat through bulk fluid movement—both require a medium. Radiation transfers heat through electromagnetic waves and requires no medium, working even through a vacuum.",
+        keyTerms: [
+          { term: "Conduction", definition: "Heat transfer through direct particle contact." },
+          { term: "Radiation", definition: "Heat transfer via electromagnetic waves; requires no medium." }
+        ]
+      },
+      {
+        heading: "The Laws of Thermodynamics",
+        body: "The first law (ΔU = Q - W) is energy conservation for a system. The second law states entropy of an isolated system never decreases, which is why no real heat engine can be 100% efficient—some heat must always be released to a cooler reservoir.",
+        keyTerms: [
+          { term: "First law of thermodynamics", definition: "ΔU = Q - W; energy conservation for a thermodynamic system." },
+          { term: "Second law of thermodynamics", definition: "Total entropy of an isolated system never decreases." }
+        ]
+      },
+      {
+        heading: "PV Diagrams and Thermodynamic Processes",
+        body: "Isobaric (constant P) traces a horizontal line; isochoric (constant V) traces a vertical line and does zero work; isothermal (constant T) and adiabatic (Q = 0) trace curves following PV relationships. The area under a process's path equals work done.",
+        keyTerms: [
+          { term: "Isochoric process", definition: "A constant-volume process; does zero work (W = PΔV = 0)." },
+          { term: "PV diagram", definition: "A plot of pressure vs. volume for a gas, tracing a process's path." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Conduction and convection require a medium; radiation transfers heat via electromagnetic waves and works through a vacuum.",
+      "The first law (ΔU = Q - W) is energy conservation; the second law states entropy never decreases, which is why no real heat engine is 100% efficient.",
+      "PV diagrams show characteristic paths for isobaric, isochoric (zero work), isothermal, and adiabatic processes, with area under the path equal to work done."
+    ],
+    knowledgeCheck: [
+      { question: "Which heat transfer mechanism can occur through a vacuum, and why?", answer: "Radiation, because it transfers heat via electromagnetic waves, which don't require a medium to propagate, unlike conduction and convection." },
+      { question: "Why can no real heat engine be 100% efficient?", answer: "The second law of thermodynamics requires that some heat always be released to a cooler reservoir in any real heat engine cycle, setting a maximum efficiency below 100%." }
+    ],
+    flashcards: [
+      { front: "Conduction", back: "Heat transfer through direct contact." },
+      { front: "Radiation", back: "Heat transfer via EM waves; works in a vacuum." },
+      { front: "First law of thermodynamics", back: "ΔU = Q - W" },
+      { front: "Second law of thermodynamics", back: "Entropy of an isolated system never decreases." },
+      { front: "Isochoric process", back: "Constant volume; zero work done." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Which mechanism of heat transfer can occur through the vacuum of space, with no matter present?",
+        concept: "Heat transfer: conduction, convection, radiation",
+        options: ["Conduction", "Convection", "Radiation", "None of these can transfer heat through a vacuum"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—conduction requires direct particle contact, impossible in a vacuum.",
+          "Incorrect—convection requires fluid movement, impossible in a vacuum.",
+          "Correct—radiation transfers heat via electromagnetic waves, which need no medium to propagate.",
+          "Incorrect—radiation does transfer heat through a vacuum; that's how sunlight reaches Earth."
+        ]
+      },
+      {
+        question: "An engineer claims a heat engine converts 100% of absorbed heat into useful work, with no heat released to a cooler reservoir. What does the second law say?",
+        concept: "The laws of thermodynamics",
+        options: ["It is possible with a well-designed engine", "It is impossible, since some heat must always be released to a cooler reservoir", "The first law, not the second, addresses this claim", "It is possible only at very high temperatures"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—no engineering design can overcome the second law's requirement.",
+          "Correct—the second law requires some heat exhaust to a cooler reservoir, making 100% efficiency thermodynamically impossible.",
+          "Incorrect—it's specifically the second law that addresses efficiency limits like this.",
+          "Incorrect—higher temperature differences increase theoretical maximum efficiency but never reach 100%."
+        ]
+      },
+      {
+        question: "A gas undergoes a process during which its volume does not change, though pressure and temperature both increase. How much work is done by the gas?",
+        concept: "PV diagrams and thermodynamic processes",
+        options: ["A large positive amount", "A large negative amount", "Zero, since work depends on a volume change and none occurred", "It cannot be determined without knowing pressure change"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—no work is done in an isochoric (constant-volume) process, regardless of pressure change.",
+          "Incorrect—for the same reason, work isn't negative either; it's exactly zero.",
+          "Correct—W = PΔV requires a volume change; with ΔV = 0, no work is done regardless of pressure or temperature changes.",
+          "Incorrect—since ΔV = 0, work is zero regardless of the magnitude of pressure change."
+        ]
+      },
+      {
+        question: "On a PV diagram, which type of process traces a horizontal line?",
+        concept: "PV diagrams and thermodynamic processes",
+        options: ["Isochoric (constant volume)", "Isobaric (constant pressure)", "Isothermal (constant temperature)", "Adiabatic (no heat exchange)"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—an isochoric process traces a vertical line (constant volume), not horizontal.",
+          "Correct—an isobaric process has constant pressure, which traces a horizontal line on a PV diagram.",
+          "Incorrect—an isothermal process traces a curve following PV = constant, not a horizontal line.",
+          "Incorrect—an adiabatic process traces a curve, similar to but steeper than an isothermal curve."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Heat transfer has three delivery methods: conduction hands it off directly (contact required), convection carries it along in a moving fluid (also requires matter), and radiation just broadcasts it as electromagnetic waves, no delivery vehicle needed at all. The first law of thermodynamics is strict accounting—energy in, energy out, no exceptions—while the second law is the reason that accounting is never perfectly reversible: every real process leaks a little useful energy as unusable heat, which is exactly why a perfect, 100%-efficient engine is a fantasy. PV diagrams are just a visual shorthand for all of this: horizontal means pressure held steady, vertical means volume held steady (and notably, no work done), and the space traced out underneath any path is literally how much work got done along the way."
+  },
+  {
+    id: "electrostatics",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Electrostatics",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "physics-thermodynamics",
+    sections: [
+      {
+        heading: "Coulomb's Law and Electric Fields",
+        body: "Coulomb's law, F = kq1q2/r², gives the force between point charges, falling off with the square of distance. Electric field (E = F/q) describes force per unit charge at a point; fields from multiple charges add by superposition.",
+        keyTerms: [
+          { term: "Coulomb's law", definition: "F = kq1q2/r²; the electrostatic force between two point charges." },
+          { term: "Electric field", definition: "E = F/q; force per unit charge at a point in space." }
+        ]
+      },
+      {
+        heading: "Electric Potential and Potential Energy",
+        body: "Electric potential (V = kQ/r) is potential energy per unit charge at a location; electric potential energy (U = qV) depends on the specific charge placed there. Electric field points from high to low potential, and positive charges accelerate toward lower potential.",
+        keyTerms: [
+          { term: "Electric potential (V)", definition: "Potential energy per unit charge at a point in space; a scalar." },
+          { term: "Electric potential energy (U)", definition: "U = qV; the actual energy a specific charge has at a given potential." }
+        ]
+      },
+      {
+        heading: "Conductors and Capacitors",
+        body: "Excess charge on a conductor at equilibrium resides on its outer surface, with zero electric field inside. A capacitor stores charge and energy proportional to voltage, with capacitance C = Q/V.",
+        keyTerms: [
+          { term: "Capacitance", definition: "C = Q/V; how much charge a capacitor stores per volt of potential difference." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Coulomb's law gives the force between point charges, falling with the square of distance; electric field describes force per unit charge, adding by superposition.",
+      "Electric potential (V) is energy per unit charge at a location; potential energy (U = qV) depends on the specific charge; field points from high to low potential.",
+      "Excess charge on a conductor resides on its outer surface with zero internal field; capacitance (C = Q/V) measures charge storage per volt."
+    ],
+    knowledgeCheck: [
+      { question: "How does distance affect the electrostatic force between two point charges?", answer: "Force is inversely proportional to the square of distance (Coulomb's law), so doubling distance reduces force to one-quarter, and tripling distance reduces it to one-ninth." },
+      { question: "Why is the electric field inside a conductor at electrostatic equilibrium zero?", answer: "Any internal field would drive charges to keep moving until they redistribute to cancel it out—zero internal field is precisely the equilibrium condition." }
+    ],
+    flashcards: [
+      { front: "Coulomb's law", back: "F = kq1q2/r²" },
+      { front: "Electric field", back: "E = F/q; force per unit charge." },
+      { front: "Electric potential (V)", back: "Potential energy per unit charge." },
+      { front: "Electric potential energy (U)", back: "U = qV" },
+      { front: "Capacitance", back: "C = Q/V" }
+    ],
+    practiceQuestions: [
+      {
+        question: "Two point charges are separated by distance r, exerting force F on each other. If the distance is tripled, what is the new force?",
+        concept: "Coulomb's law and electric fields",
+        options: ["F/3", "F/9", "3F", "9F"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—force falls off with the square of distance, not linearly.",
+          "Correct—tripling distance divides force by 3² = 9.",
+          "Incorrect—force decreases (not increases) with greater distance.",
+          "Incorrect—9F would result from decreasing (not increasing) the distance by a factor of 3."
+        ]
+      },
+      {
+        question: "A positive charge is released from rest in a region where potential decreases in the direction of motion. What happens to its kinetic energy?",
+        concept: "Electric potential and potential energy",
+        options: ["It decreases, since potential energy increases", "It increases, since potential energy decreases as the charge moves toward lower potential", "It stays constant", "It cannot be determined without knowing mass"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—potential energy decreases (not increases) as a positive charge moves toward lower potential.",
+          "Correct—a positive charge naturally accelerates toward lower potential, converting potential energy into kinetic energy.",
+          "Incorrect—energy converts from potential to kinetic form, so kinetic energy does change.",
+          "Incorrect—this follows directly from energy conservation without needing to know mass explicitly."
+        ]
+      },
+      {
+        question: "A solid conductor carries a net positive charge at electrostatic equilibrium. Where does this charge reside, and what is the field inside the conductor?",
+        concept: "Conductors and capacitors",
+        options: ["Distributed evenly throughout the volume; nonzero field inside", "Entirely on the outer surface; zero field inside the conductor", "At the exact center; maximum field inside", "Cannot be determined for a conductor"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—at equilibrium, charge resides on the surface, not distributed through the volume.",
+          "Correct—excess charge moves to the outer surface, and the field inside the conducting material is zero at equilibrium.",
+          "Incorrect—charge doesn't concentrate at the center; it resides on the outer surface.",
+          "Incorrect—this behavior is a well-established, predictable property of conductors at equilibrium."
+        ]
+      },
+      {
+        question: "A parallel plate capacitor's plate area is doubled while the distance between plates and the voltage stay the same. What happens to the charge it stores?",
+        concept: "Conductors and capacitors",
+        options: ["It stays the same", "It doubles, since capacitance increases with plate area and Q = CV", "It is cut in half", "It becomes zero"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—capacitance depends on plate area, so charge stored does change here.",
+          "Correct—capacitance increases with plate area; with voltage constant, Q = CV means charge doubles along with capacitance.",
+          "Incorrect—increasing (not decreasing) plate area increases capacitance and therefore stored charge.",
+          "Incorrect—increasing plate area increases, not eliminates, stored charge."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Electric field and electric potential describe the exact same charge setup from two different angles: field tells you the push or pull a charge would feel at a point, while potential tells you the energy it would have there—and just like a ball rolling downhill under gravity, a positive charge naturally 'rolls' from high to low potential, picking up kinetic energy as it goes. Coulomb's law is simply that same push/pull, quantified, and it fades fast with distance (inverse-square), so nearby charges dominate. Conductors and capacitors round things out with a clean, useful trick: give a conductor excess charge, and it automatically shoves that charge all the way out to its surface, canceling any field inside—which is exactly the property that lets a capacitor store charge and energy in a controlled, predictable way."
+  },
+  {
+    id: "circuits-electricity",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Circuits & Electricity",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "electrostatics",
+    sections: [
+      {
+        heading: "Current, Resistance, and Ohm's Law",
+        body: "Current (I) is the rate of charge flow; resistance (R) opposes current flow. Ohm's law, V = IR, relates voltage, current, and resistance; conventional current flows from high to low potential, opposite actual electron flow.",
+        keyTerms: [
+          { term: "Ohm's law", definition: "V = IR; relates voltage, current, and resistance." },
+          { term: "Conventional current", definition: "Defined as flowing from high to low potential, opposite actual electron movement." }
+        ]
+      },
+      {
+        heading: "Series and Parallel Circuits",
+        body: "Series resistors add directly (Req = R1 + R2 + ...) and share current; voltage divides across them. Parallel resistors combine reciprocally (1/Req = 1/R1 + 1/R2 + ...) and share voltage; equivalent resistance is always less than the smallest individual resistor.",
+        keyTerms: [
+          { term: "Series circuit", definition: "Components connected end-to-end; same current through each, resistances add." },
+          { term: "Parallel circuit", definition: "Components connected across the same two points; same voltage, resistances combine reciprocally." }
+        ]
+      },
+      {
+        heading: "Power in Circuits and Capacitors",
+        body: "Power dissipated is P = IV = I²R = V²/R. Capacitors combine oppositely to resistors: parallel capacitances add directly, series capacitances combine reciprocally.",
+        keyTerms: [
+          { term: "Electrical power", definition: "P = IV = I²R = V²/R; the rate of energy dissipation in a circuit." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Ohm's law (V = IR) relates voltage, current, and resistance; conventional current flows from high to low potential.",
+      "Series resistors add directly and share current; parallel resistors combine reciprocally and share voltage, with equivalent resistance always less than the smallest resistor.",
+      "Power dissipated by a resistor is P = IV = I²R = V²/R; capacitors combine oppositely to resistors."
+    ],
+    knowledgeCheck: [
+      { question: "Why does equivalent resistance in a parallel circuit end up less than the smallest individual resistor?", answer: "Parallel branches provide additional paths for current to flow, which always decreases the overall resistance to current flow below any single branch's resistance." },
+      { question: "How do capacitors combine differently from resistors in series and parallel?", answer: "Capacitors combine oppositely to resistors: capacitors in parallel add directly, while capacitors in series combine reciprocally—the reverse of how resistors combine." }
+    ],
+    flashcards: [
+      { front: "Ohm's law", back: "V = IR" },
+      { front: "Series resistors", back: "Req = R1 + R2 + ...; same current." },
+      { front: "Parallel resistors", back: "1/Req = 1/R1 + 1/R2 + ...; same voltage." },
+      { front: "Power", back: "P = IV = I²R = V²/R" },
+      { front: "Parallel capacitors", back: "Ceq = C1 + C2 + ... (add directly)." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A resistor with resistance 5 Ω has a voltage of 10 V across it. What is the current through it?",
+        concept: "Current, resistance, and Ohm's law",
+        options: ["0.5 A", "2 A", "15 A", "50 A"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—0.5 A doesn't match I = V/R = 10/5.",
+          "Correct—I = V/R = 10 V / 5 Ω = 2 A.",
+          "Incorrect—15 A would result from adding V and R rather than dividing.",
+          "Incorrect—50 A would result from multiplying V and R rather than dividing."
+        ]
+      },
+      {
+        question: "Two identical 10 Ω resistors are connected in parallel. What is their equivalent resistance?",
+        concept: "Series and parallel circuits",
+        options: ["20 Ω", "10 Ω", "5 Ω", "0.2 Ω"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—20 Ω would be the equivalent resistance if they were in series, not parallel.",
+          "Incorrect—10 Ω would be the case for just one resistor alone.",
+          "Correct—1/Req = 1/10 + 1/10 = 2/10, so Req = 5 Ω, less than either individual resistor.",
+          "Incorrect—0.2 Ω incorrectly reports 1/Req itself rather than Req."
+        ]
+      },
+      {
+        question: "A resistor carries 2 A of current with 6 V across it. How much power does it dissipate?",
+        concept: "Power in circuits and capacitors",
+        options: ["3 W", "8 W", "12 W", "24 W"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—3 W would result from dividing V by I rather than multiplying.",
+          "Incorrect—8 W doesn't match P = IV for these values.",
+          "Correct—P = IV = (2 A)(6 V) = 12 W.",
+          "Incorrect—24 W would result from an incorrect extra factor in the calculation."
+        ]
+      },
+      {
+        question: "Two capacitors are connected in series. Compared to either capacitor alone, what happens to the equivalent capacitance?",
+        concept: "Power in circuits and capacitors",
+        options: ["It increases beyond either individual capacitance", "It decreases below either individual capacitance, since series capacitances combine reciprocally", "It stays the same as either individual capacitor", "Capacitors cannot be connected in series"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—series capacitors decrease (not increase) equivalent capacitance, the opposite of series resistors.",
+          "Correct—capacitors in series combine reciprocally (like resistors in parallel), always giving an equivalent capacitance less than the smallest individual one.",
+          "Incorrect—equivalent capacitance changes (decreases) when capacitors are added in series.",
+          "Incorrect—series capacitor connections are a standard, common circuit configuration."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Ohm's law is the one equation tying together everything in this lesson—voltage, current, and resistance are always locked together by V = IR, and most circuit problems are really just about figuring out how a circuit's specific arrangement changes what 'resistance' even means for that arrangement. Series components make current squeeze through everything one after another (adding up resistance, like a longer hallway to walk through), while parallel components give current multiple doors to choose from at once (lowering overall resistance, since more paths means easier flow overall). Capacitors are the one place this lesson flips the script—they combine exactly backwards from resistors, which is worth remembering as a deliberate exception, not a typo."
+  },
+  {
+    id: "magnetism-electromagnetic-phenomena",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Magnetism & Electromagnetic Phenomena",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "circuits-electricity",
+    sections: [
+      {
+        heading: "Magnetic Force on Moving Charges and Currents",
+        body: "A magnetic field exerts force on a moving charge (F = qvB sin θ), found using the right-hand rule; a stationary charge feels no magnetic force. The force is always perpendicular to velocity, so it never does work, only changes direction.",
+        keyTerms: [
+          { term: "Magnetic force", definition: "F = qvB sin θ; acts only on moving charges, always perpendicular to velocity." },
+          { term: "Right-hand rule", definition: "A method for finding the direction of magnetic force or field using the right hand." }
+        ]
+      },
+      {
+        heading: "Sources of Magnetic Fields",
+        body: "A current-carrying wire generates a circular magnetic field around itself, direction found by curling right-hand fingers around the current direction. A solenoid concentrates these fields into a strong, roughly uniform field resembling a bar magnet.",
+        keyTerms: [
+          { term: "Solenoid", definition: "A coiled wire that concentrates magnetic field into a strong, roughly uniform field inside." }
+        ]
+      },
+      {
+        heading: "Electromagnetic Induction",
+        body: "Faraday's law states a changing magnetic flux through a loop induces an EMF. Lenz's law states the induced current always opposes the change in flux that created it, consistent with conservation of energy.",
+        keyTerms: [
+          { term: "Faraday's law", definition: "A changing magnetic flux through a loop induces an EMF." },
+          { term: "Lenz's law", definition: "Induced current opposes the change in flux that created it." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Magnetic force on a moving charge is found via the right-hand rule, acts only on moving charges, and is always perpendicular to velocity (does no work).",
+      "A current-carrying wire generates a circular magnetic field; a solenoid concentrates these into a strong field resembling a bar magnet.",
+      "Faraday's law states a changing magnetic flux induces an EMF; Lenz's law states the induced current opposes that change."
+    ],
+    knowledgeCheck: [
+      { question: "Why does the magnetic force never do work on a moving charged particle?", answer: "The magnetic force is always perpendicular to the particle's velocity, and a force perpendicular to displacement does zero work (W = Fd cos 90° = 0)." },
+      { question: "What does Lenz's law say about the direction of an induced current?", answer: "The induced current flows in whatever direction creates a magnetic field that opposes the change in flux that caused it, consistent with conservation of energy." }
+    ],
+    flashcards: [
+      { front: "Magnetic force", back: "F = qvB sin θ; perpendicular to velocity." },
+      { front: "Right-hand rule", back: "Finds direction of magnetic force or field." },
+      { front: "Solenoid", back: "Coiled wire; strong, uniform field inside." },
+      { front: "Faraday's law", back: "Changing flux induces an EMF." },
+      { front: "Lenz's law", back: "Induced current opposes the change in flux." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A charged particle moves through a uniform magnetic field, curving into a circular path. What happens to its speed?",
+        concept: "Magnetic force on moving charges and currents",
+        options: ["It increases steadily", "It decreases steadily", "It remains constant, since magnetic force is perpendicular to velocity and does no work", "It oscillates"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—speed doesn't increase, since magnetic force does no work on the particle.",
+          "Incorrect—speed doesn't decrease either, for the same reason.",
+          "Correct—magnetic force is always perpendicular to velocity, doing no work and changing only direction, not speed.",
+          "Incorrect—speed remains constant throughout circular motion in a uniform magnetic field."
+        ]
+      },
+      {
+        question: "Current flows upward through a straight vertical wire. What is the direction of the magnetic field at a point directly to the right of the wire?",
+        concept: "Sources of magnetic fields",
+        options: ["Directly away from the wire", "Directly toward the wire", "Into the page", "Out of the page"],
+        correctIndex: 3,
+        optionExplanations: [
+          "Incorrect—the field circles around the wire; it doesn't point radially away from it.",
+          "Incorrect—the field doesn't point radially toward the wire either.",
+          "Incorrect—applying the right-hand rule (thumb up, fingers curling) gives out of the page at this point, not into it.",
+          "Correct—pointing the thumb up (current direction) and curling the fingers shows the field pointing out of the page at a point to the right of the wire."
+        ]
+      },
+      {
+        question: "A bar magnet's north pole is pushed toward a wire loop, increasing flux through the loop. What does the induced current do, per Lenz's law?",
+        concept: "Electromagnetic induction",
+        options: ["Creates a field reinforcing the increasing flux", "Creates a field opposing the increasing flux, effectively repelling the magnet", "No current is induced without contact", "The current direction is random"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—Lenz's law specifically requires the induced current to oppose, not reinforce, the change in flux.",
+          "Correct—the induced current opposes the increasing flux, creating a field that effectively repels the approaching magnet.",
+          "Incorrect—no physical contact is needed for changing flux to induce a current.",
+          "Incorrect—Lenz's law predicts a specific, non-random direction for the induced current."
+        ]
+      },
+      {
+        question: "A wire loop is held stationary in a magnetic field that is also constant (not changing) in strength, direction, and area. What EMF is induced in the loop?",
+        concept: "Electromagnetic induction",
+        options: ["A large EMF, proportional to field strength", "Zero EMF, since flux through the loop isn't changing", "A small, constant EMF regardless of flux", "It depends on the loop's resistance"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—EMF depends on the rate of change of flux, not field strength alone.",
+          "Correct—Faraday's law requires a changing flux to induce an EMF; with nothing changing, no EMF is induced.",
+          "Incorrect—EMF isn't induced at all without a change in flux, constant or otherwise.",
+          "Incorrect—resistance affects induced current, not whether an EMF is induced in the first place."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Moving charge and magnetism are two sides of the same coin: a moving charge creates a magnetic field around itself, and that same charge feels a force whenever it moves through someone else's magnetic field—always sideways, never speeding it up or slowing it down, just steering it. A current-carrying wire is just a stream of moving charges, so naturally it builds its own magnetic field too, and coiling that wire into a solenoid concentrates all those little fields into one strong, unified one, just like a bar magnet. Induction runs this whole relationship in reverse: instead of current making a magnetic field, a changing magnetic field makes current—and Lenz's law is nature's built-in stubbornness, with that induced current always fighting back against whatever change caused it in the first place."
+  },
+  {
+    id: "waves-sound-light-optics",
+    subjectId: "physics",
+    sectionId: "chem-phys",
+    title: "Waves, Sound, Light & Optics",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "magnetism-electromagnetic-phenomena",
+    sections: [
+      {
+        heading: "Wave Properties",
+        body: "Wave speed relates to frequency and wavelength by v = fλ. Transverse waves oscillate perpendicular to travel direction; longitudinal waves (like sound) oscillate parallel to it, creating compressions and rarefactions.",
+        keyTerms: [
+          { term: "v = fλ", definition: "Relates wave speed, frequency, and wavelength." },
+          { term: "Longitudinal wave", definition: "A wave (like sound) that oscillates parallel to its direction of travel." }
+        ]
+      },
+      {
+        heading: "Sound Waves: Doppler Effect and Resonance",
+        body: "The Doppler effect raises observed frequency when source and observer approach each other and lowers it when they separate. Resonance occurs when a system is driven at a natural frequency, producing large-amplitude standing waves.",
+        keyTerms: [
+          { term: "Doppler effect", definition: "A shift in observed wave frequency due to relative motion between source and observer." },
+          { term: "Resonance", definition: "Large-amplitude response when a system is driven at one of its natural frequencies." }
+        ]
+      },
+      {
+        heading: "Light and Optics",
+        body: "Snell's law (n1 sin θ1 = n2 sin θ2) governs refraction; light bends toward the normal entering a higher-index medium, away from the normal entering a lower-index medium. The thin lens equation (1/f = 1/do + 1/di) predicts image location for mirrors and lenses.",
+        keyTerms: [
+          { term: "Snell's law", definition: "n1 sin θ1 = n2 sin θ2; governs refraction at a boundary between media." },
+          { term: "Thin lens equation", definition: "1/f = 1/do + 1/di; relates focal length to object and image distance." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Wave speed, frequency, and wavelength are related by v = fλ; transverse waves oscillate perpendicular to travel, longitudinal waves parallel.",
+      "The Doppler effect raises observed frequency when source and observer approach and lowers it when they separate; resonance produces large-amplitude standing waves at natural frequencies.",
+      "Snell's law governs how light bends at a boundary; the thin lens equation predicts image location for mirrors and lenses."
+    ],
+    knowledgeCheck: [
+      { question: "If a wave's frequency doubles while its speed stays constant, what happens to its wavelength?", answer: "Wavelength is cut in half, since v = fλ requires frequency and wavelength to be inversely proportional when speed is held constant." },
+      { question: "Which direction does light bend when entering a medium with a higher index of refraction?", answer: "Toward the normal, since a higher index of refraction means the light slows down, and Snell's law predicts bending toward the normal when slowing down." }
+    ],
+    flashcards: [
+      { front: "v = fλ", back: "Wave speed = frequency × wavelength." },
+      { front: "Transverse wave", back: "Oscillates perpendicular to travel direction." },
+      { front: "Doppler effect", back: "Frequency shift from relative motion." },
+      { front: "Snell's law", back: "n1 sin θ1 = n2 sin θ2" },
+      { front: "Thin lens equation", back: "1/f = 1/do + 1/di" }
+    ],
+    practiceQuestions: [
+      {
+        question: "A wave traveling through a fixed medium has its frequency doubled. What happens to its wavelength, assuming wave speed stays constant?",
+        concept: "Wave properties",
+        options: ["It doubles", "It is cut in half", "It stays the same", "It cannot be determined"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—doubling frequency would double wavelength only if speed also doubled, which it doesn't here.",
+          "Correct—since v = fλ and v is constant, frequency and wavelength are inversely proportional; doubling frequency halves wavelength.",
+          "Incorrect—wavelength must change to keep the product fλ (speed) constant.",
+          "Incorrect—v = fλ directly determines the new wavelength given constant speed."
+        ]
+      },
+      {
+        question: "A sound source moves toward a stationary observer. Compared to the frequency the source emits, what frequency does the observer hear?",
+        concept: "Sound waves: Doppler effect and resonance",
+        options: ["A lower frequency than emitted", "The same frequency as emitted", "A higher frequency than emitted", "No sound is heard until the source stops"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—a lower frequency would be heard if the source were moving away, not toward, the observer.",
+          "Incorrect—relative motion between source and observer does shift the observed frequency from the emitted frequency.",
+          "Correct—a source approaching an observer effectively compresses the wavelength reaching them, raising the observed frequency.",
+          "Incorrect—sound is heard continuously; only its frequency is shifted by the Doppler effect."
+        ]
+      },
+      {
+        question: "Light travels from air into glass (higher index of refraction), striking the surface at an angle. How does the ray bend?",
+        concept: "Light and optics",
+        options: ["It bends away from the normal", "It bends toward the normal", "It does not bend", "It reflects entirely back into the air"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—bending away from the normal would occur going from higher to lower index, the opposite of this scenario.",
+          "Correct—entering a higher-index medium slows the light, and Snell's law predicts bending toward the normal in that case.",
+          "Incorrect—refraction does bend the ray when crossing between media of different indices at an angle.",
+          "Incorrect—some light does refract into the glass; total internal reflection isn't relevant going from lower to higher index."
+        ]
+      },
+      {
+        question: "A system is driven at a frequency that matches one of its natural frequencies, producing a standing wave of unusually large amplitude. What is this phenomenon called?",
+        concept: "Sound waves: Doppler effect and resonance",
+        options: ["The Doppler effect", "Refraction", "Resonance", "Reflection"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—the Doppler effect involves a frequency shift from relative motion, not amplitude buildup from matching natural frequency.",
+          "Incorrect—refraction is about light bending at a boundary between media, unrelated to this scenario.",
+          "Correct—driving a system at one of its natural frequencies, producing a large-amplitude standing wave, defines resonance.",
+          "Incorrect—reflection is a wave bouncing off a boundary, not a description of amplitude buildup at natural frequency."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Every wave in this lesson—whether it's sound, light, or a wave on a string—obeys the same basic relationship (v = fλ), and most of what feels like separate topics is really just that relationship meeting a boundary or a moving source. The Doppler effect is what happens when the source itself is on the move, effectively bunching up or stretching out the waves reaching you, which your ear hears as a pitch shift. Resonance is what happens when you keep pushing a system at exactly the rhythm it already wants to vibrate at, building up amplitude the way pushing a swing at just the right moments builds up its height. And optics is just what waves do at a boundary between two materials—bending predictably (refraction) based on how much the material slows the wave down, which the thin lens equation then uses to predict exactly where an image will form."
+  }
+];
+
+const lessonContentList: LessonContent[] = [...biologyLessons, ...cellBiologyLessons, ...geneticsLessons, ...biochemistryLessons, ...organSystemsLessons, ...evolutionEcologyLessons, ...generalChemistryLessons, ...organicChemistryLessons, ...physicsLessons];
 
 export const lessonContentMap: Record<string, LessonContent> = Object.fromEntries(lessonContentList.map(l => [l.id, l]));
 

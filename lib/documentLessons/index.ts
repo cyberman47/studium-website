@@ -4,12 +4,15 @@
 // content shape.
 //
 // Scope: all 33 lessons across every subject in the MCAT "Biological &
-// Biochemical Foundations" section (lib/mcatPath.ts's lessonContentList)—
-// Biology (9), Cell Biology (4), Genetics & Molecular Biology (5),
-// Biochemistry (8), Organ Systems (6), and Evolution & Ecology (1). Every
-// entry here has real, MCAT-accurate LessonContent behind it in
-// lib/mcatPath.ts. Other MCAT sections (Chem/Phys, Psych/Social, CARS) still
-// have title-only lesson stubs with no written content and aren't included.
+// Biochemical Foundations" section, plus all 25 lessons across every subject
+// in the "Chemical & Physical Foundations of Biological Systems" section
+// (lib/mcatPath.ts's lessonContentList)—Biology (9), Cell Biology (4),
+// Genetics & Molecular Biology (5), Biochemistry (8), Organ Systems (6),
+// Evolution & Ecology (1), General Chemistry (10), Organic Chemistry (6),
+// and Physics (9). Every entry here has real, MCAT-accurate LessonContent
+// behind it in lib/mcatPath.ts. The remaining MCAT sections (Psych/Social,
+// CARS) still have title-only lesson stubs with no written content and
+// aren't included.
 import { DocumentLessonContent } from "../documentLesson";
 import { scientificMethodContent } from "../scientificMethodLesson";
 import { biomoleculesContent } from "./biomolecules";
@@ -44,6 +47,31 @@ import { digestiveSystemNutritionContent } from "./digestiveSystemNutrition";
 import { immuneSystemContent } from "./immuneSystem";
 import { reproductiveSystemDevelopmentContent } from "./reproductiveSystemDevelopment";
 import { evolutionGeneticsEcologyContent } from "./evolutionGeneticsEcology";
+import { atomicStructurePeriodicTrendsContent } from "./atomicStructurePeriodicTrends";
+import { chemicalBondingMolecularStructureContent } from "./chemicalBondingMolecularStructure";
+import { stoichiometryChemicalReactionsContent } from "./stoichiometryChemicalReactions";
+import { solutionsConcentrationsContent } from "./solutionsConcentrations";
+import { gasesLiquidsSolidsContent } from "./gasesLiquidsSolids";
+import { thermochemistryThermodynamicsContent } from "./thermochemistryThermodynamics";
+import { chemicalEquilibriumContent } from "./chemicalEquilibrium";
+import { acidsBasesBuffersContent } from "./acidsBasesBuffers";
+import { redoxElectrochemistryContent } from "./redoxElectrochemistry";
+import { chemicalKineticsContent } from "./chemicalKinetics";
+import { organicStructureFunctionalGroupsContent } from "./organicStructureFunctionalGroups";
+import { isomersStereochemistryContent } from "./isomersStereochemistry";
+import { organicReactionsContent } from "./organicReactions";
+import { carbonylsCarboxylicAcidsDerivativesContent } from "./carbonylsCarboxylicAcidsDerivatives";
+import { aminesAmidesBiologicalMoleculesContent } from "./aminesAmidesBiologicalMolecules";
+import { organicChemistrySpectroscopyContent } from "./organicChemistrySpectroscopy";
+import { unitsMathGraphsContent } from "./unitsMathGraphs";
+import { kinematicsNewtonianMechanicsContent } from "./kinematicsNewtonianMechanics";
+import { workEnergyMomentumContent } from "./workEnergyMomentum";
+import { fluidsPressureContent } from "./fluidsPressure";
+import { physicsThermodynamicsContent } from "./physicsThermodynamics";
+import { electrostaticsContent } from "./electrostatics";
+import { circuitsElectricityContent } from "./circuitsElectricity";
+import { magnetismElectromagneticPhenomenaContent } from "./magnetismElectromagneticPhenomena";
+import { wavesSoundLightOpticsContent } from "./wavesSoundLightOptics";
 
 export const documentLessonContentByLessonId: Record<string, DocumentLessonContent> = {
   "scientific-method": scientificMethodContent,
@@ -78,5 +106,30 @@ export const documentLessonContentByLessonId: Record<string, DocumentLessonConte
   "digestive-system-nutrition": digestiveSystemNutritionContent,
   "immune-system": immuneSystemContent,
   "reproductive-system-development": reproductiveSystemDevelopmentContent,
-  "evolution-genetics-ecology": evolutionGeneticsEcologyContent
+  "evolution-genetics-ecology": evolutionGeneticsEcologyContent,
+  "atomic-structure-periodic-trends": atomicStructurePeriodicTrendsContent,
+  "chemical-bonding-molecular-structure": chemicalBondingMolecularStructureContent,
+  "stoichiometry-chemical-reactions": stoichiometryChemicalReactionsContent,
+  "solutions-concentrations": solutionsConcentrationsContent,
+  "gases-liquids-solids": gasesLiquidsSolidsContent,
+  "thermochemistry-thermodynamics": thermochemistryThermodynamicsContent,
+  "chemical-equilibrium": chemicalEquilibriumContent,
+  "acids-bases-buffers": acidsBasesBuffersContent,
+  "redox-electrochemistry": redoxElectrochemistryContent,
+  "chemical-kinetics": chemicalKineticsContent,
+  "organic-structure-functional-groups": organicStructureFunctionalGroupsContent,
+  "isomers-stereochemistry": isomersStereochemistryContent,
+  "organic-reactions": organicReactionsContent,
+  "carbonyls-carboxylic-acids-derivatives": carbonylsCarboxylicAcidsDerivativesContent,
+  "amines-amides-biological-molecules": aminesAmidesBiologicalMoleculesContent,
+  "organic-chemistry-spectroscopy": organicChemistrySpectroscopyContent,
+  "units-math-graphs": unitsMathGraphsContent,
+  "kinematics-newtonian-mechanics": kinematicsNewtonianMechanicsContent,
+  "work-energy-momentum": workEnergyMomentumContent,
+  "fluids-pressure": fluidsPressureContent,
+  "physics-thermodynamics": physicsThermodynamicsContent,
+  "electrostatics": electrostaticsContent,
+  "circuits-electricity": circuitsElectricityContent,
+  "magnetism-electromagnetic-phenomena": magnetismElectromagneticPhenomenaContent,
+  "waves-sound-light-optics": wavesSoundLightOpticsContent
 };

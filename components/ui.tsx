@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, Check, Play } from "lucide-react";
+import { ArrowRight, Check, Eye, EyeOff, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -27,6 +27,21 @@ export const inputClass = "w-full rounded-xl border border-slate-200 dark:border
 
 export function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return <label className="block"><span className="mb-1.5 block text-xs font-extrabold text-slate-600">{label}{required && <span className="text-teal-500"> *</span>}</span>{children}</label>;
+}
+
+// Password inputs default masked—students can reveal what they typed to
+// catch typos before submitting, same pattern as every other auth form.
+// Toggling never changes the field's actual value, only how it's displayed.
+export function PasswordField({ label, required, value, onChange, placeholder, autoComplete }: { label: string; required?: boolean; value: string; onChange: (value: string) => void; placeholder?: string; autoComplete?: string }) {
+  const [visible, setVisible] = useState(false);
+  return <Field label={label} required={required}>
+    <div className="relative">
+      <input type={visible ? "text" : "password"} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} autoComplete={autoComplete} className={`${inputClass} pr-11`} />
+      <button type="button" onClick={() => setVisible(v => !v)} aria-label={visible ? "Hide password" : "Show password"} className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer text-slate-400 transition hover:text-slate-600">
+        {visible ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
+  </Field>;
 }
 
 export function ToggleRow({ label, desc, checked, onChange, disabled }: { label: string; desc?: string; checked: boolean; onChange?: () => void; disabled?: boolean }) {
