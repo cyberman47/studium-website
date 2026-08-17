@@ -4,15 +4,17 @@
 // content shape.
 //
 // Scope: all 33 lessons across every subject in the MCAT "Biological &
-// Biochemical Foundations" section, plus all 25 lessons across every subject
-// in the "Chemical & Physical Foundations of Biological Systems" section
-// (lib/mcatPath.ts's lessonContentList)—Biology (9), Cell Biology (4),
-// Genetics & Molecular Biology (5), Biochemistry (8), Organ Systems (6),
-// Evolution & Ecology (1), General Chemistry (10), Organic Chemistry (6),
-// and Physics (9). Every entry here has real, MCAT-accurate LessonContent
-// behind it in lib/mcatPath.ts. The remaining MCAT sections (Psych/Social,
-// CARS) still have title-only lesson stubs with no written content and
-// aren't included.
+// Biochemical Foundations" section, all 25 lessons across every subject in
+// the "Chemical & Physical Foundations of Biological Systems" section, and
+// all 20 lessons across every subject in the "Psychological, Social &
+// Biological Foundations of Behavior" section (lib/mcatPath.ts's
+// lessonContentList)—Biology (9), Cell Biology (4), Genetics & Molecular
+// Biology (5), Biochemistry (8), Organ Systems (6), Evolution & Ecology (1),
+// General Chemistry (10), Organic Chemistry (6), Physics (9), Psychology
+// (10), Social Psychology (4), Sociology (5), and Biological Bases (1).
+// Every entry here has real, MCAT-accurate LessonContent behind it in
+// lib/mcatPath.ts. The remaining MCAT section (CARS) still has title-only
+// lesson stubs with no written content and isn't included.
 import { DocumentLessonContent } from "../documentLesson";
 import { scientificMethodContent } from "../scientificMethodLesson";
 import { biomoleculesContent } from "./biomolecules";
@@ -72,6 +74,26 @@ import { electrostaticsContent } from "./electrostatics";
 import { circuitsElectricityContent } from "./circuitsElectricity";
 import { magnetismElectromagneticPhenomenaContent } from "./magnetismElectromagneticPhenomena";
 import { wavesSoundLightOpticsContent } from "./wavesSoundLightOptics";
+import { researchMethodsStatisticsContent } from "./researchMethodsStatistics";
+import { sensationPerceptionContent } from "./sensationPerception";
+import { learningConditioningContent } from "./learningConditioning";
+import { memoryCognitionContent } from "./memoryCognition";
+import { languageIntelligenceProblemSolvingContent } from "./languageIntelligenceProblemSolving";
+import { emotionMotivationContent } from "./emotionMotivation";
+import { consciousnessSleepContent } from "./consciousnessSleep";
+import { personalityContent } from "./personality";
+import { psychologicalDevelopmentContent } from "./psychologicalDevelopment";
+import { psychologicalDisordersMentalHealthContent } from "./psychologicalDisordersMentalHealth";
+import { socialInteractionGroupsContent } from "./socialInteractionGroups";
+import { attitudesBeliefsBehaviorContent } from "./attitudesBeliefsBehavior";
+import { socialInfluenceConformityContent } from "./socialInfluenceConformity";
+import { identityCultureSocializationContent } from "./identityCultureSocialization";
+import { socialStructureInstitutionsContent } from "./socialStructureInstitutions";
+import { socialStratificationInequalityContent } from "./socialStratificationInequality";
+import { raceEthnicityGenderContent } from "./raceEthnicityGender";
+import { populationDemographicsContent } from "./populationDemographics";
+import { healthHealthcareSocialDeterminantsContent } from "./healthHealthcareSocialDeterminants";
+import { brainBehaviorHormonesGeneticsContent } from "./brainBehaviorHormonesGenetics";
 
 export const documentLessonContentByLessonId: Record<string, DocumentLessonContent> = {
   "scientific-method": scientificMethodContent,
@@ -131,5 +153,25 @@ export const documentLessonContentByLessonId: Record<string, DocumentLessonConte
   "electrostatics": electrostaticsContent,
   "circuits-electricity": circuitsElectricityContent,
   "magnetism-electromagnetic-phenomena": magnetismElectromagneticPhenomenaContent,
-  "waves-sound-light-optics": wavesSoundLightOpticsContent
+  "waves-sound-light-optics": wavesSoundLightOpticsContent,
+  "research-methods-statistics": researchMethodsStatisticsContent,
+  "sensation-perception": sensationPerceptionContent,
+  "learning-conditioning": learningConditioningContent,
+  "memory-cognition": memoryCognitionContent,
+  "language-intelligence-problem-solving": languageIntelligenceProblemSolvingContent,
+  "emotion-motivation": emotionMotivationContent,
+  "consciousness-sleep": consciousnessSleepContent,
+  "personality": personalityContent,
+  "psychological-development": psychologicalDevelopmentContent,
+  "psychological-disorders-mental-health": psychologicalDisordersMentalHealthContent,
+  "social-interaction-groups": socialInteractionGroupsContent,
+  "attitudes-beliefs-behavior": attitudesBeliefsBehaviorContent,
+  "social-influence-conformity": socialInfluenceConformityContent,
+  "identity-culture-socialization": identityCultureSocializationContent,
+  "social-structure-institutions": socialStructureInstitutionsContent,
+  "social-stratification-inequality": socialStratificationInequalityContent,
+  "race-ethnicity-gender": raceEthnicityGenderContent,
+  "population-demographics": populationDemographicsContent,
+  "health-healthcare-social-determinants": healthHealthcareSocialDeterminantsContent,
+  "brain-behavior-hormones-genetics": brainBehaviorHormonesGeneticsContent
 };

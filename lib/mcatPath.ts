@@ -6395,7 +6395,2071 @@ const physicsLessons: LessonContent[] = [
   }
 ];
 
-const lessonContentList: LessonContent[] = [...biologyLessons, ...cellBiologyLessons, ...geneticsLessons, ...biochemistryLessons, ...organSystemsLessons, ...evolutionEcologyLessons, ...generalChemistryLessons, ...organicChemistryLessons, ...physicsLessons];
+// ---- Psychological, Social & Biological Foundations of Behavior ----
+// Psychology (10), Social Psychology (4), Sociology (5), and Biological
+// Bases of Behavior (1)—all 20 lessons in this section, restructured into
+// the same document-lesson layout as lib/documentLessons/ (see
+// lib/documentLessons/index.ts).
+
+const psychologyLessons: LessonContent[] = [
+  {
+    id: "research-methods-statistics",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Research Methods & Statistics",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    prerequisiteLessonId: null,
+    sections: [
+      {
+        heading: "Experimental Design",
+        body: "The independent variable (IV) is what the researcher deliberately manipulates; the dependent variable (DV) is what's measured as an outcome; operationalization means defining both in specific, measurable terms so the study can actually be run and replicated. Random assignment to conditions is what distinguishes a true experiment from other designs—by spreading confounding variables roughly evenly across groups, it lets researchers attribute a difference in the DV to the IV rather than to some other, uncontrolled difference between groups.",
+        keyTerms: [
+          { term: "Independent variable", definition: "What the researcher deliberately manipulates in an experiment." },
+          { term: "Dependent variable", definition: "What's measured as the outcome in an experiment." },
+          { term: "Random assignment", definition: "Randomly placing participants into conditions to control confounds and support causal conclusions." }
+        ]
+      },
+      {
+        heading: "Research Designs, Reliability, and Validity",
+        body: "Correlational studies measure two variables without manipulating either, so they can show that variables are related but never that one causes the other. Case studies give rich detail on a single individual but don't generalize well; surveys/naturalistic observation capture real-world behavior with less control over confounds. Reliability is whether a measure gives consistent results on repeated use; validity is whether a measure actually captures what it claims to measure—a measure can be reliable without being valid.",
+        keyTerms: [
+          { term: "Correlational study", definition: "A study measuring the relationship between variables without manipulation; can't establish causation." },
+          { term: "Reliability", definition: "Whether a measure gives consistent results on repeated use." },
+          { term: "Validity", definition: "Whether a measure actually captures what it claims to measure." }
+        ]
+      },
+      {
+        heading: "Descriptive and Inferential Statistics",
+        body: "Mean, median, and mode describe central tendency but respond differently to outliers; standard deviation describes how spread out data is. A p-value indicates the probability of observing a result this extreme if there were truly no effect—a result is typically significant when p < 0.05. A correlation coefficient (r) ranges from -1 to +1, indicating the direction and strength of a linear relationship.",
+        keyTerms: [
+          { term: "Mean, median, mode", definition: "Three measures of central tendency, each responding differently to outliers." },
+          { term: "p-value", definition: "The probability of a result this extreme occurring if there were truly no effect." },
+          { term: "Correlation coefficient (r)", definition: "A value from -1 to +1 indicating the direction and strength of a linear relationship." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "A true experiment manipulates an independent variable and uses random assignment to control confounds, which is specifically what allows a causal conclusion.",
+      "Correlational, case study, and survey designs can reveal associations but not causation; reliability (consistency) and validity (accuracy) are independent qualities of a measure.",
+      "Descriptive statistics (mean, median, mode, standard deviation) summarize a data set; inferential statistics like p-values and correlation coefficients assess whether a finding is likely real and how strong a relationship is."
+    ],
+    knowledgeCheck: [
+      { question: "What does random assignment accomplish in an experiment?", answer: "It spreads confounding variables roughly evenly across groups, letting researchers attribute a difference in the outcome to the independent variable rather than to some other, uncontrolled difference between groups." },
+      { question: "Can a measure be reliable but not valid?", answer: "Yes—reliability (consistency) and validity (accuracy) are independent qualities; a measure can give consistent results that are consistently wrong." }
+    ],
+    flashcards: [
+      { front: "Independent variable", back: "What the researcher manipulates." },
+      { front: "Dependent variable", back: "What's measured as the outcome." },
+      { front: "Reliability", back: "Consistency of a measure." },
+      { front: "Validity", back: "Accuracy of a measure—does it measure what it claims to?" },
+      { front: "p-value < 0.05", back: "Conventional threshold for statistical significance." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A researcher randomly assigns participants to either a new therapy or a waitlist control group, then measures anxiety scores afterward. What is the independent variable?",
+        concept: "Experimental design",
+        options: ["Anxiety score", "Whether a participant received the therapy or was on the waitlist", "The participant's age", "The researcher's hypothesis"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—anxiety score is the dependent variable, the outcome being measured.",
+          "Correct—the independent variable is what the researcher manipulates between groups: therapy vs. waitlist.",
+          "Incorrect—age is not being manipulated by the researcher here.",
+          "Incorrect—the hypothesis is not itself a variable in the study."
+        ]
+      },
+      {
+        question: "A scale consistently reads 5 pounds heavier than a person's true weight every time they step on it. What does this describe?",
+        concept: "Reliability and validity",
+        options: ["The scale is reliable but not valid", "The scale is valid but not reliable", "The scale is neither reliable nor valid", "The scale is both reliable and valid"],
+        correctIndex: 0,
+        optionExplanations: [
+          "Correct—consistent results (reliable) that are consistently inaccurate (not valid).",
+          "Incorrect—the scale's readings are not accurate, so it isn't valid.",
+          "Incorrect—the scale is reliable, since its readings are consistent.",
+          "Incorrect—the scale is not valid, since its readings are consistently wrong."
+        ]
+      },
+      {
+        question: "A data set of yearly incomes contains one extreme outlier (a billionaire) among otherwise typical values. Which measure of central tendency is least affected by this outlier?",
+        concept: "Descriptive statistics",
+        options: ["Mean", "Median", "Both are affected equally", "Standard deviation"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the mean would be pulled sharply upward by the outlier.",
+          "Correct—the median depends only on rank order, not magnitude, so it resists extreme outliers.",
+          "Incorrect—the mean and median are affected very differently by outliers.",
+          "Incorrect—standard deviation is not a measure of central tendency."
+        ]
+      },
+      {
+        question: "A correlational study finds that ice cream sales and drowning deaths are strongly positively correlated. What is the best interpretation of this finding?",
+        concept: "Research designs",
+        options: ["Ice cream sales cause drownings", "Drownings cause increased ice cream sales", "Both are likely related to a third variable (like hot weather), not causally linked to each other", "This correlation is meaningless and impossible"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—correlation does not establish causation, and this causal claim is implausible.",
+          "Incorrect—this reverse causal claim is equally implausible and unsupported.",
+          "Correct—both variables likely rise together because of a third variable (hot weather increasing both swimming and ice cream sales), a classic confound in correlational data.",
+          "Incorrect—this is a real, frequently cited example of a confounded correlation, not a meaningless one."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Think of a study's design as determining what kind of sentence it's allowed to end with—only a true experiment, with a manipulated variable and random assignment to spread out confounds, earns the right to say one thing 'causes' another; everything else can only say two things are 'related.' Reliability and validity are like a bathroom scale: reliability is whether it gives you the same number each time you step on it, and validity is whether that number is actually your real weight—you can have one without the other. And statistics are just organized honesty about data: descriptive stats summarize what you found, while inferential stats (like a p-value) tell you how much to trust that what you found wasn't just random noise."
+  },
+  {
+    id: "sensation-perception",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Sensation & Perception",
+    estimatedMinutes: 25,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "research-methods-statistics",
+    sections: [
+      {
+        heading: "Sensory Thresholds",
+        body: "Absolute threshold is the smallest amount of a stimulus a person can detect half the time it's presented. Difference threshold (just noticeable difference, JND) is the smallest change in a stimulus a person can reliably detect. Weber's law states that the JND is a constant proportion, not a constant amount, of the original stimulus intensity—detecting a 1-pound increase is easy holding a 2-pound bag but nearly impossible holding a 100-pound bag.",
+        keyTerms: [
+          { term: "Absolute threshold", definition: "The minimum stimulus intensity detectable 50% of the time." },
+          { term: "Just noticeable difference (JND)", definition: "The minimum detectable change in a stimulus." },
+          { term: "Weber's law", definition: "The JND is a constant proportion of the original stimulus intensity." }
+        ]
+      },
+      {
+        heading: "Sensory Transduction",
+        body: "Transduction is the shared mechanism underlying every sense: photoreceptors transduce light, hair cells transduce sound waves, and mechanoreceptors transduce pressure—each converts its specific type of physical energy into the same basic currency, neural action potentials. The brain never directly experiences light, sound, or pressure; it only interprets patterns of neural firing.",
+        keyTerms: [
+          { term: "Transduction", definition: "Converting a specific type of physical energy into neural signals." },
+          { term: "Photoreceptor", definition: "A retinal receptor that transduces light." }
+        ]
+      },
+      {
+        heading: "Perceptual Organization",
+        body: "Bottom-up processing builds perception from raw sensory data upward; top-down processing uses prior knowledge and expectations to interpret sensory input. Gestalt principles describe the brain's default rules for organizing elements into unified wholes: proximity, similarity, closure, and figure-ground.",
+        keyTerms: [
+          { term: "Bottom-up processing", definition: "Building perception from raw sensory data upward." },
+          { term: "Top-down processing", definition: "Using prior knowledge and context to interpret sensory input." },
+          { term: "Gestalt principles", definition: "Rules (proximity, similarity, closure, figure-ground) for organizing sensory elements into wholes." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Absolute threshold is the minimum detectable stimulus; difference threshold (JND) is the minimum detectable change, and Weber's law states the JND is a constant proportion of the original stimulus.",
+      "Transduction—converting physical energy into neural signals—is the shared mechanism underlying every sense.",
+      "Bottom-up processing builds perception from raw data; top-down processing uses prior knowledge; Gestalt principles describe how the brain organizes elements into unified wholes."
+    ],
+    knowledgeCheck: [
+      { question: "According to Weber's law, why does a 1-pound weight increase feel more noticeable on a 2-pound bag than a 100-pound bag?", answer: "The just noticeable difference is a constant proportion of the original stimulus—1 pound is a much larger proportional change relative to a 2-pound bag than relative to a 100-pound bag." },
+      { question: "Why can the brain never directly experience light or sound?", answer: "Sensory receptors transduce physical energy into electrochemical neural signals; the brain only ever interprets those signals, never the original physical stimulus itself." }
+    ],
+    flashcards: [
+      { front: "Absolute threshold", back: "Minimum stimulus detectable 50% of the time." },
+      { front: "Weber's law", back: "JND is a constant proportion of the original stimulus." },
+      { front: "Transduction", back: "Converting physical energy into neural signals." },
+      { front: "Top-down processing", back: "Using prior knowledge to interpret sensory input." },
+      { front: "Gestalt: closure", back: "The brain fills in gaps to perceive a complete shape." }
+    ],
+    practiceQuestions: [
+      {
+        question: "According to Weber's law, why is it easier to notice someone turning on one extra candle in a dark room than turning on one extra light in an already brightly lit room?",
+        concept: "Sensory thresholds",
+        options: ["Candles are inherently easier to detect than electric lights", "The added light is a much larger proportional change relative to the dim room's low starting brightness", "Absolute threshold, not difference threshold, applies here", "There is no real difference in detectability"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the type of light source isn't the deciding factor.",
+          "Correct—Weber's law: the JND is a constant proportion of the starting stimulus, so the candle is a much bigger proportional change.",
+          "Incorrect—this is specifically a difference threshold (detecting a change) scenario.",
+          "Incorrect—Weber's law predicts a real, substantial difference in detectability."
+        ]
+      },
+      {
+        question: "What do photoreceptors in the eye and hair cells in the cochlea have in common, despite responding to completely different stimuli?",
+        concept: "Sensory transduction",
+        options: ["They both directly transmit light energy to the brain", "They both transduce their specific stimulus into electrical neural signals", "They are located in the same part of the nervous system", "They both respond exclusively to chemical stimuli"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—neither directly transmits the physical stimulus itself to the brain.",
+          "Correct—both transduce their specific physical energy into the same basic currency, neural signals.",
+          "Incorrect—they are located in different sensory organs.",
+          "Incorrect—light and sound are not chemical stimuli."
+        ]
+      },
+      {
+        question: "A reader easily perceives a word even though several letters are blurry, because the surrounding sentence provides context to fill in the gaps. This best illustrates:",
+        concept: "Perceptual organization",
+        options: ["Bottom-up processing", "Top-down processing", "Absolute threshold", "Transduction"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—bottom-up processing would build the perception purely from raw visual features.",
+          "Correct—using context and prior knowledge to interpret incomplete sensory data is top-down processing.",
+          "Incorrect—this isn't about a minimum detectable stimulus.",
+          "Incorrect—this is about interpretation, not conversion of physical energy to neural signals."
+        ]
+      },
+      {
+        question: "A viewer looking at a series of dots arranged closely in rows perceives them as grouped into rows rather than columns, based purely on how close together the dots are. This illustrates the Gestalt principle of:",
+        concept: "Perceptual organization",
+        options: ["Closure", "Figure-ground", "Proximity", "Similarity"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—closure is about filling in gaps to perceive a complete shape, not spatial grouping by distance.",
+          "Incorrect—figure-ground is about separating an object from its background.",
+          "Correct—proximity groups nearby elements together, which is exactly what's driving the row perception here.",
+          "Incorrect—similarity groups elements by shared appearance, not by distance."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Sensation is your body's raw data feed—thresholds are just where that feed switches on (absolute threshold) or notices a change (JND), and Weber's law explains why a change has to be proportionally, not just numerically, big enough to register. Transduction is the universal translator: no matter which sense, physical energy gets converted into the same electrical language the brain speaks. And perception is what the brain does with that translated data—sometimes building it up piece by piece (bottom-up), sometimes using what it already expects to see or hear to fill in the blanks (top-down), all organized by a handful of default Gestalt rules for grouping scattered elements into a coherent whole."
+  },
+  {
+    id: "learning-conditioning",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Learning & Conditioning",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "sensation-perception",
+    sections: [
+      {
+        heading: "Classical Conditioning",
+        body: "An unconditioned stimulus (UCS) naturally triggers an unconditioned response (UCR) without learning. Repeatedly pairing a neutral stimulus with the UCS eventually makes it a conditioned stimulus (CS) triggering a conditioned response (CR). Extinction occurs when the CS is presented without the UCS, fading the CR; generalization spreads the CR to similar stimuli; discrimination distinguishes the CS from similar stimuli.",
+        keyTerms: [
+          { term: "Unconditioned stimulus (UCS)", definition: "Naturally triggers a response without learning." },
+          { term: "Conditioned stimulus (CS)", definition: "A neutral stimulus that, after pairing with a UCS, triggers a learned response." },
+          { term: "Extinction", definition: "Fading of the conditioned response when the CS is presented without the UCS." }
+        ]
+      },
+      {
+        heading: "Operant Conditioning",
+        body: "Positive reinforcement adds a desirable stimulus to increase a behavior; negative reinforcement removes an aversive stimulus to increase a behavior—both increase future frequency. Positive punishment adds an aversive stimulus to decrease a behavior; negative punishment removes a desirable stimulus to decrease a behavior—both decrease future frequency.",
+        keyTerms: [
+          { term: "Positive reinforcement", definition: "Adding a desirable stimulus to increase a behavior." },
+          { term: "Negative reinforcement", definition: "Removing an aversive stimulus to increase a behavior." },
+          { term: "Punishment", definition: "A consequence (adding or removing a stimulus) that decreases a behavior's frequency." }
+        ]
+      },
+      {
+        heading: "Schedules of Reinforcement and Observational Learning",
+        body: "Fixed-ratio schedules reinforce after a set number of responses; variable-ratio schedules reinforce after an unpredictable number and produce the highest, most persistent response rate. Fixed-interval schedules reinforce the first response after a set time; variable-interval schedules reinforce after an unpredictable time. Observational learning (Bandura) shows behavior can be learned by watching a model, without direct reinforcement.",
+        keyTerms: [
+          { term: "Variable-ratio schedule", definition: "Reinforcement after an unpredictable number of responses; produces the highest, most persistent response rate." },
+          { term: "Observational learning", definition: "Learning by watching a model, without direct reinforcement of the observer." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Classical conditioning pairs a neutral stimulus with an unconditioned stimulus until it becomes a conditioned stimulus triggering a conditioned response.",
+      "Reinforcement (positive or negative) increases a behavior's frequency; punishment (positive or negative) decreases it.",
+      "Variable-ratio schedules produce the highest, most extinction-resistant response rates; observational learning shows behavior can be acquired by watching a model."
+    ],
+    knowledgeCheck: [
+      { question: "What is the difference between negative reinforcement and punishment?", answer: "Negative reinforcement removes an aversive stimulus to increase a behavior's frequency; punishment (positive or negative) decreases a behavior's frequency—'negative' refers to removing something, not to a bad outcome." },
+      { question: "Why do variable-ratio schedules produce especially persistent behavior?", answer: "Because reinforcement is unpredictable, the organism can never be sure continued responding won't pay off, keeping response rates high and making the behavior resistant to extinction." }
+    ],
+    flashcards: [
+      { front: "Unconditioned stimulus", back: "Naturally triggers a response without learning." },
+      { front: "Conditioned stimulus", back: "Learned trigger for a conditioned response." },
+      { front: "Negative reinforcement", back: "Removing an aversive stimulus to increase behavior." },
+      { front: "Variable-ratio schedule", back: "Unpredictable reinforcement; highest, most persistent response rate." },
+      { front: "Observational learning", back: "Learning by watching a model, without direct reinforcement." }
+    ],
+    practiceQuestions: [
+      {
+        question: "In Pavlov's classic experiment, a bell is repeatedly paired with food until the bell alone causes a dog to salivate. What is the food in this scenario?",
+        concept: "Classical conditioning",
+        options: ["Conditioned stimulus", "Unconditioned stimulus", "Conditioned response", "Unconditioned response"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the bell is the conditioned stimulus.",
+          "Correct—food naturally triggers salivation without learning, defining it as the unconditioned stimulus.",
+          "Incorrect—salivation to the bell alone would be the conditioned response.",
+          "Incorrect—salivation itself (to food) is the unconditioned response, not the food."
+        ]
+      },
+      {
+        question: "A student starts turning in homework on time because doing so stops their parent from nagging them about it. What type of operant conditioning does this illustrate?",
+        concept: "Operant conditioning",
+        options: ["Positive reinforcement", "Negative reinforcement", "Positive punishment", "Negative punishment"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—nothing desirable is being added.",
+          "Correct—removing an aversive stimulus (nagging) to increase a behavior is negative reinforcement.",
+          "Incorrect—punishment decreases behavior; this behavior increased.",
+          "Incorrect—nothing desirable is being removed, and this is reinforcement, not punishment."
+        ]
+      },
+      {
+        question: "Why do variable-ratio reinforcement schedules typically produce behavior that is highly resistant to extinction?",
+        concept: "Schedules of reinforcement",
+        options: ["Reinforcement occurs after a completely predictable number of responses", "The unpredictability of reinforcement keeps the organism responding at a high rate", "Variable-ratio schedules never actually reinforce the behavior", "This schedule only applies to classical conditioning"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—variable-ratio schedules are specifically unpredictable, not fixed.",
+          "Correct—unpredictable reinforcement keeps the organism responding since the next response could always pay off.",
+          "Incorrect—the behavior is still reinforced, just unpredictably.",
+          "Incorrect—schedules of reinforcement apply to operant, not classical, conditioning."
+        ]
+      },
+      {
+        question: "A child observes an older sibling get praised for sharing toys, and later begins sharing toys themselves, without ever being directly reinforced for it. This best illustrates:",
+        concept: "Observational learning",
+        options: ["Classical conditioning", "Negative punishment", "Observational learning", "Extinction"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—no neutral stimulus is being paired with an unconditioned stimulus here.",
+          "Incorrect—nothing is being removed to decrease behavior.",
+          "Correct—learning a behavior by watching a model receive consequences, without direct reinforcement, is observational learning.",
+          "Incorrect—extinction is the fading of a previously conditioned response, not this."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Classical conditioning is about linking two things together in the mind—a bell starts meaning 'food is coming' purely through repeated pairing. Operant conditioning is about consequences shaping voluntary behavior—reinforcement (adding or removing something) makes a behavior happen more, punishment makes it happen less, and the 'positive/negative' labels just mean adding or removing, not good or bad. And how predictably those consequences arrive matters enormously: a slot machine's unpredictable payout (variable-ratio) keeps people pulling the lever far more persistently than a paycheck that arrives like clockwork ever could."
+  },
+  {
+    id: "memory-cognition",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Memory & Cognition",
+    estimatedMinutes: 25,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "learning-conditioning",
+    sections: [
+      {
+        heading: "Stages of Memory",
+        body: "Sensory memory holds a nearly complete, high-capacity but extremely brief snapshot of sensory input. Short-term/working memory holds a small amount of information (~7 ± 2 items) for roughly 20-30 seconds unless rehearsed. Long-term memory has essentially unlimited capacity and can store information for a lifetime; elaborative rehearsal helps move information into long-term storage.",
+        keyTerms: [
+          { term: "Sensory memory", definition: "A brief, high-capacity snapshot of sensory input." },
+          { term: "Short-term/working memory", definition: "Limited capacity (~7 items), lasting ~20-30 seconds without rehearsal." },
+          { term: "Elaborative rehearsal", definition: "Connecting new information to existing knowledge to aid long-term encoding." }
+        ]
+      },
+      {
+        heading: "Types of Long-Term Memory",
+        body: "Explicit (declarative) memory requires conscious recall and splits into episodic memory (personal experiences) and semantic memory (general facts). Implicit (nondeclarative) memory doesn't require conscious recall and includes procedural memory (skills/habits), often preserved even when explicit memory is impaired, as in some forms of amnesia.",
+        keyTerms: [
+          { term: "Episodic memory", definition: "Memory for personal experiences and events." },
+          { term: "Semantic memory", definition: "Memory for general facts and knowledge." },
+          { term: "Procedural memory", definition: "Implicit memory for skills and habits." }
+        ]
+      },
+      {
+        heading: "Forgetting: Interference and Decay",
+        body: "Proactive interference occurs when older memories interfere with learning new information; retroactive interference occurs when new information interferes with recalling older memories. Decay theory proposes memories fade from disuse over time; encoding failure and retrieval failure are other distinct reasons information can seem forgotten.",
+        keyTerms: [
+          { term: "Proactive interference", definition: "Old memories disrupting new learning." },
+          { term: "Retroactive interference", definition: "New memories disrupting recall of old information." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Information flows through sensory memory (brief), short-term/working memory (~20-30 seconds), and long-term memory (essentially unlimited); elaborative rehearsal helps encode information into long-term storage.",
+      "Explicit memory (episodic and semantic) requires conscious recall; implicit memory (especially procedural) doesn't, and the two can be selectively impaired.",
+      "Proactive interference is old memories disrupting new learning; retroactive interference is new memories disrupting old recall."
+    ],
+    knowledgeCheck: [
+      { question: "What is the difference between episodic and semantic memory?", answer: "Episodic memory is for personal experiences and events tied to a specific time and place; semantic memory is for general facts and knowledge, not tied to when or where they were learned." },
+      { question: "How can amnesia patients show impaired explicit memory but intact implicit memory?", answer: "Explicit and implicit memory rely on at least partially distinct brain systems, so damage can selectively impair one (e.g., conscious recall of events) while leaving the other (e.g., learning new motor skills) intact." }
+    ],
+    flashcards: [
+      { front: "Short-term memory capacity", back: "~7 ± 2 items, ~20-30 seconds." },
+      { front: "Episodic memory", back: "Personal experiences, tied to time/place." },
+      { front: "Semantic memory", back: "General facts and knowledge." },
+      { front: "Procedural memory", back: "Implicit memory for skills/habits." },
+      { front: "Retroactive interference", back: "New memories disrupt recall of old ones." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A student repeats a phone number just long enough to dial it, then immediately forgets it. Which memory stage was this held in?",
+        concept: "Stages of memory",
+        options: ["Sensory memory", "Short-term/working memory", "Long-term memory", "It never entered any memory stage"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—sensory memory lasts under a second.",
+          "Correct—brief active rehearsal for tens of seconds, without further encoding, is short-term/working memory.",
+          "Incorrect—long-term memory would persist well beyond the moment of dialing.",
+          "Incorrect—the information clearly entered at least short-term memory to be dialed correctly."
+        ]
+      },
+      {
+        question: "A patient with amnesia cannot remember meeting their therapist each session, yet steadily improves at a motor task practiced across sessions, with no conscious memory of practicing it. This illustrates:",
+        concept: "Types of long-term memory",
+        options: ["Both explicit and implicit memory are impaired", "Explicit memory is impaired while implicit (procedural) memory remains intact", "Sensory memory is impaired while short-term memory is intact", "This pattern is impossible"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—implicit/procedural memory is clearly intact, shown by the skill improvement.",
+          "Correct—impaired conscious recall (explicit) with intact skill learning (implicit/procedural) is a real, documented dissociation.",
+          "Incorrect—this isn't about sensory vs. short-term memory.",
+          "Incorrect—this is a well-documented real pattern in amnesia research."
+        ]
+      },
+      {
+        question: "After memorizing a new address, a person finds it harder to remember their old address, known well for years. What does this illustrate?",
+        concept: "Forgetting",
+        options: ["Proactive interference", "Retroactive interference", "Sensory decay", "Encoding failure"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—proactive interference would be the old address making the new one harder to learn.",
+          "Correct—new information (new address) disrupting recall of old information (old address) is retroactive interference.",
+          "Incorrect—this isn't about sensory memory.",
+          "Incorrect—the old address was clearly encoded, since it was known well for years."
+        ]
+      },
+      {
+        question: "A word is 'on the tip of your tongue'—you know you know it, but can't recall it right now, though you recognize it instantly once someone says it. This best illustrates:",
+        concept: "Forgetting",
+        options: ["Encoding failure", "Retrieval failure", "Proactive interference", "Decay"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—encoding failure would mean the information was never stored at all, but recognition shows it was.",
+          "Correct—the memory exists (shown by recognition) but currently can't be accessed—retrieval failure.",
+          "Incorrect—no competing memory is described here.",
+          "Incorrect—decay is about fading from disuse, not a temporary access problem."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Memory is a relay race with three legs: a near-instant sensory snapshot, a brief working-memory holding pen (about 7 items, 30 seconds), and a vast long-term archive—and elaborative rehearsal (connecting new info to what you already know) is what gets information handed off successfully to that final leg. Once in long-term storage, memory splits into what you can consciously describe (explicit: facts and personal events) and what your body just knows how to do without thinking about it (implicit: skills and habits)—which is why someone can lose the ability to recall new facts while still getting better at a physical skill. And most 'forgetting' isn't really deletion—it's competition between memories (interference) or a temporarily locked door (retrieval failure) more often than the memory being gone for good."
+  },
+  {
+    id: "language-intelligence-problem-solving",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Language, Intelligence & Problem Solving",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "memory-cognition",
+    sections: [
+      {
+        heading: "The Structure of Language",
+        body: "A phoneme is the smallest unit of sound that affects meaning; a morpheme is the smallest unit that carries meaning. Syntax is the set of rules governing grammatical sentence structure; semantics is the actual meaning conveyed—a sentence can be syntactically correct but semantically meaningless, showing the two are separate properties.",
+        keyTerms: [
+          { term: "Phoneme", definition: "The smallest unit of sound that affects meaning." },
+          { term: "Morpheme", definition: "The smallest unit of language that carries meaning." },
+          { term: "Syntax", definition: "Grammatical rules governing sentence structure, distinct from meaning (semantics)." }
+        ]
+      },
+      {
+        heading: "Problem Solving, Heuristics, and Biases",
+        body: "An algorithm is a step-by-step procedure guaranteed to eventually produce a correct solution; a heuristic is a faster mental shortcut that isn't guaranteed correct. The availability heuristic judges likelihood based on ease of recall; the representativeness heuristic judges likelihood based on resemblance to a prototype, often ignoring base rates.",
+        keyTerms: [
+          { term: "Algorithm", definition: "A guaranteed-correct, step-by-step problem-solving procedure." },
+          { term: "Heuristic", definition: "A fast mental shortcut that isn't guaranteed to produce a correct answer." },
+          { term: "Availability heuristic", definition: "Judging likelihood based on how easily examples come to mind." }
+        ]
+      },
+      {
+        heading: "Theories of Intelligence",
+        body: "The general intelligence (g) model proposes one underlying ability contributing to performance across many cognitive tasks, based on correlated test performance. Multiple intelligences theory (Gardner) proposes several distinct, relatively independent types of intelligence rather than one general factor.",
+        keyTerms: [
+          { term: "General intelligence (g)", definition: "A proposed single underlying ability behind correlated performance across cognitive tasks." },
+          { term: "Multiple intelligences theory", definition: "Gardner's theory of several distinct, independent types of intelligence." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Phonemes are the smallest sound units, morphemes the smallest meaningful units; syntax (grammar) and semantics (meaning) are separate properties of language.",
+      "Algorithms are slow but guaranteed-correct; heuristics are fast but error-prone—availability relies on ease of recall, representativeness relies on resemblance to a prototype.",
+      "General intelligence (g) proposes one underlying ability behind correlated task performance; multiple intelligences theory proposes several independent types of intelligence."
+    ],
+    knowledgeCheck: [
+      { question: "Can a sentence be syntactically correct but semantically meaningless?", answer: "Yes—Chomsky's example 'colorless green ideas sleep furiously' follows grammatical rules (syntax) while conveying no coherent meaning (semantics), showing the two properties are separate." },
+      { question: "What's the difference between the availability and representativeness heuristics?", answer: "Availability judges likelihood based on how easily examples come to mind; representativeness judges likelihood based on how closely something matches a prototype, often ignoring actual base rates." }
+    ],
+    flashcards: [
+      { front: "Phoneme", back: "Smallest unit of sound affecting meaning." },
+      { front: "Morpheme", back: "Smallest unit carrying meaning." },
+      { front: "Availability heuristic", back: "Judging likelihood by ease of recall." },
+      { front: "Representativeness heuristic", back: "Judging likelihood by resemblance to a prototype." },
+      { front: "General intelligence (g)", back: "One underlying ability behind correlated task performance." }
+    ],
+    practiceQuestions: [
+      {
+        question: "The word 'unhappiness' contains three morphemes: 'un-', 'happy', and '-ness'. What makes each a morpheme?",
+        concept: "Structure of language",
+        options: ["Each is a complete word on its own", "Each is the smallest unit that carries its own distinct piece of meaning", "Each is a single phoneme", "Morphemes are defined by syntax, not meaning"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—'un-' and '-ness' are not complete words on their own.",
+          "Correct—a morpheme is the smallest meaningful unit, and each of these contributes its own distinct meaning.",
+          "Incorrect—each morpheme here is made of multiple phonemes.",
+          "Incorrect—morphemes are defined by meaning, not grammatical structure."
+        ]
+      },
+      {
+        question: "After seeing extensive news coverage of a plane crash, a person becomes afraid to fly, despite flying being statistically much safer than driving. This illustrates:",
+        concept: "Heuristics and biases",
+        options: ["The representativeness heuristic", "The availability heuristic", "An algorithm", "Confirmation bias specifically, not a heuristic"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—representativeness is about resemblance to a prototype, not ease of recall.",
+          "Correct—the vivid, memorable crash inflates perceived likelihood, which is the availability heuristic.",
+          "Incorrect—this is a fast, error-prone judgment, not a guaranteed-correct algorithm.",
+          "Incorrect—this specific pattern is availability, not confirmation bias."
+        ]
+      },
+      {
+        question: "A researcher finds that a person's musical ability shows no meaningful correlation with their mathematical or linguistic ability. This finding is most consistent with:",
+        concept: "Theories of intelligence",
+        options: ["The general intelligence (g) model", "Multiple intelligences theory", "Weber's law", "The representativeness heuristic"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the g model predicts correlated performance across cognitive domains, the opposite of this finding.",
+          "Correct—independent, uncorrelated abilities support the idea of several distinct intelligences.",
+          "Incorrect—Weber's law is about sensory thresholds, unrelated to intelligence.",
+          "Incorrect—this isn't a heuristic or judgment bias scenario."
+        ]
+      },
+      {
+        question: "A person assumes a quiet, detail-oriented individual is more likely to be a librarian than a salesperson, even though salespeople vastly outnumber librarians. This illustrates:",
+        concept: "Heuristics and biases",
+        options: ["The availability heuristic", "The representativeness heuristic, ignoring base rates", "An algorithm applied correctly", "General intelligence"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this isn't about ease of recall, but resemblance to a stereotype.",
+          "Correct—judging likelihood by resemblance to a prototype (quiet, detail-oriented = librarian), while ignoring the actual base rate of each profession, is the representativeness heuristic.",
+          "Incorrect—this is a heuristic-driven judgment error, not a guaranteed-correct algorithm.",
+          "Incorrect—this isn't related to intelligence theories."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Language is built in layers, like a house: phonemes are the individual bricks (sounds), morphemes are the smallest meaningful chunks built from them, syntax is the blueprint for how to assemble a grammatically sound structure, and semantics is whether the finished house actually makes sense to live in. Heuristics are the mental shortcuts we use instead of laboriously following an algorithm every time—usually helpful, but they fail in predictable ways: availability tricks us into overweighting whatever comes easily to mind, and representativeness tricks us into overweighting whatever resembles a stereotype, both while ignoring the boring statistical reality. And intelligence theories are really just disagreeing about whether there's one 'g' factor underneath everything or several genuinely separate types of smart."
+  },
+  {
+    id: "emotion-motivation",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Emotion & Motivation",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "language-intelligence-problem-solving",
+    sections: [
+      {
+        heading: "Theories of Emotion",
+        body: "James-Lange theory proposes physiological arousal comes first and the brain interprets it as emotion. Cannon-Bard theory proposes arousal and emotion occur simultaneously and independently. Schachter-Singer two-factor theory proposes emotion results from arousal plus a cognitive label for that arousal, drawn from context.",
+        keyTerms: [
+          { term: "James-Lange theory", definition: "Physiological arousal causes emotion." },
+          { term: "Cannon-Bard theory", definition: "Arousal and emotion occur simultaneously and independently." },
+          { term: "Schachter-Singer two-factor theory", definition: "Emotion requires arousal plus a cognitive label from context." }
+        ]
+      },
+      {
+        heading: "Theories of Motivation",
+        body: "Drive reduction theory explains motivation as reducing physiological needs to restore homeostasis. Maslow's hierarchy of needs proposes that basic needs must be largely met before higher psychological needs (like self-actualization) become motivating. Extrinsic rewards for an already intrinsically motivating activity can undermine intrinsic motivation (overjustification effect).",
+        keyTerms: [
+          { term: "Drive reduction theory", definition: "Motivation as reducing an unmet physiological need to restore homeostasis." },
+          { term: "Maslow's hierarchy of needs", definition: "Lower-level needs generally must be met before higher-level needs become motivating." },
+          { term: "Overjustification effect", definition: "An extrinsic reward undermining intrinsic motivation for an activity." }
+        ]
+      },
+      {
+        heading: "The Biological Basis of Emotion",
+        body: "The limbic system, especially the amygdala, is central to processing emotion, particularly fear. The sympathetic nervous system drives the physiological arousal of strong emotions ('fight-or-flight'); the parasympathetic system calms the body afterward ('rest-and-digest').",
+        keyTerms: [
+          { term: "Amygdala", definition: "A limbic structure central to processing fear and threat detection." },
+          { term: "Sympathetic nervous system", definition: "Drives the physiological arousal of strong emotion (fight-or-flight)." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "James-Lange: arousal causes emotion. Cannon-Bard: arousal and emotion occur simultaneously and independently. Schachter-Singer: emotion requires arousal plus a cognitive label.",
+      "Drive reduction theory explains motivation via restoring homeostasis; Maslow's hierarchy proposes basic needs generally precede higher psychological needs; extrinsic rewards can undermine intrinsic motivation.",
+      "The amygdala is central to processing fear; the sympathetic nervous system drives emotional arousal, and the parasympathetic system calms the body afterward."
+    ],
+    knowledgeCheck: [
+      { question: "What is the key difference between the James-Lange and Cannon-Bard theories of emotion?", answer: "James-Lange proposes arousal causes emotion (arousal first); Cannon-Bard proposes arousal and emotion occur simultaneously and independently, with neither causing the other." },
+      { question: "What is the overjustification effect?", answer: "Adding an extrinsic reward to an already intrinsically motivating activity can reduce intrinsic motivation for that activity once the reward is removed." }
+    ],
+    flashcards: [
+      { front: "James-Lange theory", back: "Arousal causes emotion." },
+      { front: "Schachter-Singer theory", back: "Emotion = arousal + cognitive label from context." },
+      { front: "Maslow's hierarchy", back: "Basic needs generally precede higher psychological needs." },
+      { front: "Overjustification effect", back: "Extrinsic reward undermines intrinsic motivation." },
+      { front: "Amygdala", back: "Central to processing fear and threat." }
+    ],
+    practiceQuestions: [
+      {
+        question: "In a classic study, participants physiologically aroused (from exercise) but told it was due to an attractive person nearby reported greater attraction than an unaroused control group. This best supports:",
+        concept: "Theories of emotion",
+        options: ["James-Lange theory", "Cannon-Bard theory", "Schachter-Singer two-factor theory", "None of these theories address this scenario"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—James-Lange doesn't involve a cognitive relabeling of the same arousal based on context.",
+          "Incorrect—Cannon-Bard proposes arousal and emotion are independent, not that arousal gets relabeled by context.",
+          "Correct—the same arousal was cognitively relabeled based on context, which is exactly the two-factor theory's mechanism.",
+          "Incorrect—this is a classic supporting study for the two-factor theory."
+        ]
+      },
+      {
+        question: "A child who loves drawing for fun starts receiving cash rewards for drawing, then draws less often once the reward stops. This illustrates:",
+        concept: "Theories of motivation",
+        options: ["Drive reduction theory", "The overjustification effect", "Maslow's hierarchy of needs", "The James-Lange theory of emotion"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—drawing for fun isn't reducing a physiological drive.",
+          "Correct—an extrinsic reward undermined intrinsic motivation, exactly the overjustification effect.",
+          "Incorrect—this isn't about a hierarchy of needs.",
+          "Incorrect—this is about motivation, not emotion theory."
+        ]
+      },
+      {
+        question: "A patient with amygdala damage shows a marked reduction in fear responses to threatening stimuli, while other functions remain intact. This is most consistent with the amygdala's role in:",
+        concept: "Biological basis of emotion",
+        options: ["General intelligence", "Language processing", "Processing fear and threat detection", "Long-term memory consolidation exclusively"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—this isn't about intelligence.",
+          "Incorrect—the amygdala isn't primarily a language structure.",
+          "Correct—the amygdala is specifically central to fear/threat processing, matching this selective deficit.",
+          "Incorrect—while related to memory, this scenario specifically involves fear response."
+        ]
+      },
+      {
+        question: "A person feels their heart racing after being startled and, based on that physical sensation, concludes 'I must be afraid.' This sequence best matches:",
+        concept: "Theories of emotion",
+        options: ["James-Lange theory", "Cannon-Bard theory", "Maslow's hierarchy of needs", "Drive reduction theory"],
+        correctIndex: 0,
+        optionExplanations: [
+          "Correct—physiological arousal (racing heart) occurring first, with the emotion (fear) inferred from that arousal, is exactly James-Lange theory.",
+          "Incorrect—Cannon-Bard proposes arousal and emotion occur simultaneously and independently, not one inferred from the other.",
+          "Incorrect—this isn't about a hierarchy of needs.",
+          "Incorrect—this isn't about reducing a physiological drive."
+        ]
+      }
+    ],
+    simplifiedExplanation: "The three emotion theories are all arguing about timing: does your body react first and your mind label it afterward (James-Lange), do both happen at once independently (Cannon-Bard), or does the same generic arousal get labeled differently depending on the situation you're in (Schachter-Singer)? Motivation theories ask a different question—drive reduction says we're motivated to restore balance when a need goes unmet, while Maslow's pyramid says we generally can't worry about self-actualization while we're still worried about food and safety. And underneath both emotion and motivation sits real biology: the amygdala as the brain's fear-detector, and the sympathetic/parasympathetic nervous system as the gas pedal and brake for the body's arousal response."
+  },
+  {
+    id: "consciousness-sleep",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Consciousness & Sleep",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    prerequisiteLessonId: "emotion-motivation",
+    sections: [
+      {
+        heading: "Stages of Sleep",
+        body: "NREM sleep has three stages of increasing depth, from light stage 1 to deep, slow-wave stage 3 (delta waves). REM sleep is marked by fast, waking-like brain waves, rapid eye movements, and vivid dreaming, despite near-total muscle paralysis (atonia).",
+        keyTerms: [
+          { term: "NREM stage 3 (slow-wave sleep)", definition: "The deepest NREM stage, marked by high-amplitude delta waves." },
+          { term: "REM sleep", definition: "Waking-like brain activity, vivid dreaming, and near-total muscle paralysis." }
+        ]
+      },
+      {
+        heading: "The Sleep Cycle and Circadian Rhythm",
+        body: "A full sleep cycle repeats roughly every 90 minutes, with REM periods lengthening later in the night. Circadian rhythm is regulated by the suprachiasmatic nucleus (SCN) in the hypothalamus, which responds to light and regulates the pineal gland's melatonin release.",
+        keyTerms: [
+          { term: "Suprachiasmatic nucleus (SCN)", definition: "The hypothalamic structure regulating circadian rhythm based on light." },
+          { term: "Melatonin", definition: "A hormone promoting sleepiness, released in darkness." }
+        ]
+      },
+      {
+        heading: "Sleep Disorders",
+        body: "Insomnia is difficulty falling/staying asleep; sleep apnea involves repeated pauses in breathing during sleep; narcolepsy involves sudden daytime sleep attacks, sometimes with cataplexy (sudden muscle weakness); parasomnias are abnormal behaviors during NREM sleep, like sleepwalking.",
+        keyTerms: [
+          { term: "Narcolepsy", definition: "Sudden, uncontrollable daytime sleep attacks, sometimes with cataplexy." },
+          { term: "Cataplexy", definition: "Sudden muscle weakness triggered by strong emotion, reflecting REM-like paralysis intruding into waking life." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "NREM sleep progresses through stages 1-3 with progressively slower brain waves; REM sleep features waking-like brain activity, dreaming, and muscle paralysis.",
+      "A sleep cycle repeats roughly every 90 minutes; the suprachiasmatic nucleus regulates circadian rhythm via light and melatonin.",
+      "Insomnia, sleep apnea, narcolepsy (with cataplexy), and parasomnias each have distinct defining features."
+    ],
+    knowledgeCheck: [
+      { question: "Why is REM sleep sometimes called 'paradoxical sleep'?", answer: "Because brain activity during REM closely resembles wakefulness, even though the body is nearly completely paralyzed at the same time." },
+      { question: "What role does the suprachiasmatic nucleus play in sleep?", answer: "It functions as the body's primary circadian pacemaker, responding to light exposure and regulating melatonin release to control the sleep-wake cycle." }
+    ],
+    flashcards: [
+      { front: "NREM stage 3", back: "Deepest NREM stage; delta waves." },
+      { front: "REM sleep", back: "Waking-like brain waves, dreaming, muscle paralysis." },
+      { front: "Suprachiasmatic nucleus", back: "Body's master circadian clock, regulated by light." },
+      { front: "Melatonin", back: "Sleep-promoting hormone, released in darkness." },
+      { front: "Cataplexy", back: "Sudden muscle weakness triggered by emotion; linked to narcolepsy." }
+    ],
+    practiceQuestions: [
+      {
+        question: "An EEG shows a sleeping person's brain waves resembling those of an awake person, with rapid eye movements, despite near-total body paralysis. What sleep stage does this describe?",
+        concept: "Stages of sleep",
+        options: ["NREM stage 1", "NREM stage 3", "REM sleep", "This pattern does not occur during normal sleep"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—stage 1 shows light, theta-wave activity, not waking-like activity.",
+          "Incorrect—stage 3 shows slow, high-amplitude delta waves, not waking-like activity.",
+          "Correct—waking-like brain activity with rapid eye movements and paralysis is REM sleep.",
+          "Incorrect—this is a real, well-documented sleep stage."
+        ]
+      },
+      {
+        question: "Which brain structure functions as the body's primary internal clock, regulating the circadian sleep-wake cycle based on light exposure?",
+        concept: "Circadian rhythm",
+        options: ["The amygdala", "The suprachiasmatic nucleus", "The cerebellum", "The pineal gland"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the amygdala is involved in fear processing, not circadian timing.",
+          "Correct—the SCN is the primary circadian pacemaker, regulated by light.",
+          "Incorrect—the cerebellum is involved in motor coordination, not circadian timing.",
+          "Incorrect—the pineal gland releases melatonin but is regulated by the SCN, not itself the master clock."
+        ]
+      },
+      {
+        question: "A patient experiences sudden muscle weakness triggered by laughter, along with uncontrollable daytime sleep attacks. This is most consistent with:",
+        concept: "Sleep disorders",
+        options: ["Insomnia", "Sleep apnea", "Narcolepsy with cataplexy", "A parasomnia like sleepwalking"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—insomnia is difficulty falling/staying asleep, not sleep attacks.",
+          "Incorrect—sleep apnea involves breathing pauses, not muscle weakness or sleep attacks.",
+          "Correct—daytime sleep attacks with emotion-triggered muscle weakness (cataplexy) is the classic narcolepsy presentation.",
+          "Incorrect—parasomnias occur during NREM sleep, not as daytime attacks."
+        ]
+      },
+      {
+        question: "Across a typical night's sleep, how does the pattern of sleep stages generally change from the earlier cycles to the later cycles?",
+        concept: "The sleep cycle",
+        options: ["REM periods shorten and slow-wave sleep lengthens later in the night", "REM periods lengthen and slow-wave sleep is concentrated earlier in the night", "Sleep stages remain identical throughout the entire night", "The person alternates only between stage 1 and REM, with no stage 3"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this reverses the actual pattern.",
+          "Correct—slow-wave sleep is concentrated in earlier cycles, while REM periods progressively lengthen later in the night.",
+          "Incorrect—the balance of stages shifts substantially across the night.",
+          "Incorrect—stage 3 does occur, concentrated in the earlier part of the night."
+        ]
+      }
+    ],
+    simplifiedExplanation: "A night of sleep isn't one long uniform state—it's a repeating 90-minute loop through progressively deeper NREM stages and a very different REM stage, where your brain looks almost awake while your body is essentially switched off. The suprachiasmatic nucleus is the conductor keeping this whole nightly performance on a roughly 24-hour schedule, mostly by reading light levels and adjusting melatonin accordingly. And sleep disorders are really just specific breakdowns in different parts of this system—insomnia breaks the ability to fall or stay asleep, apnea breaks breathing during sleep, and narcolepsy breaks the normal boundary between REM's paralysis and waking life."
+  },
+  {
+    id: "personality",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Personality",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "consciousness-sleep",
+    sections: [
+      {
+        heading: "Psychoanalytic Theory",
+        body: "The id operates on the pleasure principle, seeking immediate gratification; the superego represents internalized moral standards; the ego mediates between them and reality. Defense mechanisms (repression, denial, projection, displacement, rationalization) protect the ego from anxiety.",
+        keyTerms: [
+          { term: "Id, ego, superego", definition: "Freud's structural model: instinctual drives, rational mediator, and moral standards." },
+          { term: "Defense mechanism", definition: "An unconscious strategy the ego uses to reduce anxiety." }
+        ]
+      },
+      {
+        heading: "Trait Theory: The Big Five",
+        body: "Trait theory describes personality as stable, continuous dimensions. The Big Five (OCEAN) are Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism—well-supported across cultures and relatively stable across adulthood.",
+        keyTerms: [
+          { term: "Big Five (OCEAN)", definition: "Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism." }
+        ]
+      },
+      {
+        heading: "Humanistic and Social-Cognitive Theory",
+        body: "Humanistic theory emphasizes free will and an innate drive toward self-actualization; Rogers proposed unconditional positive regard helps develop a healthy self-concept. Bandura's social-cognitive theory proposes reciprocal determinism—person, behavior, and environment continuously shaping each other—with self-efficacy as a key personal factor.",
+        keyTerms: [
+          { term: "Self-actualization", definition: "Reaching one's full potential; the top of Maslow's hierarchy and a humanistic goal." },
+          { term: "Reciprocal determinism", definition: "Person, behavior, and environment continuously influencing each other (Bandura)." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Freud's model divides personality into the id, ego, and superego; defense mechanisms protect the ego from anxiety.",
+      "The Big Five (OCEAN) is the best-supported modern trait model, describing personality as continuous dimensions.",
+      "Humanistic theory emphasizes self-actualization; Bandura's reciprocal determinism describes person, behavior, and environment continuously shaping each other, with self-efficacy as a key factor."
+    ],
+    knowledgeCheck: [
+      { question: "What distinguishes displacement from projection as defense mechanisms?", answer: "Displacement redirects an emotional impulse to a safer substitute target; projection attributes one's own unacceptable feelings to someone else entirely." },
+      { question: "What is reciprocal determinism?", answer: "Bandura's idea that personal factors, behavior, and environment all continuously influence one another in a two-way loop, rather than any one factor simply causing the others." }
+    ],
+    flashcards: [
+      { front: "Id", back: "Pleasure principle; instinctual drives." },
+      { front: "Superego", back: "Internalized moral standards." },
+      { front: "Big Five (OCEAN)", back: "Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism." },
+      { front: "Self-efficacy", back: "Belief in one's own ability to succeed at a task." },
+      { front: "Reciprocal determinism", back: "Person, behavior, environment continuously shape each other." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A person who is angry at their boss but can't express it comes home and snaps at their family instead. This best illustrates which defense mechanism?",
+        concept: "Psychoanalytic theory",
+        options: ["Denial", "Projection", "Displacement", "Rationalization"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—denial would be refusing to acknowledge the anger at all.",
+          "Incorrect—projection would involve attributing the anger to someone else.",
+          "Correct—redirecting an emotional impulse to a safer substitute target is displacement.",
+          "Incorrect—rationalization involves making a logical-sounding excuse, not redirecting emotion."
+        ]
+      },
+      {
+        question: "A person is described as highly organized, disciplined, and reliable. Which Big Five trait does this best describe?",
+        concept: "Trait theory",
+        options: ["Openness", "Conscientiousness", "Extraversion", "Agreeableness"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—openness relates to curiosity and imagination.",
+          "Correct—organization, discipline, and reliability define conscientiousness.",
+          "Incorrect—extraversion relates to sociability.",
+          "Incorrect—agreeableness relates to cooperation and compassion."
+        ]
+      },
+      {
+        question: "A student with high self-efficacy for math chooses harder math courses, which exposes them to encouraging teachers, which further boosts their confidence. This illustrates:",
+        concept: "Humanistic and social-cognitive theory",
+        options: ["Freud's structural model", "The Big Five trait model", "Bandura's reciprocal determinism", "The James-Lange theory of emotion"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—this isn't about id/ego/superego.",
+          "Incorrect—this isn't describing stable trait dimensions.",
+          "Correct—personal belief, behavior, and environment continuously influencing each other in a loop is reciprocal determinism.",
+          "Incorrect—this isn't about emotion theory."
+        ]
+      },
+      {
+        question: "According to Carl Rogers, what helps a person develop a healthy, congruent self-concept?",
+        concept: "Humanistic and social-cognitive theory",
+        options: ["Strict conditional approval from others", "Unconditional positive regard—acceptance without conditions", "A high score on the g factor of intelligence", "Successfully resolving Erikson's identity vs. role confusion stage"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—Rogers argued the opposite: conditional approval undermines healthy self-concept.",
+          "Correct—Rogers proposed unconditional positive regard helps develop a healthy, congruent self-concept.",
+          "Incorrect—this is unrelated to intelligence theory.",
+          "Incorrect—this is Erikson's theory, a separate developmental framework."
+        ]
+      }
+    ],
+    simplifiedExplanation: "These four perspectives aren't fighting over the same facts so much as asking completely different questions about personality. Psychoanalytic theory asks what unconscious conflict is driving you (id wanting, superego judging, ego mediating). Trait theory just describes you along five stable dimensions (OCEAN) without worrying about why. Humanistic theory asks what you're growing toward (your own best potential). And social-cognitive theory asks how you, your behavior, and your environment keep shaping each other in a continuous feedback loop—your confidence in math shapes what classes you take, which shapes your environment, which shapes your confidence right back."
+  },
+  {
+    id: "psychological-development",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Psychological Development",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "personality",
+    sections: [
+      {
+        heading: "Piaget's Stages of Cognitive Development",
+        body: "Sensorimotor (birth-2): object permanence develops. Preoperational (2-7): symbolic thought and language, but egocentrism and lack of conservation. Concrete operational (7-11): conservation and logical reasoning about concrete objects. Formal operational (12+): abstract, hypothetical reasoning.",
+        keyTerms: [
+          { term: "Object permanence", definition: "Understanding that objects continue to exist when out of sight; develops in the sensorimotor stage." },
+          { term: "Conservation", definition: "Understanding that quantity stays the same despite a change in appearance; develops in the concrete operational stage." }
+        ]
+      },
+      {
+        heading: "Erikson's Psychosocial Stages",
+        body: "Erikson's eight stages span the whole lifespan, each centered on a social/emotional conflict: infancy's trust vs. mistrust, adolescence's identity vs. role confusion, young adulthood's intimacy vs. isolation, middle adulthood's generativity vs. stagnation, and late adulthood's integrity vs. despair, among others.",
+        keyTerms: [
+          { term: "Identity vs. role confusion", definition: "Erikson's central adolescent conflict: developing a coherent sense of self." },
+          { term: "Generativity vs. stagnation", definition: "Erikson's middle adulthood conflict: contributing to future generations vs. feeling unproductive." }
+        ]
+      },
+      {
+        heading: "Attachment Theory",
+        body: "Bowlby proposed infants have an innate drive to form an attachment bond; Ainsworth's Strange Situation classifies attachment style based on reaction to caregiver separation and return: secure, avoidant, anxious/ambivalent, and disorganized.",
+        keyTerms: [
+          { term: "Strange Situation", definition: "Ainsworth's procedure for classifying infant attachment style." },
+          { term: "Secure attachment", definition: "Distressed at separation, readily comforted upon caregiver's return." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Piaget's four stages (sensorimotor, preoperational, concrete operational, formal operational) each represent a qualitatively different mode of thinking.",
+      "Erikson's eight psychosocial stages span the entire lifespan, each centered on a specific social/emotional conflict, distinct from Piaget's cognitive stages.",
+      "The Strange Situation classifies attachment style (secure, avoidant, anxious/ambivalent, disorganized) based primarily on the infant's reaction to the caregiver's return."
+    ],
+    knowledgeCheck: [
+      { question: "How do Piaget's and Erikson's stage theories differ in what they track?", answer: "Piaget's stages track cognitive reasoning ability and end in adolescence; Erikson's stages track social/emotional conflicts and span the entire lifespan." },
+      { question: "What distinguishes secure from avoidant attachment in the Strange Situation?", answer: "Securely attached infants are distressed at separation but readily comforted upon the caregiver's return; avoidant infants show little distress and largely ignore the caregiver upon return." }
+    ],
+    flashcards: [
+      { front: "Object permanence", back: "Objects exist even when out of sight; sensorimotor stage." },
+      { front: "Conservation", back: "Quantity stays the same despite appearance change; concrete operational stage." },
+      { front: "Identity vs. role confusion", back: "Erikson's adolescent stage conflict." },
+      { front: "Strange Situation", back: "Ainsworth's procedure classifying attachment style." },
+      { front: "Anxious/ambivalent attachment", back: "High distress at separation; mixed, hard-to-soothe reaction on return." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A young child insists a tall, thin glass has 'more' water than a short, wide glass, despite equal amounts. This is most characteristic of which stage?",
+        concept: "Piaget's cognitive development",
+        options: ["Sensorimotor", "Preoperational", "Concrete operational", "Formal operational"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—sensorimotor is about object permanence, not conservation.",
+          "Correct—lacking conservation is a defining limitation of the preoperational stage.",
+          "Incorrect—conservation is gained upon entering the concrete operational stage.",
+          "Incorrect—formal operational is about abstract reasoning, well beyond this scenario."
+        ]
+      },
+      {
+        question: "A teenager actively explores career paths, beliefs, and social roles to figure out 'who they are.' Per Erikson, this reflects:",
+        concept: "Erikson's psychosocial stages",
+        options: ["Trust vs. mistrust", "Identity vs. role confusion", "Intimacy vs. isolation", "Generativity vs. stagnation"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—trust vs. mistrust is the infancy stage.",
+          "Correct—adolescence's central conflict is identity vs. role confusion.",
+          "Incorrect—intimacy vs. isolation is the young adulthood stage.",
+          "Incorrect—generativity vs. stagnation is the middle adulthood stage."
+        ]
+      },
+      {
+        question: "In the Strange Situation, an infant shows high distress at separation but, upon the caregiver's return, seeks contact while also pushing them away, remaining hard to soothe. This matches:",
+        concept: "Attachment theory",
+        options: ["Secure attachment", "Avoidant attachment", "Anxious/ambivalent attachment", "There is no matching attachment style"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—secure infants are readily comforted upon return, unlike this scenario.",
+          "Incorrect—avoidant infants show little distress and ignore the caregiver, unlike this scenario.",
+          "Correct—high distress with mixed, hard-to-soothe behavior upon return is anxious/ambivalent attachment.",
+          "Incorrect—this matches a well-documented attachment style."
+        ]
+      },
+      {
+        question: "Which of the following best distinguishes Piaget's stage theory from Erikson's stage theory?",
+        concept: "Piaget vs. Erikson",
+        options: ["Piaget's stages span the whole lifespan; Erikson's end in adolescence", "Piaget's stages track cognitive reasoning; Erikson's track social/emotional conflicts across the whole lifespan", "The two theories describe the exact same stages with different names", "Neither theory describes stages at all"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this reverses the actual scope of each theory.",
+          "Correct—Piaget tracks cognitive development (ending in adolescence); Erikson tracks social/emotional conflicts across the entire lifespan.",
+          "Incorrect—the two theories describe genuinely different stages and domains.",
+          "Incorrect—both are stage theories."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Piaget's stages track how a child's thinking itself changes, from an infant learning objects still exist when hidden, up through an adolescent who can finally reason about pure hypotheticals. Erikson takes a completely different, wider-angle lens—tracking not thinking ability but a central social/emotional conflict at every single stage of life, from infancy's basic trust all the way to old age's search for integrity. And attachment theory zooms in even further, onto the earliest relationship of all: how an infant learns, through repeated experience with a caregiver's presence and absence, whether the world is a safe place to explore from."
+  },
+  {
+    id: "psychological-disorders-mental-health",
+    subjectId: "psychology",
+    sectionId: "psych-social",
+    title: "Psychological Disorders & Mental Health",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "psychological-development",
+    sections: [
+      {
+        heading: "Classifying Disorders: The Biopsychosocial Model",
+        body: "The biopsychosocial model explains mental disorders as arising from the interaction of biological (genetics, neurochemistry), psychological (thought patterns, coping), and social (stress, relationships, culture) factors together, not any one alone.",
+        keyTerms: [
+          { term: "Biopsychosocial model", definition: "Explains mental disorders via the interaction of biological, psychological, and social factors." }
+        ]
+      },
+      {
+        heading: "Anxiety and Mood Disorders",
+        body: "Generalized anxiety disorder involves persistent worry not tied to one trigger; panic disorder involves recurrent unexpected panic attacks; specific phobias involve intense fear of a specific trigger. Major depressive disorder involves persistent low mood; bipolar disorder involves manic episodes alternating with depressive episodes—the presence of mania distinguishes it from depression.",
+        keyTerms: [
+          { term: "Panic disorder", definition: "Recurrent, unexpected panic attacks plus persistent worry about future attacks." },
+          { term: "Bipolar disorder", definition: "Manic or hypomanic episodes alternating with depressive episodes." }
+        ]
+      },
+      {
+        heading: "Schizophrenia Spectrum Disorders",
+        body: "Positive symptoms add to normal experience: hallucinations, delusions, disorganized thinking—these respond relatively well to antipsychotics. Negative symptoms subtract from normal function: flat affect, avolition, social withdrawal—these respond less well to standard treatment.",
+        keyTerms: [
+          { term: "Positive symptoms", definition: "An addition to normal experience, like hallucinations or delusions." },
+          { term: "Negative symptoms", definition: "A deficit in normal function, like flat affect or avolition." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "The biopsychosocial model explains mental disorders as arising from the interaction of biological, psychological, and social factors together.",
+      "Anxiety disorders share excessive fear/worry but differ in pattern; bipolar disorder is distinguished from major depressive disorder specifically by manic or hypomanic episodes.",
+      "Positive symptoms of schizophrenia add to normal experience; negative symptoms subtract from it, and the two respond differently to treatment."
+    ],
+    knowledgeCheck: [
+      { question: "What distinguishes panic disorder from a specific phobia?", answer: "Panic disorder involves panic attacks that occur unexpectedly, without a specific trigger; a specific phobia involves fear tied to a specific, identifiable object or situation." },
+      { question: "Why are positive and negative symptoms of schizophrenia named that way?", answer: "'Positive' means an addition to normal experience (like hallucinations); 'negative' means a deficit or absence of normal function (like flat affect)—not a judgment of good or bad." }
+    ],
+    flashcards: [
+      { front: "Biopsychosocial model", back: "Disorders arise from biological + psychological + social factors together." },
+      { front: "Generalized anxiety disorder", back: "Persistent worry not tied to one trigger." },
+      { front: "Bipolar disorder", back: "Manic/hypomanic episodes alternating with depression." },
+      { front: "Positive symptoms", back: "Addition to normal function (hallucinations, delusions)." },
+      { front: "Negative symptoms", back: "Deficit in normal function (flat affect, avolition)." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A researcher explains a depressive episode via family history (genetics), negative self-talk, and a recent job loss. This best reflects:",
+        concept: "Biopsychosocial model",
+        options: ["A purely biological model", "A purely psychological model", "The biopsychosocial model, integrating all three factor types", "This scenario doesn't fit any model"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—psychological and social factors are also cited, not just biological.",
+          "Incorrect—biological and social factors are also cited, not just psychological.",
+          "Correct—biological (genetics), psychological (self-talk), and social (job loss) factors are all combined here.",
+          "Incorrect—this is a textbook biopsychosocial explanation."
+        ]
+      },
+      {
+        question: "A patient experiences sudden, unexpected episodes of intense fear and racing heart with no specific trigger, plus persistent worry about future episodes. This is most consistent with:",
+        concept: "Anxiety and mood disorders",
+        options: ["A specific phobia", "Panic disorder", "Generalized anxiety disorder", "Bipolar disorder"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—a specific phobia involves a specific, identifiable trigger, which is absent here.",
+          "Correct—unexpected panic attacks plus worry about future attacks is panic disorder.",
+          "Incorrect—generalized anxiety disorder involves persistent worry, not discrete panic attacks.",
+          "Incorrect—bipolar disorder involves mood episodes, not panic attacks specifically."
+        ]
+      },
+      {
+        question: "A patient with schizophrenia shows reduced facial expression, minimal speech, and lost motivation, without hallucinations or delusions. These symptoms are best classified as:",
+        concept: "Schizophrenia spectrum",
+        options: ["Positive symptoms", "Negative symptoms", "Manic symptoms", "Symptoms of generalized anxiety disorder"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—positive symptoms would involve additions like hallucinations or delusions, absent here.",
+          "Correct—reduced expression, speech, and motivation are deficits in normal function, defining negative symptoms.",
+          "Incorrect—this isn't a manic presentation.",
+          "Incorrect—this isn't an anxiety disorder presentation."
+        ]
+      },
+      {
+        question: "What is the key factor distinguishing bipolar disorder from major depressive disorder?",
+        concept: "Anxiety and mood disorders",
+        options: ["The severity of depressive symptoms alone", "The presence of manic or hypomanic episodes", "Whether hallucinations are present", "Whether the patient has a family history of the disorder"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—severity of depression alone doesn't distinguish the two disorders.",
+          "Correct—the presence of manic or hypomanic episodes is specifically what distinguishes bipolar disorder from major depressive disorder.",
+          "Incorrect—hallucinations aren't the distinguishing feature between these two mood disorders.",
+          "Incorrect—family history isn't the diagnostic distinguishing factor."
+        ]
+      }
+    ],
+    simplifiedExplanation: "No mental disorder here gets explained by one single cause—the biopsychosocial model insists biology, psychology, and social circumstances all combine, the way a genetic predisposition might sit dormant until a stressful life event and a pessimistic thinking style both show up too. Anxiety and mood disorders each have their own distinct signature within their category—generalized worry vs. sudden unexpected panic vs. a specific trigger for anxiety, and the presence or absence of mania for mood disorders. And schizophrenia's symptoms split cleanly into two directions: positive symptoms add something that shouldn't be there (hallucinations, delusions), while negative symptoms take away something that should be (motivation, emotional expression, speech)."
+  }
+];
+
+const socialPsychologyLessons: LessonContent[] = [
+  {
+    id: "social-interaction-groups",
+    subjectId: "social-psychology",
+    sectionId: "psych-social",
+    title: "Social Interaction & Groups",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "psychological-disorders-mental-health",
+    sections: [
+      {
+        heading: "Social Facilitation and Social Loafing",
+        body: "Social facilitation is improved performance on simple/well-learned tasks when others are present, since increased arousal helps performance on tasks already done well. Social loafing is reduced individual effort on a shared task when working in a group, especially when individual contribution can't be separately evaluated.",
+        keyTerms: [
+          { term: "Social facilitation", definition: "Improved performance on simple tasks when others are present." },
+          { term: "Social loafing", definition: "Reduced individual effort on a shared task when contribution isn't separately evaluated." }
+        ]
+      },
+      {
+        heading: "Group Polarization and Groupthink",
+        body: "Group polarization is the tendency for group discussion to strengthen the group's initial leaning into a more extreme position. Groupthink is the tendency for a highly cohesive group to prioritize consensus over critically evaluating alternatives, suppressing dissent.",
+        keyTerms: [
+          { term: "Group polarization", definition: "Group discussion strengthening the group's initial leaning into a more extreme position." },
+          { term: "Groupthink", definition: "A cohesive group prioritizing consensus over critical evaluation, suppressing dissent." }
+        ]
+      },
+      {
+        heading: "Deindividuation and the Bystander Effect",
+        body: "Deindividuation is a loss of self-awareness and personal accountability in a group, especially when anonymous. The bystander effect is reduced likelihood of any one person helping in an emergency as the number of bystanders increases, driven by diffusion of responsibility.",
+        keyTerms: [
+          { term: "Deindividuation", definition: "Loss of self-awareness and accountability in an anonymous group." },
+          { term: "Diffusion of responsibility", definition: "Each bystander assumes someone else will act, spreading perceived obligation across the group." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Social facilitation improves performance on simple/well-learned tasks when individually observed; social loafing reduces individual effort on shared tasks when contribution can't be separately evaluated.",
+      "Group polarization strengthens a group's initial leaning through discussion; groupthink is a cohesive group prioritizing consensus over critical evaluation, suppressing dissent.",
+      "Deindividuation reduces self-awareness and accountability in a group; the bystander effect makes any one person less likely to help as witnesses increase, driven by diffusion of responsibility."
+    ],
+    knowledgeCheck: [
+      { question: "What determines whether the presence of others produces social facilitation or social loafing?", answer: "Whether individual performance is separately identifiable and evaluated (facilitation) or pooled into an untraceable group output (loafing)." },
+      { question: "What mechanism explains the bystander effect?", answer: "Diffusion of responsibility—each witness assumes someone else will help, spreading the perceived obligation to act across the whole group." }
+    ],
+    flashcards: [
+      { front: "Social facilitation", back: "Improved performance on simple tasks when observed." },
+      { front: "Social loafing", back: "Reduced effort on shared, unevaluated tasks." },
+      { front: "Groupthink", back: "Cohesive group suppresses dissent for consensus." },
+      { front: "Deindividuation", back: "Loss of self-awareness/accountability in an anonymous group." },
+      { front: "Bystander effect", back: "More witnesses, less likely any one helps." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A team works on a group project where individual contributions aren't tracked separately. Several members put in less effort than they would alone. This best illustrates:",
+        concept: "Social facilitation and loafing",
+        options: ["Social facilitation", "Social loafing", "Group polarization", "Deindividuation"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—facilitation involves individually observable performance improving.",
+          "Correct—reduced effort when contribution can't be separately evaluated is social loafing.",
+          "Incorrect—polarization is about attitude shift through discussion, not effort.",
+          "Incorrect—deindividuation is about loss of accountability, typically in anonymous crowds."
+        ]
+      },
+      {
+        question: "A cohesive committee suppresses private doubts to maintain apparent consensus before moving forward with a risky decision. This best illustrates:",
+        concept: "Group polarization and groupthink",
+        options: ["Social loafing", "Group polarization", "Groupthink", "The bystander effect"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—this isn't about reduced individual effort.",
+          "Incorrect—polarization is about the group's opinion becoming more extreme, not dissent suppression specifically.",
+          "Correct—a cohesive group suppressing dissent to maintain consensus is groupthink.",
+          "Incorrect—this isn't about helping behavior."
+        ]
+      },
+      {
+        question: "Research on the bystander effect predicts that, compared to one witness, many witnesses to an emergency will most likely result in:",
+        concept: "Bystander effect",
+        options: ["A faster response, since more people can help", "A slower or absent response, since each witness assumes someone else will act", "No difference regardless of witness count", "Witnesses becoming anxious but equally likely to help"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this is the intuitive but incorrect prediction.",
+          "Correct—diffusion of responsibility makes any individual witness less likely to help as witnesses increase.",
+          "Incorrect—the bystander effect predicts a real difference based on witness count.",
+          "Incorrect—likelihood of helping does decrease with more witnesses, not remain equal."
+        ]
+      },
+      {
+        question: "A person in an anonymous crowd during a riot behaves in ways they would never consider doing alone and identifiable. This best illustrates:",
+        concept: "Deindividuation",
+        options: ["Social loafing", "Deindividuation", "Groupthink", "Social facilitation"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this isn't about reduced effort on a shared task.",
+          "Correct—anonymity in a group reducing self-awareness and accountability, leading to atypical behavior, is deindividuation.",
+          "Incorrect—groupthink is about suppressing dissent for consensus, not anonymous behavior change.",
+          "Incorrect—facilitation is about improved performance on simple tasks when observed."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Groups change individual behavior in a few distinct, well-documented ways. Being watched sharpens performance on things you're already good at (facilitation), but hiding within a group's pooled effort lets people quietly coast (loafing). Talking things over with like-minded others doesn't average out opinions—it pushes the group further toward wherever it already leaned (polarization), and a tight-knit group's desire for harmony can override its own better judgment (groupthink). And anonymity within a crowd can erode your normal sense of personal accountability (deindividuation), the same underlying dynamic that makes a lone witness more likely to help in an emergency than one lost in a crowd of many (the bystander effect)."
+  },
+  {
+    id: "attitudes-beliefs-behavior",
+    subjectId: "social-psychology",
+    sectionId: "psych-social",
+    title: "Attitudes, Beliefs & Behavior",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "social-interaction-groups",
+    sections: [
+      {
+        heading: "The ABC Model of Attitudes",
+        body: "An attitude has three components: affect (emotional response), behavior (action tendency), and cognition (beliefs/thoughts). These usually align but can conflict, setting up the tension cognitive dissonance theory addresses.",
+        keyTerms: [
+          { term: "ABC model of attitudes", definition: "Affect, behavior, and cognition as the three components of an attitude." }
+        ]
+      },
+      {
+        heading: "Cognitive Dissonance",
+        body: "Cognitive dissonance is the discomfort from conflicting beliefs, or from behavior conflicting with belief; people often resolve it by changing their attitude to match behavior, especially when external justification for the behavior is insufficient (insufficient justification effect).",
+        keyTerms: [
+          { term: "Cognitive dissonance", definition: "Psychological discomfort from conflicting beliefs or belief-behavior conflict." },
+          { term: "Insufficient justification", definition: "A small external reward for counter-attitudinal behavior produces larger attitude change." }
+        ]
+      },
+      {
+        heading: "Attribution Theory",
+        body: "Dispositional attribution explains behavior by internal traits; situational attribution explains it by external circumstances. The fundamental attribution error over-attributes others' behavior to disposition; actor-observer bias attributes our own behavior situationally but others' dispositionally; self-serving bias attributes our own successes to disposition and failures to situation.",
+        keyTerms: [
+          { term: "Fundamental attribution error", definition: "Over-relying on dispositional explanations for others' behavior." },
+          { term: "Self-serving bias", definition: "Attributing our own successes to disposition and failures to situation." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Attitudes have three components—affective (emotion), behavioral (action tendency), and cognitive (beliefs)—that usually align but can conflict.",
+      "Cognitive dissonance is the discomfort from conflicting beliefs or belief-behavior conflict; people often resolve it by changing their attitude, especially with insufficient external justification.",
+      "The fundamental attribution error over-attributes others' behavior to disposition; actor-observer bias and self-serving bias are more specific, self-relevant attribution patterns."
+    ],
+    knowledgeCheck: [
+      { question: "Why did participants paid only $1 to lie about a boring task show more attitude change than those paid $20?", answer: "The small payment provided insufficient external justification for the lie, creating dissonance they resolved by genuinely changing their attitude toward the task." },
+      { question: "How does self-serving bias differ from the fundamental attribution error?", answer: "Self-serving bias specifically protects our own self-image (attributing our successes to disposition, failures to situation), while the fundamental attribution error is a general tendency to over-attribute others' behavior to disposition." }
+    ],
+    flashcards: [
+      { front: "ABC model", back: "Affect, Behavior, Cognition—three components of attitude." },
+      { front: "Cognitive dissonance", back: "Discomfort from conflicting beliefs or belief-behavior conflict." },
+      { front: "Fundamental attribution error", back: "Over-attributing others' behavior to disposition." },
+      { front: "Actor-observer bias", back: "Own behavior: situational. Others' behavior: dispositional." },
+      { front: "Self-serving bias", back: "Own success: disposition. Own failure: situation." }
+    ],
+    practiceQuestions: [
+      {
+        question: "An anti-smoking campaign uses graphic imagery to evoke disgust and fear. Which component of attitude is this targeting?",
+        concept: "ABC model",
+        options: ["The cognitive component", "The affective component", "The behavioral component", "None of the three components"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—statistics/facts would target cognition, not this imagery.",
+          "Correct—evoking emotion (disgust, fear) targets the affective component.",
+          "Incorrect—the behavioral component is action tendency, not what's being targeted here.",
+          "Incorrect—this campaign is targeting a specific component, the affective one."
+        ]
+      },
+      {
+        question: "Participants paid only $1 to say a boring task was interesting later rated it as more enjoyable than participants paid $20 for the same lie. Why?",
+        concept: "Cognitive dissonance",
+        options: ["They were paid more, creating stronger justification", "The small payment provided insufficient justification, so dissonance was resolved by genuinely changing their attitude", "Money has no effect on cognitive dissonance", "The $20 group experienced no dissonance"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the $1 group was paid less, not more.",
+          "Correct—insufficient external justification created stronger dissonance, resolved by genuine attitude change.",
+          "Incorrect—money's amount directly affected the degree of dissonance and resulting attitude change.",
+          "Incorrect—the $20 group had ample justification, reducing (not eliminating) their dissonance."
+        ]
+      },
+      {
+        question: "A student attributes their own failing grade to an unfair exam but attributes a classmate's identical failing grade to the classmate not being smart. This illustrates:",
+        concept: "Attribution theory",
+        options: ["The fundamental attribution error only", "Self-serving bias", "Cognitive dissonance", "Social loafing"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this specific self-protective pattern (own failure vs. others' failure) is more precisely self-serving bias.",
+          "Correct—attributing one's own failure situationally but another's identical failure dispositionally protects self-image—self-serving bias.",
+          "Incorrect—this isn't about conflicting beliefs or behavior.",
+          "Incorrect—this isn't about effort in a group task."
+        ]
+      },
+      {
+        question: "A driver who cuts someone off attributes it to being late for an emergency (situational), but when someone else cuts them off, they assume that driver is simply reckless (dispositional). This illustrates:",
+        concept: "Attribution theory",
+        options: ["Self-serving bias specifically about success/failure", "Actor-observer bias", "Cognitive dissonance", "Groupthink"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this isn't about success vs. failure attributions specifically.",
+          "Correct—attributing our own behavior situationally but others' identical behavior dispositionally is actor-observer bias.",
+          "Incorrect—no conflicting belief or behavior is described.",
+          "Incorrect—this isn't a group consensus scenario."
+        ]
+      }
+    ],
+    simplifiedExplanation: "An attitude is really three things bundled together—how you feel about something, what you believe about it, and how you tend to act toward it—and cognitive dissonance is what happens when those three stop agreeing with each other, especially when behavior and belief clash. Since behavior that's already happened is hard to undo, people often resolve that tension by quietly changing the belief instead, which is exactly why a flimsy excuse for lying produces more genuine attitude change than a solid one. And attribution theory is about the stories we tell for why people (including ourselves) do what they do—stories that reliably tilt toward blaming others' character while excusing our own circumstances, and toward crediting our own successes while excusing our own failures."
+  },
+  {
+    id: "social-influence-conformity",
+    subjectId: "social-psychology",
+    sectionId: "psych-social",
+    title: "Social Influence & Conformity",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "attitudes-beliefs-behavior",
+    sections: [
+      {
+        heading: "Conformity: Asch's Studies",
+        body: "Asch's line-judgment studies showed participants would often conform to an obviously incorrect group answer. Conformity increased with group size (up to a point) and public responding, but dropped sharply if even one confederate broke unanimity.",
+        keyTerms: [
+          { term: "Conformity", definition: "Matching behavior or belief to a group's norm." }
+        ]
+      },
+      {
+        heading: "Obedience: Milgram's Studies",
+        body: "Milgram's studies showed a majority of participants would obey an authority figure's instructions to deliver what they believed were dangerous electric shocks. Obedience dropped when the authority figure was less physically present/legitimate, or when the participant could see direct consequences.",
+        keyTerms: [
+          { term: "Obedience", definition: "Following a direct command from a recognized authority figure." }
+        ]
+      },
+      {
+        heading: "Conformity, Compliance, Obedience; Compliance Techniques",
+        body: "Conformity matches group norms without a direct request; compliance follows a peer's direct request; obedience follows an authority figure's command. Foot-in-the-door escalates from a small to a larger request; door-in-the-face de-escalates from a large to a smaller one.",
+        keyTerms: [
+          { term: "Foot-in-the-door technique", definition: "A small initial request increases compliance with a larger related request later." },
+          { term: "Door-in-the-face technique", definition: "A large request expected to be refused, followed by a smaller, actually desired request." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Asch's studies showed conformity to an incorrect group answer, increasing with group size and public responding, but dropping sharply when unanimity is broken.",
+      "Milgram's studies showed high obedience to authority, decreasing with less physical presence/legitimacy of the authority figure.",
+      "Conformity, compliance, and obedience differ by who is influencing and how directly; foot-in-the-door escalates requests, door-in-the-face de-escalates them."
+    ],
+    knowledgeCheck: [
+      { question: "What effect does a single dissenting confederate have in Asch's paradigm?", answer: "It substantially reduces conformity, since the participant no longer feels alone in disagreeing with the majority." },
+      { question: "How does the foot-in-the-door technique differ from door-in-the-face?", answer: "Foot-in-the-door starts with a small request and escalates to a larger one; door-in-the-face starts with a large request (expected to be refused) and de-escalates to a smaller one." }
+    ],
+    flashcards: [
+      { front: "Asch's conformity studies", back: "Conforming to an obviously wrong group answer." },
+      { front: "Milgram's obedience studies", back: "Majority obeyed authority to deliver apparent shocks." },
+      { front: "Foot-in-the-door", back: "Small request first, then a larger one." },
+      { front: "Door-in-the-face", back: "Large request first, then a smaller one." },
+      { front: "Obedience", back: "Following a direct command from an authority figure." }
+    ],
+    practiceQuestions: [
+      {
+        question: "In a replication of Asch's study, one confederate is instructed to give the correct answer while the rest give an incorrect answer. What effect does this have on conformity?",
+        concept: "Conformity",
+        options: ["No measurable effect", "It substantially increases conformity", "It substantially decreases conformity", "It causes the participant to always answer incorrectly"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—breaking unanimity has a well-documented, substantial effect.",
+          "Incorrect—a dissenter decreases, not increases, conformity.",
+          "Correct—breaking group unanimity substantially reduces conformity in Asch's studies.",
+          "Incorrect—this reverses the actual finding."
+        ]
+      },
+      {
+        question: "In a variation of Milgram's study, the experimenter gives instructions by phone from another room. What effect does this most likely have on obedience?",
+        concept: "Obedience",
+        options: ["Obedience increases", "Obedience decreases", "Obedience remains the same", "This variation was not studied"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—reduced authority presence decreases, not increases, obedience.",
+          "Correct—Milgram found obedience dropped with reduced physical presence of the authority figure.",
+          "Incorrect—Milgram found a real, substantial difference based on authority proximity.",
+          "Incorrect—this variation was studied and produced lower obedience rates."
+        ]
+      },
+      {
+        question: "A salesperson first asks a homeowner to sign a small petition, then weeks later asks them to place a large sign supporting the same cause in their yard. This is:",
+        concept: "Compliance techniques",
+        options: ["The door-in-the-face technique", "The foot-in-the-door technique", "Obedience to authority", "The bystander effect"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—door-in-the-face starts with an oversized request, not a small one.",
+          "Correct—starting small and escalating to a larger related request is foot-in-the-door.",
+          "Incorrect—a salesperson is a peer, not an authority figure.",
+          "Incorrect—this isn't about emergency helping behavior."
+        ]
+      },
+      {
+        question: "A soldier follows a direct command from a commanding officer, even though they personally disagree with it. This is best classified as:",
+        concept: "Conformity, compliance, obedience",
+        options: ["Conformity", "Compliance", "Obedience", "Cognitive dissonance"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—conformity is matching group norms without a direct request.",
+          "Incorrect—compliance is following a peer's request, not a recognized authority's command.",
+          "Correct—following a direct command from a recognized authority figure is obedience.",
+          "Incorrect—this isn't about conflicting beliefs or behavior."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Asch and Milgram both asked, in their own way, how far people will go along with something they privately know or suspect is wrong—Asch found people will often deny the evidence of their own eyes to match a unanimous group, and Milgram found most people will keep pressing a button they believe is hurting someone, simply because a person in a lab coat told them to. Both effects share the same escape hatch: breaking unanimity (one ally who disagrees) breaks conformity, and reducing the authority figure's presence or legitimacy breaks obedience. Compliance techniques exploit the same social pressure on a smaller, everyday scale—foot-in-the-door gets you to escalate your own commitment, and door-in-the-face makes a real request look reasonable by comparison to a bigger one."
+  },
+  {
+    id: "identity-culture-socialization",
+    subjectId: "social-psychology",
+    sectionId: "psych-social",
+    title: "Identity, Culture & Socialization",
+    estimatedMinutes: 25,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "social-influence-conformity",
+    sections: [
+      {
+        heading: "Self-Concept and Social Identity",
+        body: "Self-concept is a person's overall understanding of who they are, built from self-schemas. Social identity theory explains how belonging to groups becomes part of self-concept, often producing in-group favoritism even from arbitrary group distinctions (minimal group studies).",
+        keyTerms: [
+          { term: "Self-schema", definition: "An organized cluster of beliefs and feelings about an aspect of oneself." },
+          { term: "Social identity theory", definition: "Group membership becomes part of self-concept, producing in-group favoritism." }
+        ]
+      },
+      {
+        heading: "Agents of Socialization",
+        body: "Family is typically the earliest and most influential agent of socialization; peer groups become increasingly influential in adolescence; media socializes at a large scale; institutions like schools and religion formally transmit values and roles.",
+        keyTerms: [
+          { term: "Agents of socialization", definition: "Sources (family, peers, media, institutions) that transmit a society's norms and values." }
+        ]
+      },
+      {
+        heading: "Culture, Norms, and Values",
+        body: "Norms are a culture's specific expected behaviors; values are its broader shared priorities. Individualistic cultures emphasize personal autonomy and achievement; collectivistic cultures emphasize group harmony and interdependence.",
+        keyTerms: [
+          { term: "Individualistic culture", definition: "Emphasizes personal autonomy, achievement, and self-expression." },
+          { term: "Collectivistic culture", definition: "Emphasizes group harmony, interdependence, and community needs." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Self-concept is built from self-schemas; social identity theory explains how group membership becomes part of self-concept, producing in-group favoritism even from arbitrary distinctions.",
+      "Socialization is transmitted through family (earliest), peer groups (increasingly influential in adolescence), media, and institutions like schools and religion.",
+      "Norms are a culture's specific expected behaviors; values are its broader priorities. Individualistic cultures emphasize autonomy; collectivistic cultures emphasize group harmony."
+    ],
+    knowledgeCheck: [
+      { question: "What do minimal group studies reveal about social identity?", answer: "Even arbitrary, meaningless group assignment (like a coin flip) is enough to produce in-group favoritism, showing group membership alone becomes tied to self-concept and self-esteem." },
+      { question: "What is the difference between a norm and a value?", answer: "A norm is a specific expected behavior; a value is a broader, shared belief about what's important, which norms typically reflect and reinforce." }
+    ],
+    flashcards: [
+      { front: "Self-schema", back: "Organized beliefs about an aspect of oneself." },
+      { front: "Social identity theory", back: "Group membership becomes part of self-concept; in-group favoritism." },
+      { front: "Agents of socialization", back: "Family, peers, media, institutions." },
+      { front: "Individualistic culture", back: "Emphasizes personal autonomy and achievement." },
+      { front: "Collectivistic culture", back: "Emphasizes group harmony and interdependence." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Participants randomly assigned to 'Group A' or 'Group B' via coin flip later allocate more rewards to their own group. This illustrates:",
+        concept: "Social identity theory",
+        options: ["Cognitive dissonance", "Social identity theory and in-group favoritism", "The bystander effect", "The fundamental attribution error"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—no conflicting belief or behavior is described.",
+          "Correct—favoring one's own group even from an arbitrary distinction demonstrates social identity theory's in-group favoritism.",
+          "Incorrect—this isn't about emergency helping behavior.",
+          "Incorrect—this isn't about explaining others' behavior via disposition."
+        ]
+      },
+      {
+        question: "A teenager adopts slang and attitudes largely because their close friend group has adopted them. Which agent of socialization is at work?",
+        concept: "Agents of socialization",
+        options: ["Family", "Peer group", "Media", "Religious institutions"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this isn't attributed to family influence.",
+          "Correct—influence from a close friend group is the peer group acting as the agent of socialization.",
+          "Incorrect—media isn't the source described here.",
+          "Incorrect—religious institutions aren't the source described here."
+        ]
+      },
+      {
+        question: "In a particular culture, career decisions are made collaboratively with extended family, prioritizing family harmony over individual preference. This is most consistent with:",
+        concept: "Culture, norms, values",
+        options: ["An individualistic culture", "A collectivistic culture", "The fundamental attribution error", "Deindividuation"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—individualistic cultures emphasize personal autonomy, the opposite of this pattern.",
+          "Correct—prioritizing group harmony and collaborative decisions is characteristic of a collectivistic culture.",
+          "Incorrect—this isn't about attributing others' behavior.",
+          "Incorrect—this isn't about anonymity in a crowd."
+        ]
+      },
+      {
+        question: "A society's unwritten rule about appropriate physical distance during conversation is best described as:",
+        concept: "Culture, norms, values",
+        options: ["A value", "A norm", "An agent of socialization", "Social identity theory"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—a value is a broader shared priority, not a specific behavioral rule.",
+          "Correct—a specific, often unwritten expected behavior is a norm.",
+          "Incorrect—this describes the rule itself, not a source that transmits it.",
+          "Incorrect—this isn't about group membership and self-concept."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Self-concept isn't built in isolation—it's assembled from self-schemas about who you are, and social identity theory shows that just belonging to a group, even a meaningless randomly-assigned one, becomes part of that self-concept and makes you root for your own side. That whole process of picking up a culture's expectations comes through specific channels: family first, then increasingly peers, media, and institutions like school. And what gets transmitted through those channels splits into norms (the specific behavioral rules) and values (the bigger priorities those rules serve)—with cultures broadly differing in whether they prioritize the individual's own path or the group's harmony."
+  }
+];
+
+const sociologyLessons: LessonContent[] = [
+  {
+    id: "social-structure-institutions",
+    subjectId: "sociology",
+    sectionId: "psych-social",
+    title: "Social Structure & Institutions",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    prerequisiteLessonId: "identity-culture-socialization",
+    sections: [
+      {
+        heading: "Status, Role, and Social Institutions",
+        body: "An ascribed status is assigned at birth or involuntarily; an achieved status is earned through effort. A role is the expected behavior associated with a status. A social institution is an established system of roles and norms organized around a core societal function.",
+        keyTerms: [
+          { term: "Ascribed status", definition: "A status assigned at birth or without choice." },
+          { term: "Achieved status", definition: "A status earned through effort or choice." },
+          { term: "Role", definition: "The expected behavior associated with a status." }
+        ]
+      },
+      {
+        heading: "The Three Major Sociological Perspectives",
+        body: "Functionalism sees society as interdependent parts working together for stability. Conflict theory sees society as shaped by competition and inequality between groups. Symbolic interactionism is a micro-level view focused on meaning created through everyday individual interaction.",
+        keyTerms: [
+          { term: "Functionalism", definition: "Society as interdependent parts serving functions for overall stability." },
+          { term: "Conflict theory", definition: "Society shaped by competition and inequality between groups." },
+          { term: "Symbolic interactionism", definition: "A micro-level view of meaning built from everyday individual interaction." }
+        ]
+      },
+      {
+        heading: "Major Social Institutions",
+        body: "Family handles reproduction and early socialization; education transmits knowledge and skills; religion provides shared meaning and cohesion; government provides social order; the economy organizes production and distribution—all interconnected.",
+        keyTerms: [
+          { term: "Social institution", definition: "An organized system of roles and norms around a core societal need (family, education, religion, government, economy)." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Ascribed status is assigned at birth; achieved status is earned through effort. A role is expected behavior for a status; institutions organize roles around a core societal function.",
+      "Functionalism explains society via function/stability; conflict theory via power/inequality; symbolic interactionism via meaning from individual interaction.",
+      "Family, education, religion, government, and the economy are the major social institutions, each organized around a distinct societal need, and interconnected."
+    ],
+    knowledgeCheck: [
+      { question: "What is the difference between ascribed and achieved status?", answer: "Ascribed status is assigned at birth or without choice; achieved status is earned through a person's own effort or choice." },
+      { question: "How does conflict theory's explanation of society differ from functionalism's?", answer: "Functionalism explains social structures via the function they serve for overall stability; conflict theory explains them via competition and the maintenance of power/advantage between unequal groups." }
+    ],
+    flashcards: [
+      { front: "Ascribed status", back: "Assigned at birth, without choice." },
+      { front: "Achieved status", back: "Earned through effort." },
+      { front: "Functionalism", back: "Society as interdependent parts serving stability." },
+      { front: "Conflict theory", back: "Society shaped by competition/inequality." },
+      { front: "Symbolic interactionism", back: "Meaning built from everyday individual interaction." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Being born into a royal family vs. becoming a licensed physician after years of training are examples of which status types, respectively?",
+        concept: "Status, role, institutions",
+        options: ["Both achieved", "Both ascribed", "Ascribed, then achieved", "Achieved, then ascribed"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—royal birth isn't earned through effort.",
+          "Incorrect—becoming a physician requires deliberate effort, not just birth.",
+          "Correct—royal birth is ascribed (assigned at birth); becoming a physician is achieved (earned through effort).",
+          "Incorrect—this reverses the correct classification."
+        ]
+      },
+      {
+        question: "A sociologist argues education persists because wealthy groups use it to maintain their advantage across generations. This reflects:",
+        concept: "Sociological perspectives",
+        options: ["Functionalism", "Conflict theory", "Symbolic interactionism", "None of these perspectives address education"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—functionalism would explain persistence via a beneficial function for society as a whole.",
+          "Correct—explaining persistence via power and advantage maintenance is conflict theory's lens.",
+          "Incorrect—symbolic interactionism focuses on individual meaning-making, not macro-level power analysis.",
+          "Incorrect—this is a classic conflict theory explanation of education."
+        ]
+      },
+      {
+        question: "Schools transmitting literacy, skills, and cultural knowledge to each new generation is the core function of which institution?",
+        concept: "Major social institutions",
+        options: ["Family", "Education", "Religion", "Government"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—family centers on reproduction and early socialization.",
+          "Correct—transmitting knowledge and skills across generations is education's core function.",
+          "Incorrect—religion centers on shared meaning and moral guidance.",
+          "Incorrect—government centers on social order and collective decision-making."
+        ]
+      },
+      {
+        question: "A researcher studies how two strangers negotiate meaning and roles during a brief face-to-face conversation. This approach best reflects:",
+        concept: "Sociological perspectives",
+        options: ["Functionalism", "Conflict theory", "Symbolic interactionism", "The demographic transition model"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—functionalism is macro-level, focused on societal stability.",
+          "Incorrect—conflict theory is macro-level, focused on power and inequality.",
+          "Correct—studying meaning created through everyday individual interaction is symbolic interactionism's micro-level focus.",
+          "Incorrect—this is a demographic concept, unrelated to this scenario."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Social structure is just the scaffolding everyone moves through: statuses (some handed to you at birth, some earned), the roles expected of each status, and institutions that organize whole clusters of roles around one core job for society. The three perspectives are simply three different zoom levels for looking at that same scaffolding—functionalism zooms out to ask what purpose each piece serves, conflict theory zooms out to ask who benefits and who doesn't, and symbolic interactionism zooms all the way in to the actual moment-to-moment interactions where that structure gets lived out."
+  },
+  {
+    id: "social-stratification-inequality",
+    subjectId: "sociology",
+    sectionId: "psych-social",
+    title: "Social Stratification & Inequality",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "social-structure-institutions",
+    sections: [
+      {
+        heading: "Systems of Social Stratification",
+        body: "A class system stratifies mainly by wealth/income and allows some mobility. A caste system assigns fixed, inherited status at birth with little to no mobility. A meritocracy ideally stratifies by individual ability and effort, though rarely achieved in pure form.",
+        keyTerms: [
+          { term: "Class system", definition: "Stratification mainly by wealth/income, with some mobility possible." },
+          { term: "Caste system", definition: "Fixed, inherited status at birth, with little to no mobility." }
+        ]
+      },
+      {
+        heading: "Social Mobility",
+        body: "Intergenerational mobility compares social position across generations; intragenerational mobility compares one person's position over their own lifetime. Structural mobility results from broad societal/economic changes shifting many people's position at once.",
+        keyTerms: [
+          { term: "Intergenerational mobility", definition: "A change in social position between generations." },
+          { term: "Structural mobility", definition: "Mobility resulting from broad societal/economic changes, affecting many at once." }
+        ]
+      },
+      {
+        heading: "Explaining Stratification, and Poverty",
+        body: "Functionalist theory argues stratification motivates people to fill important roles. Conflict theory argues stratification persists because it benefits already-powerful groups. Absolute poverty is lacking basic survival needs; relative poverty is having significantly less than the surrounding society's norm.",
+        keyTerms: [
+          { term: "Absolute poverty", definition: "Lacking resources for basic survival needs, measured against a fixed standard." },
+          { term: "Relative poverty", definition: "Having significantly less than the typical standard of living in one's own society." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Class systems stratify by wealth with some mobility; caste systems assign fixed status at birth; meritocracy ideally stratifies by ability and effort.",
+      "Intergenerational mobility compares across generations; intragenerational mobility compares within one lifetime; structural mobility results from broad societal/economic shifts.",
+      "Functionalist theory explains stratification via social benefit; conflict theory via power maintenance. Absolute poverty lacks survival needs; relative poverty is below a society's typical standard."
+    ],
+    knowledgeCheck: [
+      { question: "What distinguishes a caste system from a class system?", answer: "A caste system assigns fixed status at birth with little to no mobility; a class system stratifies mainly by wealth/income and allows for some mobility based on individual achievement." },
+      { question: "How does structural mobility differ from mobility due to individual achievement?", answer: "Structural mobility results from broad societal or economic changes shifting many people's position at once, regardless of individual effort, rather than one person's own achievement or failure." }
+    ],
+    flashcards: [
+      { front: "Class system", back: "Stratifies by wealth; some mobility possible." },
+      { front: "Caste system", back: "Fixed status at birth; little to no mobility." },
+      { front: "Structural mobility", back: "Mobility from broad societal/economic change." },
+      { front: "Absolute poverty", back: "Lacking basic survival needs." },
+      { front: "Relative poverty", back: "Below the surrounding society's typical standard." }
+    ],
+    practiceQuestions: [
+      {
+        question: "In a society, position is determined entirely by family at birth, unchangeable through effort, with strong prohibitions on intergroup marriage. This describes:",
+        concept: "Systems of stratification",
+        options: ["A class system", "A caste system", "A meritocracy", "Social mobility"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—a class system allows at least some mobility.",
+          "Correct—fixed birth-assigned status with essentially no mobility is a caste system.",
+          "Incorrect—meritocracy is based on ability and effort, not fixed birth status.",
+          "Incorrect—social mobility is the concept of movement, not a stratification system itself."
+        ]
+      },
+      {
+        question: "A major economic downturn causes widespread layoffs across an entire industry, regardless of individual skill. This is best described as:",
+        concept: "Social mobility",
+        options: ["Intragenerational mobility from individual achievement", "Structural mobility", "A caste system", "Meritocracy functioning as intended"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this isn't about one individual's own effort or achievement.",
+          "Correct—a broad economic change moving many people's position at once, regardless of effort, is structural mobility.",
+          "Incorrect—this isn't about a fixed, inherited status system.",
+          "Incorrect—this scenario doesn't reflect merit-based position at all."
+        ]
+      },
+      {
+        question: "A family in a wealthy country meets basic survival needs but earns much less than their community's typical income. This is best described as:",
+        concept: "Poverty",
+        options: ["Absolute poverty", "Relative poverty", "Structural mobility", "A caste system"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—absolute poverty means lacking basic survival needs, which isn't the case here.",
+          "Correct—meeting survival needs but falling well below the surrounding society's typical standard is relative poverty.",
+          "Incorrect—this isn't about a broad societal shift in position.",
+          "Incorrect—this isn't about a fixed stratification system."
+        ]
+      },
+      {
+        question: "Functionalist theory explains social stratification primarily by arguing that:",
+        concept: "Explaining stratification",
+        options: ["It exists purely to benefit already-powerful groups", "Unequal rewards motivate people to pursue society's most important or difficult roles", "It has no real social purpose", "It is identical to a caste system in every society"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this is conflict theory's explanation, not functionalism's.",
+          "Correct—functionalism argues unequal rewards motivate people toward important roles, benefiting society overall.",
+          "Incorrect—functionalism specifically argues stratification does serve a social purpose.",
+          "Incorrect—stratification systems vary widely and aren't all caste systems."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Every society sorts people into a hierarchy, but how rigid that hierarchy is varies enormously—a caste system locks your position in at birth, while a class system (at least officially) leaves the door open for movement. Mobility itself comes in different flavors too: sometimes it's a story about one person's own life (intragenerational) or about a family across generations (intergenerational), and sometimes it's not really an individual story at all, just an entire economy shifting and taking huge numbers of people up or down with it (structural). And whether stratification is a necessary motivator (functionalism) or just entrenched advantage (conflict theory) is the same recurring theoretical disagreement as everywhere else in sociology."
+  },
+  {
+    id: "race-ethnicity-gender",
+    subjectId: "sociology",
+    sectionId: "psych-social",
+    title: "Race, Ethnicity & Gender",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "social-stratification-inequality",
+    sections: [
+      {
+        heading: "Race and Ethnicity as Social Constructs",
+        body: "Race and ethnicity are social constructs—categories created and given meaning by society rather than reflecting clear biological divisions. Ethnicity is based on shared cultural heritage; race is typically based on perceived physical characteristics. Both have real social consequences precisely because society treats them as significant.",
+        keyTerms: [
+          { term: "Social construct", definition: "A category created and given meaning by society, not a fixed biological fact." },
+          { term: "Ethnicity", definition: "Shared cultural heritage—language, ancestry, traditions." }
+        ]
+      },
+      {
+        heading: "Prejudice, Discrimination, and Stereotypes",
+        body: "A stereotype is a generalized belief about a group; prejudice is a negative attitude toward a group; discrimination is unequal treatment based on group membership—attitude and behavior don't always occur together.",
+        keyTerms: [
+          { term: "Prejudice", definition: "A negative attitude toward a group, typically rooted in stereotypes." },
+          { term: "Discrimination", definition: "Unequal, unfair treatment based on group membership." }
+        ]
+      },
+      {
+        heading: "Sex, Gender, and Intersectionality",
+        body: "Sex refers to biological characteristics; gender refers to socially constructed roles, behaviors, and identity. Intersectionality describes how overlapping identities (race, gender, class) combine to shape experience in ways not reducible to any single category.",
+        keyTerms: [
+          { term: "Gender", definition: "Socially constructed roles, behaviors, and identity associated with a gender." },
+          { term: "Intersectionality", definition: "Overlapping identities combining to shape experience beyond any single category alone." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Race and ethnicity are social constructs with real social consequences; race is typically based on perceived physical traits, ethnicity on shared cultural heritage.",
+      "A stereotype is a belief, prejudice is an attitude, and discrimination is behavior—the three don't always co-occur.",
+      "Sex is biological; gender is socially constructed. Intersectionality describes how overlapping identities combine to shape experience beyond any single category."
+    ],
+    knowledgeCheck: [
+      { question: "Why is race considered a social construct rather than a clean biological category?", answer: "Genetic research shows more variation within socially-defined racial groups than between them, and the meaning/boundaries of racial categories have shifted across history and culture." },
+      { question: "Can someone hold prejudiced attitudes without engaging in discrimination?", answer: "Yes—prejudice is an internal attitude, and discrimination is unequal treatment/behavior; a person can hold one without the other." }
+    ],
+    flashcards: [
+      { front: "Social construct", back: "A category created and given meaning by society." },
+      { front: "Prejudice", back: "Negative attitude toward a group." },
+      { front: "Discrimination", back: "Unequal treatment based on group membership." },
+      { front: "Gender", back: "Socially constructed roles/identity, distinct from biological sex." },
+      { front: "Intersectionality", back: "Overlapping identities combine to shape experience." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Genetic research finds more variation within socially-defined racial groups than between them. What does this support?",
+        concept: "Race and ethnicity as social constructs",
+        options: ["Race is purely biological with no social component", "Race is a social construct, since it doesn't correspond to clean genetic divisions", "This finding means race has no real effects", "This finding is only relevant to ethnicity"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this finding undermines, not supports, a purely biological view.",
+          "Correct—more within-group than between-group genetic variation undermines clean biological division, supporting social construction.",
+          "Incorrect—race still has real social consequences, despite not being a clean biological category.",
+          "Incorrect—this finding is specifically about race, not ethnicity."
+        ]
+      },
+      {
+        question: "A landlord privately holds negative beliefs about a group but has never treated any tenant from that group differently. This illustrates:",
+        concept: "Prejudice, discrimination, stereotypes",
+        options: ["Discrimination", "Prejudice without discrimination", "Intersectionality", "A social institution"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—no unequal treatment has actually occurred.",
+          "Correct—a negative attitude without accompanying unequal treatment is prejudice without discrimination.",
+          "Incorrect—this isn't about overlapping identity categories.",
+          "Incorrect—this isn't a social institution."
+        ]
+      },
+      {
+        question: "A researcher finds that the workplace experiences of women of color differ from both white women's and men of color's experiences, in ways not explained by race or gender alone. This is best explained by:",
+        concept: "Sex, gender, intersectionality",
+        options: ["Sex differences alone", "Intersectionality", "The bystander effect", "Structural mobility"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—sex differences alone can't explain a finding tied to race and gender combined.",
+          "Correct—a distinct experience emerging from overlapping identities, not reducible to either alone, is intersectionality.",
+          "Incorrect—this isn't about emergency helping behavior.",
+          "Incorrect—this isn't about a change in stratification position."
+        ]
+      },
+      {
+        question: "Which best distinguishes sex from gender?",
+        concept: "Sex, gender, intersectionality",
+        options: ["Sex and gender are identical terms with no meaningful difference", "Sex refers to biological characteristics; gender refers to socially constructed roles and identity", "Gender is purely biological; sex is purely social", "Sex refers only to gender identity"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—the two terms refer to genuinely different things.",
+          "Correct—sex is biological; gender is the socially constructed roles, behaviors, and identity associated with a gender.",
+          "Incorrect—this reverses the actual definitions.",
+          "Incorrect—this conflates sex with gender identity."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Race and ethnicity feel like solid biological facts, but sociology's point is that the actual dividing lines are drawn by society, not by clean genetics—which doesn't make their effects any less real, since people are treated according to those categories every day regardless. Stereotype, prejudice, and discrimination form a chain from belief to attitude to action, but the chain can break at any link—someone can hold a stereotype without prejudice, or prejudice without ever discriminating. And just as race/ethnicity are socially constructed, gender is too, layered on top of the more strictly biological category of sex—with intersectionality as the reminder that none of these categories operates alone in a person's actual, lived experience."
+  },
+  {
+    id: "population-demographics",
+    subjectId: "sociology",
+    sectionId: "psych-social",
+    title: "Population & Demographics",
+    estimatedMinutes: 25,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "race-ethnicity-gender",
+    sections: [
+      {
+        heading: "Basic Demographic Measures",
+        body: "Birth rate and death rate (per 1,000 per year) and fertility rate (average births per woman) describe a population's vital statistics. A population pyramid visually represents age/sex structure—a wide base indicates a young, rapidly growing population.",
+        keyTerms: [
+          { term: "Fertility rate", definition: "Average number of children born per woman over her reproductive lifetime." },
+          { term: "Population pyramid", definition: "A graph of a population's age and sex distribution." }
+        ]
+      },
+      {
+        heading: "The Demographic Transition Model",
+        body: "Stage 1: high birth and death rates, slow growth. Stage 2: death rates fall while birth rates stay high, rapid growth. Stage 3: birth rates begin falling too, slowing growth. Stage 4: low birth and death rates, stable population.",
+        keyTerms: [
+          { term: "Demographic transition model", definition: "A predictable pattern of shifting birth/death rates as societies industrialize." }
+        ]
+      },
+      {
+        heading: "Migration and Urbanization",
+        body: "Push factors drive people to leave a location; pull factors attract people to a new one. Urbanization—growth of cities relative to rural areas—is driven by economic opportunity and is linked to lower birth rates.",
+        keyTerms: [
+          { term: "Push factor", definition: "A negative condition driving migration away from a location." },
+          { term: "Pull factor", definition: "A positive condition attracting migration toward a new location." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Birth rate, death rate, and fertility rate describe a population's vital statistics; a population pyramid's shape reveals age structure and growth trajectory.",
+      "The demographic transition model describes a predictable shift from high birth/death rates through rapid growth (falling death rate) to stable low rates.",
+      "Push factors drive migration away from a location; pull factors attract it. Urbanization is driven by economic opportunity and linked to lower birth rates."
+    ],
+    knowledgeCheck: [
+      { question: "What does a wide-based population pyramid indicate?", answer: "A young, rapidly growing population with a high birth rate." },
+      { question: "What specifically drives the rapid population growth of stage 2 in the demographic transition model?", answer: "Death rates fall sharply (due to improved sanitation, medicine, food supply) while birth rates remain high, producing rapid growth." }
+    ],
+    flashcards: [
+      { front: "Fertility rate", back: "Average births per woman." },
+      { front: "Population pyramid", back: "Graph of age/sex structure." },
+      { front: "Demographic transition stage 2", back: "Death rate falls, birth rate stays high; rapid growth." },
+      { front: "Push factor", back: "Negative condition driving migration away." },
+      { front: "Pull factor", back: "Positive condition attracting migration toward." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A population pyramid shows a very wide base narrowing sharply with older age groups. What does this indicate?",
+        concept: "Demographic measures",
+        options: ["A shrinking, aging population", "A young, rapidly growing population with a high birth rate", "Equal numbers in every age group", "Significant emigration only"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—a shrinking population would show a narrower base, not wider.",
+          "Correct—a wide base narrowing with age indicates many more young than old, reflecting high birth rate and growth.",
+          "Incorrect—equal numbers would produce a rectangular, not pyramid, shape.",
+          "Incorrect—this shape reflects birth rate, not emigration specifically."
+        ]
+      },
+      {
+        question: "A developing country's death rate falls sharply due to improved medical care while birth rates remain high, producing rapid growth. This is most likely:",
+        concept: "Demographic transition model",
+        options: ["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—stage 1 has both rates high, with slow growth.",
+          "Correct—falling death rate with still-high birth rate, producing rapid growth, is stage 2.",
+          "Incorrect—stage 3 involves birth rates beginning to decline as well.",
+          "Incorrect—stage 4 has both rates low and stable."
+        ]
+      },
+      {
+        question: "A family leaves due to political persecution and moves to a country with relatives and job opportunities. Which is a pull factor here?",
+        concept: "Migration",
+        options: ["The political persecution", "The relatives and job opportunities in the new country", "Both are push factors", "Neither is a push or pull factor"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—persecution is a push factor, driving them away.",
+          "Correct—relatives and job opportunities are positive conditions attracting them, making them pull factors.",
+          "Incorrect—only the persecution is a push factor; the other is a pull factor.",
+          "Incorrect—both are clearly push/pull factors in this scenario."
+        ]
+      },
+      {
+        question: "Urbanization is most closely associated with which demographic trend?",
+        concept: "Migration and urbanization",
+        options: ["Higher birth rates", "Lower birth rates", "No change in birth rate", "Only affects death rate, not birth rate"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—urbanization is associated with lower, not higher, birth rates.",
+          "Correct—urban living is associated with lower birth rates, due to factors like cost of raising children and access to family planning.",
+          "Incorrect—urbanization is linked to a real, measurable shift in birth rate.",
+          "Incorrect—urbanization is specifically linked to birth rate trends, not just death rate."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Demography turns a population into a handful of vital signs—birth rate, death rate, fertility rate—and a population pyramid is just a picture of what those vital signs have produced over time: a wide base means lots of recent births, a narrow one means the opposite. The demographic transition model tracks a fairly predictable story as a society industrializes: death rates fall first (thanks to medicine and sanitation), causing a population boom, and only later do birth rates catch up and fall too, eventually leveling the whole thing off. Migration and urbanization are the other half of the population picture—people don't just get born and die in place, they move, pushed away from bad conditions and pulled toward better ones, often concentrating in cities as they go."
+  },
+  {
+    id: "health-healthcare-social-determinants",
+    subjectId: "sociology",
+    sectionId: "psych-social",
+    title: "Health, Healthcare & Social Determinants",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    prerequisiteLessonId: "population-demographics",
+    sections: [
+      {
+        heading: "Social Determinants of Health",
+        body: "Socioeconomic status is one of the most consistent predictors of health outcomes; neighborhood/environment and social support also substantially shape health, independent of individual behavior or genetics.",
+        keyTerms: [
+          { term: "Social determinants of health", definition: "Non-medical conditions (SES, education, environment, social support) that shape health outcomes." }
+        ]
+      },
+      {
+        heading: "Healthcare Disparities and Access",
+        body: "Financial, geographic, and systemic barriers (including implicit bias) drive unequal healthcare access. Healthcare disparities are measurable differences in outcomes/access/quality between groups, not explained by differences in underlying medical need.",
+        keyTerms: [
+          { term: "Healthcare disparity", definition: "Unequal health outcomes, access, or quality of care between groups, not explained by medical need." }
+        ]
+      },
+      {
+        heading: "The Sick Role and Stigma",
+        body: "Parsons' sick role has two rights (exemption from responsibilities, no blame) and two obligations (seeking help, wanting to get well). Stigma attached to a condition can discourage people from seeking diagnosis or treatment.",
+        keyTerms: [
+          { term: "Sick role", definition: "Parsons' framework: illness as a social role with rights and obligations." },
+          { term: "Stigma", definition: "A negative social label attached to a condition, often discouraging care-seeking." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "Social determinants of health—SES, education, neighborhood/environment, social support—shape health outcomes substantially, often independent of individual behavior.",
+      "Healthcare disparities are unequal outcomes/access/quality between groups, driven by financial, geographic, and systemic barriers—distinct from broader social determinants.",
+      "Parsons' sick role frames illness as a social role with rights (exemption, no blame) and obligations (seeking help, wanting to recover); stigma can discourage care-seeking."
+    ],
+    knowledgeCheck: [
+      { question: "How do healthcare disparities differ from social determinants of health?", answer: "Healthcare disparities are specifically about unequal access, treatment, or outcomes within the healthcare system itself; social determinants are the broader social/economic conditions shaping health generally." },
+      { question: "What are the two obligations of Parsons' sick role?", answer: "Wanting to get well, and seeking competent help (such as medical treatment)." }
+    ],
+    flashcards: [
+      { front: "Social determinants of health", back: "Non-medical conditions shaping health (SES, environment, etc.)." },
+      { front: "Healthcare disparity", back: "Unequal outcomes/access/quality between groups." },
+      { front: "Sick role rights", back: "Exemption from responsibilities; not blamed for illness." },
+      { front: "Sick role obligations", back: "Want to get well; seek competent help." },
+      { front: "Stigma", back: "Negative label that can discourage care-seeking." }
+    ],
+    practiceQuestions: [
+      {
+        question: "Residents of a low-income neighborhood with limited access to fresh produce have higher rates of diet-related disease than a nearby higher-income neighborhood. This is best explained by:",
+        concept: "Social determinants of health",
+        options: ["Genetic differences between neighborhoods", "A social determinant of health—limited access to healthy food tied to neighborhood/SES", "Random chance, unrelated to any social factor", "Differences in fertility rate"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—no basis for attributing this to genetics.",
+          "Correct—limited food access tied to neighborhood/SES conditions is a clear social determinant of health.",
+          "Incorrect—this is a well-documented, non-random pattern.",
+          "Incorrect—fertility rate is unrelated to this finding."
+        ]
+      },
+      {
+        question: "Even after controlling for insurance and illness severity, patients from a particular group receive less aggressive pain management than clinically similar patients. This is evidence of:",
+        concept: "Healthcare disparities",
+        options: ["A social determinant of health", "A healthcare disparity", "Structural mobility", "The demographic transition"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this is about unequal treatment within healthcare, not broader social conditions.",
+          "Correct—unequal quality of care not explained by insurance or need is specifically a healthcare disparity.",
+          "Incorrect—this isn't about social stratification mobility.",
+          "Incorrect—this isn't a demographic transition concept."
+        ]
+      },
+      {
+        question: "Which of the following is one of the obligations (not rights) of Parsons' sick role?",
+        concept: "The sick role",
+        options: ["Exemption from normal work responsibilities", "Not being blamed for the illness", "Seeking competent medical help and wanting to get well", "Receiving unconditional support regardless of behavior"],
+        correctIndex: 2,
+        optionExplanations: [
+          "Incorrect—this is one of the sick role's rights, not obligations.",
+          "Incorrect—this is also one of the sick role's rights.",
+          "Correct—seeking help and wanting to recover are the sick role's two obligations.",
+          "Incorrect—support isn't unconditional; it depends on meeting the obligations."
+        ]
+      },
+      {
+        question: "A condition carrying significant social stigma sees reduced rates of people seeking diagnosis. What does this illustrate?",
+        concept: "Stigma",
+        options: ["The demographic transition model", "Stigma discouraging health-seeking behavior due to social costs", "A healthcare disparity specifically caused by insurance status", "Structural mobility"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this isn't a demographic concept.",
+          "Correct—stigma's social costs (shame, discrimination) discouraging care-seeking is exactly this concept.",
+          "Incorrect—this scenario isn't specifically about insurance-driven disparity.",
+          "Incorrect—this isn't about stratification mobility."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Health outcomes are shaped by forces well outside a doctor's office—income, neighborhood, and education (social determinants) do enormous work before anyone even seeks care, and healthcare disparities show that even once people do seek care, they aren't always treated equally once they get there. Parsons' sick role reframes illness itself as something social, not just biological—being sick comes with real privileges (skipping work, not being blamed) but also real expectations (actually trying to get better), and stigma is what can quietly break that whole bargain by making people avoid seeking help in the first place."
+  }
+];
+
+const biologicalBasesLessons: LessonContent[] = [
+  {
+    id: "brain-behavior-hormones-genetics",
+    subjectId: "biological-bases",
+    sectionId: "psych-social",
+    title: "Brain, Behavior, Hormones & Genetics",
+    estimatedMinutes: 35,
+    difficulty: "Advanced",
+    prerequisiteLessonId: "health-healthcare-social-determinants",
+    sections: [
+      {
+        heading: "Brain Structures and Behavior",
+        body: "The limbic system (amygdala for fear, hippocampus for new long-term memory formation) governs emotion and memory. The cerebral cortex's four lobes each handle distinct functions: frontal (reasoning, movement, impulse control), parietal (touch, spatial awareness), temporal (hearing, language), and occipital (vision).",
+        keyTerms: [
+          { term: "Amygdala", definition: "Processes fear and threat detection." },
+          { term: "Hippocampus", definition: "Critical for forming new long-term (especially explicit) memories." },
+          { term: "Frontal lobe", definition: "Handles reasoning, planning, voluntary movement, and impulse control." }
+        ]
+      },
+      {
+        heading: "Hormones and Behavior",
+        body: "The HPA axis (hypothalamus → pituitary → adrenal glands) governs the stress response via cortisol release. Oxytocin promotes social bonding and trust; testosterone is associated with aggression and dominance behavior, shaped substantially by social context.",
+        keyTerms: [
+          { term: "HPA axis", definition: "Hypothalamus-pituitary-adrenal pathway governing the stress response via cortisol." },
+          { term: "Oxytocin", definition: "A hormone promoting social bonding and trust." }
+        ]
+      },
+      {
+        heading: "Behavioral Genetics",
+        body: "Twin and adoption studies help estimate heritability—the proportion of trait variation across a population attributable to genetic differences, not a statement about any individual. Gene-environment interaction shows genetic predisposition and environment jointly shape outcomes.",
+        keyTerms: [
+          { term: "Heritability", definition: "The proportion of trait variation across a population attributable to genetic differences." },
+          { term: "Gene-environment interaction", definition: "Genetic predisposition's effect on behavior often depends on environmental context." }
+        ]
+      }
+    ],
+    keyTakeaways: [
+      "The limbic system (amygdala, hippocampus) governs emotion and memory; the cerebral cortex's four lobes each handle distinct higher-order functions.",
+      "The HPA axis (hypothalamus → pituitary → adrenal glands) governs the stress response via cortisol; oxytocin promotes bonding, and testosterone is linked to aggression/dominance.",
+      "Heritability describes population-level trait variation attributable to genetics, not any individual's trait origin; gene-environment interaction shows genes and environment jointly shape outcomes."
+    ],
+    knowledgeCheck: [
+      { question: "What is the correct order of activation in the HPA axis?", answer: "Hypothalamus → pituitary gland → adrenal glands → cortisol release." },
+      { question: "What does a heritability of 60% for a trait actually mean?", answer: "60% of the variation in that trait across the studied population is attributable to genetic differences—not that 60% of any individual's trait is 'caused by genes.'" }
+    ],
+    flashcards: [
+      { front: "Amygdala", back: "Fear and threat detection." },
+      { front: "Hippocampus", back: "Forms new long-term memories." },
+      { front: "HPA axis", back: "Hypothalamus → pituitary → adrenal → cortisol." },
+      { front: "Oxytocin", back: "Promotes social bonding and trust." },
+      { front: "Heritability", back: "Population-level trait variation attributable to genetics." }
+    ],
+    practiceQuestions: [
+      {
+        question: "A patient with bilateral hippocampal damage can't form new long-term memories, though older memories remain intact. This is most consistent with damage to a structure primarily responsible for:",
+        concept: "Brain structures and behavior",
+        options: ["Fear and threat detection", "Forming new long-term memories", "Visual processing", "Voluntary movement"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—that's the amygdala's role, not the hippocampus's.",
+          "Correct—the hippocampus is critical for forming new long-term memories, matching this classic presentation.",
+          "Incorrect—that's the occipital lobe's role.",
+          "Incorrect—that's the frontal lobe's role."
+        ]
+      },
+      {
+        question: "Which sequence correctly describes the HPA axis's order of activation in the stress response?",
+        concept: "Hormones and behavior",
+        options: ["Adrenal glands → pituitary → hypothalamus → cortisol", "Hypothalamus → pituitary → adrenal glands → cortisol", "Pituitary → hypothalamus → adrenal glands → cortisol", "Hypothalamus → adrenal glands → pituitary → cortisol"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—this reverses the correct order.",
+          "Correct—hypothalamus signals pituitary, which signals adrenal glands, which release cortisol.",
+          "Incorrect—the hypothalamus initiates the pathway, not the pituitary.",
+          "Incorrect—the pituitary comes between the hypothalamus and adrenal glands, not after."
+        ]
+      },
+      {
+        question: "A researcher reports a personality trait has 60% heritability in the studied population. What does this mean?",
+        concept: "Behavioral genetics",
+        options: ["60% of any individual's personality is directly caused by genes", "60% of the variation in this trait across the population is attributable to genetic differences", "The trait is inherited in 60% of cases", "Environment has no meaningful effect on this trait"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—heritability doesn't describe any individual's trait origin.",
+          "Correct—heritability is a population-level statistic about variation attributable to genetic differences.",
+          "Incorrect—this misinterprets heritability as an inheritance probability.",
+          "Incorrect—heritability doesn't rule out environmental influence."
+        ]
+      },
+      {
+        question: "A genetic risk factor for a disorder only actually produces the disorder in the presence of a specific environmental stressor. This best illustrates:",
+        concept: "Behavioral genetics",
+        options: ["Heritability alone", "Gene-environment interaction", "The HPA axis", "Oxytocin's role in bonding"],
+        correctIndex: 1,
+        optionExplanations: [
+          "Incorrect—heritability is a population statistic, not this specific dependency pattern.",
+          "Correct—a genetic predisposition's effect depending on environmental context is gene-environment interaction.",
+          "Incorrect—this isn't specifically about the stress response pathway.",
+          "Incorrect—this isn't about social bonding."
+        ]
+      }
+    ],
+    simplifiedExplanation: "Every psychological and social process this whole section covers ultimately runs on biological hardware. The limbic system and cortex are the brain's specialized departments—one handling emotion and memory, the other handling reasoning, movement, and the senses, each with its own dedicated real estate. Hormones are the body's slower, broadcast-style messaging system layered on top of fast neural signals—the HPA axis is the stress broadcast, and oxytocin/testosterone shape bonding and aggression in their own ways. And behavioral genetics closes the loop by showing that genes never act alone—heritability describes population-level patterns, not individual destiny, and gene-environment interaction is the reminder that a genetic predisposition usually still needs the right (or wrong) environment to actually show up as behavior."
+  }
+];
+
+const lessonContentList: LessonContent[] = [...biologyLessons, ...cellBiologyLessons, ...geneticsLessons, ...biochemistryLessons, ...organSystemsLessons, ...evolutionEcologyLessons, ...generalChemistryLessons, ...organicChemistryLessons, ...physicsLessons, ...psychologyLessons, ...socialPsychologyLessons, ...sociologyLessons, ...biologicalBasesLessons];
 
 export const lessonContentMap: Record<string, LessonContent> = Object.fromEntries(lessonContentList.map(l => [l.id, l]));
 
